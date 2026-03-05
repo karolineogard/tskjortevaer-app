@@ -3,3 +3,4 @@
 Navn på teamet:
 Ingrid\
 Karoline\
+Eirik
