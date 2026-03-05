@@ -1,4 +1,5 @@
 # Team 32
 
-Navn på teamet: \n
-Ingrid\n
+Navn på teamet:
+Ingrid\
+Karoline\
