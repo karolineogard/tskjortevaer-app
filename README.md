@@ -1,6 +1,7 @@
 # Team 32
 
-Navn på teamet:
+Navn på teamet:\
 Ingrid\
 Karoline\
-Eirik
+Eirik\
+Isak\
