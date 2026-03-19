@@ -8,7 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
-import no.uio.ifi.in2000.ieulrich.team32.model.MapViewModel
+import no.uio.ifi.in2000.ieulrich.team32.ui.victoriaWMS.MapViewModel
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapView
