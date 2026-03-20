@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Team32Theme {
-                LocationForecastScreen(lat = 60.0, lon = 11.0)
+                MapScreen()
             }
         }
     }
