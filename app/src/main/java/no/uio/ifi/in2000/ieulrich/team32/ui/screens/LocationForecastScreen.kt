@@ -1,0 +1,4 @@
+package no.uio.ifi.in2000.ieulrich.team32.ui.screens
+
+class LocationForecastScreen {
+}
