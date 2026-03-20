@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Units(
     @SerialName("air_pressure_at_sea_level") val airPressureAtSeaLevel: String,
-    @SerialName("air_pressure_at_sea_level") val airTemperature: String,
+    @SerialName("air_temperature") val airTemperature: String,
     @SerialName("cloud_area_fraction") val cloudAreaFraction: String,
     @SerialName("precipitation_amount") val precipitationAmount: String,
     @SerialName("relative_humidity") val relativeHumidity: String,

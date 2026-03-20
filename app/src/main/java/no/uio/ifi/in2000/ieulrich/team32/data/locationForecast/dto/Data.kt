@@ -5,8 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Data(
+    // kan også legge til 6 og 12 timer om vi trenger
     val instant: Instant,
     @SerialName("next_1_hours") val next1Hours: NextHours? = null,
-    @SerialName("next_6_hours") val next6Hours: NextHours? = null,
-    @SerialName("next_12_hours") val next12Hours: NextHours? = null
 )
