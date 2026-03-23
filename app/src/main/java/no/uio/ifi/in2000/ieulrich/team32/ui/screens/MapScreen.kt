@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -29,20 +30,45 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavHost
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import no.uio.ifi.in2000.ieulrich.team32.model.victoriaWMS.WeatherLayer
 
 @Composable
 fun MapApp(
-    navController: NavController = rememberNavController(),
+    navController: NavHostController = rememberNavController(),
     modifier: Modifier = Modifier
 ){
 
+    Scaffold(
+        topBar = { } // fiks senere
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = "map",
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable(route = "map") {
+                MapScreen(navController = navController)
+            }
+
+            composable(route = "forecast?lat={lat}&lon={lon}") { backStackEntry ->
+                val lat = backStackEntry.arguments?.getString("lat")?.toDoubleOrNull()
+                val lon = backStackEntry.arguments?.getString("lon")?.toDoubleOrNull()
+                LocationForecastScreen(lat = lat, lon = lon)
+            }
+        }
+    }
 }
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
-    viewModel: MapViewModel = viewModel()
+    viewModel: MapViewModel = viewModel(),
+    navController: NavController
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var mapRef by remember { mutableStateOf<org.maplibre.android.maps.MapLibreMap?>(null)}
@@ -67,6 +93,7 @@ fun MapScreen(
                             val lat = point.latitude
                             val lon = point.longitude
                             Log.d("Map click", "Lat: $lat, Lng: $lon")
+                            navController.navigate("forecast?lat=$lat&lon=$lon")
                             true
                         }
                     }
