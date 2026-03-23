@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -27,8 +28,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import no.uio.ifi.in2000.ieulrich.team32.model.victoriaWMS.WeatherLayer
 
+@Composable
+fun MapApp(
+    navController: NavController = rememberNavController(),
+    modifier: Modifier = Modifier
+){
+
+}
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
@@ -52,6 +62,12 @@ fun MapScreen(
                                 .build()
                             
                             updateWmsLayer(style, uiState.wmsUrl, uiState.currentLayer.name)
+                        }
+                        map.addOnMapClickListener { point ->
+                            val lat = point.latitude
+                            val lon = point.longitude
+                            Log.d("Map click", "Lat: $lat, Lng: $lon")
+                            true
                         }
                     }
                 }

@@ -69,4 +69,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
     implementation("io.ktor:ktor-client-okhttp:2.3.7")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
+
+    // navigation stuff
+    implementation("androidx.navigation:navigation-compose:2.7.4")
 }
