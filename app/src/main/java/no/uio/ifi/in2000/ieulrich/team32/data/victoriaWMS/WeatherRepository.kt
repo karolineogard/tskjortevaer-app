@@ -18,6 +18,6 @@ class WeatherRepositoryImpl: WeatherRepository {
                 "&width=256" +
                 "&height=256" +
                 "&bbox={bbox-epsg-3857}" +
-                "&time=2026-03-19T11:00:00Z"
+                "&time=2026-03-25T12:00:00Z"
     }
 }
