@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,6 +29,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.ieulrich.team32.model.victoriaWMS.WeatherLayer
+import org.maplibre.android.style.sources.GeoJsonSource
+import java.net.URI
+import org.maplibre.android.style.layers.FillLayer
+import org.maplibre.android.style.layers.PropertyFactory
+
 
 @Composable
 fun MapScreen(
@@ -52,6 +58,7 @@ fun MapScreen(
                                 .build()
                             
                             updateWmsLayer(style, uiState.wmsUrl, uiState.currentLayer.name)
+                            updateAlertsLayer(style, uiState.showAlerts, uiState.alertsUrl)
                         }
                     }
                 }
@@ -59,57 +66,74 @@ fun MapScreen(
             modifier = Modifier.fillMaxSize()
         )
 
-        LaunchedEffect(uiState.wmsUrl) {
+        LaunchedEffect(uiState.wmsUrl, uiState.showAlerts) {
             val map = mapRef ?: return@LaunchedEffect
 
             map.getStyle { style ->
                 updateWmsLayer(style, uiState.wmsUrl, uiState.currentLayer.name)
+                updateAlertsLayer(style, uiState.showAlerts, uiState.alertsUrl)
             }
         }
 
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
                 .align(Alignment.BottomCenter),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
 
-            Button(
-                onClick = { viewModel.onLayerSelected(WeatherLayer.TEMPERATURE) },
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (uiState.currentLayer == WeatherLayer.TEMPERATURE) Color(
-                        0xFF3F51B5
-                    ) else Color.Gray
-                )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text("Temp", maxLines = 1)
+
+                Button(
+                    onClick = { viewModel.onLayerSelected(WeatherLayer.TEMPERATURE) },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (uiState.currentLayer == WeatherLayer.TEMPERATURE) Color(
+                            0xFF3F51B5
+                        ) else Color.Gray
+                    )
+                ) {
+                    Text("Temp", maxLines = 1)
+                }
+
+                Button(
+                    onClick = { viewModel.onLayerSelected(WeatherLayer.PRECIPITATION) },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (uiState.currentLayer == WeatherLayer.PRECIPITATION) Color(
+                            0xFF3F51B5
+                        ) else Color.Gray
+                    )
+                ) {
+                    Text("Nedbør", maxLines = 1)
+                }
+
+                Button(
+                    onClick = { viewModel.onLayerSelected(WeatherLayer.WIND) },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (uiState.currentLayer == WeatherLayer.WIND) Color(
+                            0xFF3F51B5
+                        ) else Color.Gray
+                    )
+                ) {
+                    Text("Vind", maxLines = 1)
+                }
+            }
+            Button(
+                onClick = { viewModel.toggleAlerts()},
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (uiState.showAlerts) Color(0xFFFF9800) else Color.Gray)
+            ) {
+                Text(if (uiState.showAlerts) "Skjul farevarsel" else "Vis farevarsel")
             }
 
-            Button(
-                onClick = { viewModel.onLayerSelected(WeatherLayer.PRECIPITATION) },
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (uiState.currentLayer == WeatherLayer.PRECIPITATION) Color(
-                        0xFF3F51B5
-                    ) else Color.Gray
-                )
-            ) {
-                Text("Nedbør", maxLines = 1)
-            }
-
-            Button(
-                onClick = { viewModel.onLayerSelected(WeatherLayer.WIND) },
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (uiState.currentLayer == WeatherLayer.WIND) Color(
-                        0xFF3F51B5
-                    ) else Color.Gray
-                )
-            ) {
-                Text("Vind", maxLines = 1)
-            }
         }
     }
 }
@@ -134,4 +158,21 @@ private fun updateWmsLayer(style: Style, wmsUrl: String, layerId: String) {
 
     val rasterLayer = RasterLayer(layerId, sourceId)
     style.addLayer(rasterLayer)
+}
+
+private fun updateAlertsLayer(style: Style, show: Boolean, alertsUrl: String){
+    style.removeLayer("alerts-layer")
+    style.removeSource("alerts-source")
+
+    if (!show || alertsUrl.isEmpty()) return
+
+    val geoJsonSource = GeoJsonSource("alerts-source", URI(alertsUrl))
+    style.addSource(geoJsonSource)
+
+    val fillLayer = FillLayer("alerts-layer", "alerts-source")
+    fillLayer.setProperties(
+        PropertyFactory.fillColor(Color(0x80FF0000).hashCode()),
+        PropertyFactory.fillOutlineColor(Color.Red.hashCode())
+    )
+    style.addLayer(fillLayer)
 }
