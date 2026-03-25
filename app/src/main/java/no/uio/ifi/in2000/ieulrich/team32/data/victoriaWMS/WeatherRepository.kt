@@ -5,6 +5,8 @@ import no.uio.ifi.in2000.ieulrich.team32.model.victoriaWMS.WeatherLayer
 
 interface WeatherRepository{
     fun getWmsUrl(layer: WeatherLayer): String
+
+    fun getAlertsUrl(): String
 }
 
 class WeatherRepositoryImpl: WeatherRepository {
@@ -19,5 +21,8 @@ class WeatherRepositoryImpl: WeatherRepository {
                 "&height=256" +
                 "&bbox={bbox-epsg-3857}" +
                 "&time=2026-03-25T12:00:00Z"
+    }
+    override fun getAlertsUrl(): String {
+        return "https://api.met.no/weatherapi/metalerts/2.0/current.json"
     }
 }

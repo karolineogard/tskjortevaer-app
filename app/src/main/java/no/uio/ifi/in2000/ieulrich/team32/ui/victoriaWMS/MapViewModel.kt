@@ -12,16 +12,30 @@ import no.uio.ifi.in2000.ieulrich.team32.model.victoriaWMS.WeatherLayer
 data class MapUiState(
     // Enkel WMS-URL for temperatur. {bbox-epsg-3857} er påkrevd for at MapLibre skal vite hvor filene skal hentes.
     val currentLayer: WeatherLayer = WeatherLayer.TEMPERATURE,
-    val wmsUrl: String = ""
+    val wmsUrl: String = "",
+    val showAlerts: Boolean = false,
+    val alertsUrl: String = "",
         )
 
 class MapViewModel(
     private val repository: WeatherRepository = WeatherRepositoryImpl()
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(MapUiState())
+    private val _uiState = MutableStateFlow(MapUiState(alertsUrl = repository.getAlertsUrl()))
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
 
+    init{
+        updateLayer(WeatherLayer.TEMPERATURE)
+    }
+
     fun onLayerSelected(layer: WeatherLayer) {
+        updateLayer(layer)
+    }
+
+    fun toggleAlerts(){
+        _uiState.update { it.copy(showAlerts = !it.showAlerts) }
+    }
+
+    private fun updateLayer(layer: WeatherLayer) {
         _uiState.update { it.copy(
             currentLayer = layer,
             wmsUrl = repository.getWmsUrl(layer)
