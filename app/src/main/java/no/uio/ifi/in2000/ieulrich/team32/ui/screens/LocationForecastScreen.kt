@@ -28,11 +28,16 @@ import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 @Composable
 fun LocationForecastScreen(
     viewmodel: LocationForecastViewmodel = viewModel(),
-    lat: Double,
-    lon: Double
+    lat: Double?,
+    lon: Double?
 ) {
-    LaunchedEffect(lat, lon) {
-        viewmodel.getForecast(lat, lon)
+    if (lat == null || lon == null){
+        // håndter null-verdier her
+    }
+    else {
+        LaunchedEffect(lat, lon) {
+            viewmodel.getForecast(lat, lon)
+        }
     }
     val forecast by viewmodel.forecast.collectAsState()
 
