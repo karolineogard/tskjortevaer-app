@@ -1,8 +1,6 @@
 package no.uio.ifi.in2000.ieulrich.team32.model.metAlerts
 
-import kotlinx.serialization.Serializable
-
-class metAlert {
+class MetAlert {
 
     data class MetAlert(
         val event:  String? = null,
