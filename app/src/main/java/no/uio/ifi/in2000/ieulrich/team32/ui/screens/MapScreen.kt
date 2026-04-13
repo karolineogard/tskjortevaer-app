@@ -40,6 +40,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
 import no.uio.ifi.in2000.ieulrich.team32.model.victoriaWMS.WeatherLayer
+import no.uio.ifi.in2000.ieulrich.team32.ui.victoriaWMS.MapUiState
+import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.style.sources.GeoJsonSource
 import java.net.URI
 import org.maplibre.android.style.layers.FillLayer
@@ -80,9 +82,11 @@ fun MapScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var mapRef by remember { mutableStateOf<org.maplibre.android.maps.MapLibreMap?>(null)}
+    val showAlersActive by rememberUpdatedState(uiState.showAlerts)
+
     if (uiState.selectedAlert != null){
         AlertDetailScreen(
-            aler = uiState.selectedAlert!!,
+            alert = uiState.selectedAlert!!,
             onBack = {viewModel.selectAlert(null)}
         )
 
@@ -102,16 +106,23 @@ fun MapScreen(
                                     .zoom(5.0)
                                     .build()
 
-                                updateWmsLayer(style, uiState.wmsUrl, uiState.currentLayer.name)
+                                updateWmsLayer(style, uiState.wmsUrl, uiState.currentLayer?.name?: "none")
                                 updateAlertsLayer(style, uiState.showAlerts, uiState.alertsUrl)
                             }
-                            map.addOnMapClickListener { point ->
-                                val lat = point.latitude
-                                val lon = point.longitude
-                                Log.d("Map click", "Lat: $lat, Lng: $lon")
-                                navController.navigate("forecast?lat=$lat&lon=$lon")
-                                true
-                            }
+
+
+                                map.addOnMapClickListener { point ->
+                                    if(showAlersActive){
+                                        return@addOnMapClickListener false
+                                    }
+
+                                    val lat = point.latitude
+                                    val lon = point.longitude
+                                    Log.d("Map click", "Lat: $lat, Lng: $lon")
+                                    navController.navigate("forecast?lat=$lat&lon=$lon")
+                                    true
+                                }
+
                             map.addOnMapClickListener { point ->
                                 val features = map.queryRenderedFeatures(map.projection.toScreenLocation(point), "alerts-layer")
                                 if (features.isNotEmpty()) {
@@ -162,7 +173,9 @@ fun MapScreen(
                 ) {
 
                     Button(
-                        onClick = { viewModel.onLayerSelected(WeatherLayer.TEMPERATURE) },
+                        onClick = { viewModel.onLayerSelected(WeatherLayer.TEMPERATURE)
+
+                            },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (uiState.currentLayer == WeatherLayer.TEMPERATURE) Color(
@@ -174,7 +187,8 @@ fun MapScreen(
                     }
 
                     Button(
-                        onClick = { viewModel.onLayerSelected(WeatherLayer.PRECIPITATION) },
+                        onClick = { viewModel.onLayerSelected(WeatherLayer.PRECIPITATION)
+                            },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (uiState.currentLayer == WeatherLayer.PRECIPITATION) Color(
@@ -186,7 +200,9 @@ fun MapScreen(
                     }
 
                     Button(
-                        onClick = { viewModel.onLayerSelected(WeatherLayer.WIND) },
+                        onClick = {
+                            viewModel.onLayerSelected(WeatherLayer.WIND)
+                        },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (uiState.currentLayer == WeatherLayer.WIND) Color(
@@ -198,7 +214,8 @@ fun MapScreen(
                     }
 
                     Button(
-                        onClick = { viewModel.onAlertsSelected() },
+                        onClick = { viewModel.onAlertsSelected()
+                            },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (uiState.showAlerts) Color(0xFFFF9800) else Color.Gray
@@ -212,6 +229,7 @@ fun MapScreen(
     }
     }
 }
+
 
 private fun updateWmsLayer(style: Style, wmsUrl: String, layerId: String) {
 

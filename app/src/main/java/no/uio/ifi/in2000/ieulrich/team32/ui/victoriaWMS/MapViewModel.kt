@@ -9,6 +9,7 @@ import no.uio.ifi.in2000.ieulrich.team32.data.victoriaWMS.WeatherRepository
 import no.uio.ifi.in2000.ieulrich.team32.data.victoriaWMS.WeatherRepositoryImpl
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
 import no.uio.ifi.in2000.ieulrich.team32.model.victoriaWMS.WeatherLayer
+import kotlin.Boolean
 
 data class MapUiState(
     val currentLayer: WeatherLayer? = WeatherLayer.TEMPERATURE,
@@ -25,6 +26,8 @@ class MapViewModel(
     private val _uiState = MutableStateFlow(MapUiState(alertsUrl = repository.getAlertsUrl()))
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
 
+    var alertScreen : Boolean = false
+
     init{
         updateLayer(WeatherLayer.TEMPERATURE)
     }
@@ -37,16 +40,19 @@ class MapViewModel(
         _uiState.update { it.copy(
             currentLayer = null,
             wmsUrl = "",
-            showAlerts = true
+            showAlerts = true,
+
         )
 
         }
+
     }
 
     fun selectAlert(alert: MetAlert?){
         _uiState.update { it.copy(
             selectedAlert = alert
         ) }
+
     }
 
     fun toggleAlerts(){
@@ -59,5 +65,7 @@ class MapViewModel(
             wmsUrl = repository.getWmsUrl(layer),
             showAlerts = false
         ) }
+
+
     }
 }
