@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -116,13 +117,23 @@ fun MapScreen(
                                 if (features.isNotEmpty()) {
                                     val feature = features[0]
                                     val alert = MetAlert(
-
+                                        event = feature.getStringProperty("event"),
+                                        severity = feature.getStringProperty("severity"),
+                                        description = feature.getStringProperty("description"),
+                                        area = feature.getStringProperty("area"),
+                                        instruction = feature.getStringProperty("instruction"),
+                                        consequence = feature.getStringProperty("consequence"),
+                                        title = feature.getStringProperty("title"),
                                     )
+                                    viewModel.selectAlert(alert)
+                                    true
+                                }else{
+                                    false
                                 }
                                 }
                             }
                         }
-                    }
+
                 },
                 modifier = Modifier.fillMaxSize()
             )
@@ -131,7 +142,7 @@ fun MapScreen(
                 val map = mapRef ?: return@LaunchedEffect
 
                 map.getStyle { style ->
-                    updateWmsLayer(style, uiState.wmsUrl, uiState.currentLayer.name)
+                    updateWmsLayer(style, uiState.wmsUrl, uiState.currentLayer?.name?: "none")
                     updateAlertsLayer(style, uiState.showAlerts, uiState.alertsUrl)
                 }
             }
@@ -159,7 +170,7 @@ fun MapScreen(
                             ) else Color.Gray
                         )
                     ) {
-                        Text("Temp", maxLines = 1)
+                        Text("Temp", maxLines = 1, style = MaterialTheme.typography.labelSmall)
                     }
 
                     Button(
@@ -171,7 +182,7 @@ fun MapScreen(
                             ) else Color.Gray
                         )
                     ) {
-                        Text("Nedbør", maxLines = 1)
+                        Text("Nedbør", maxLines = 1, style = MaterialTheme.typography.labelSmall)
                     }
 
                     Button(
@@ -183,16 +194,18 @@ fun MapScreen(
                             ) else Color.Gray
                         )
                     ) {
-                        Text("Vind", maxLines = 1)
+                        Text("Vind", maxLines = 1, style = MaterialTheme.typography.labelSmall)
                     }
-                }
-                Button(
-                    onClick = { viewModel.toggleAlerts()},
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (uiState.showAlerts) Color(0xFFFF9800) else Color.Gray)
-                ) {
-                    Text(if (uiState.showAlerts) "Skjul farevarsel" else "Vis farevarsel")
+
+                    Button(
+                        onClick = { viewModel.onAlertsSelected() },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (uiState.showAlerts) Color(0xFFFF9800) else Color.Gray
+                        )
+                    ) {
+                        Text("Varsel", maxLines = 1, style = MaterialTheme.typography.labelSmall)
+                    }
                 }
 
             }
