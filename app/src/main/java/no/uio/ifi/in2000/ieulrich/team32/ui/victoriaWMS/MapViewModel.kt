@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import no.uio.ifi.in2000.ieulrich.team32.data.victoriaWMS.WeatherRepository
 import no.uio.ifi.in2000.ieulrich.team32.data.victoriaWMS.WeatherRepositoryImpl
-import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.metAlert
+import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
 import no.uio.ifi.in2000.ieulrich.team32.model.victoriaWMS.WeatherLayer
 
 data class MapUiState(
@@ -15,7 +15,7 @@ data class MapUiState(
     val wmsUrl: String = "",
     val showAlerts: Boolean = false,
     val alertsUrl: String = "",
-    val selectedAlert: metAlert? = null
+    val selectedAlert: MetAlert? = null
         )
 
 
@@ -43,9 +43,9 @@ class MapViewModel(
         }
     }
 
-    fun selectAlert(alert: metAlert?){
+    fun selectAlert(alert: MetAlert?){
         _uiState.update { it.copy(
-            selectAlert = alert
+            selectedAlert = alert
         ) }
     }
 
