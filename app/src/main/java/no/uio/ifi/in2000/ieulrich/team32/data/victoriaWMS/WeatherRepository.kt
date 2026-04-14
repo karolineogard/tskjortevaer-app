@@ -31,6 +31,7 @@ class WeatherRepositoryImpl : WeatherRepository {
                 "&height=256" +
                 "&bbox={bbox-epsg-3857}" +
                 "&time=$currentTime"
+
     }
 
     override fun getAlertsUrl(): String {
