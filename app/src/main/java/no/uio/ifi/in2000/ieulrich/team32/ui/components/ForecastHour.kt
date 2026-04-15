@@ -23,7 +23,7 @@ import no.uio.ifi.in2000.ieulrich.team32.R
 
 @Composable
 fun ForecastHour(time: String, temp: String, windSpeed: String, symbolCode: String) {
-    // må finne ut hvordan jeg kan bruke symbolCode til å hente riktig bilde, prøvde med et eksempel først
+    // TODO: må finne ut hvordan jeg kan bruke symbolCode til å hente riktig bilde, prøvde med et eksempel først
     val size = 24.sp
     Row(
         modifier = Modifier

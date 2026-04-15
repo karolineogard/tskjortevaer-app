@@ -55,7 +55,7 @@ fun MapApp(
 ){
 
     Scaffold(
-        topBar = { } // fiks senere
+        topBar = { } // TODO: fiks senere
     ) { innerPadding ->
         NavHost(
             navController = navController,

@@ -32,7 +32,7 @@ fun LocationForecastScreen(
     lon: Double?
 ) {
     if (lat == null || lon == null){
-        // håndter null-verdier her
+        // TODO: håndter null-verdier her
     }
     else {
         LaunchedEffect(lat, lon) {
