@@ -12,6 +12,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -56,154 +57,190 @@ fun MapScreen(
     viewModel: MapViewModel = viewModel(),
     navController: NavController
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    var mapRef by remember { mutableStateOf<org.maplibre.android.maps.MapLibreMap?>(null)}
-    val showAlersActive by rememberUpdatedState(uiState.showAlerts)
 
-    if (uiState.selectedAlert != null){
-        AlertDetailScreen(
-            alert = uiState.selectedAlert!!,
-            onBack = {viewModel.selectAlert(null)}
-        )
+            val uiState by viewModel.uiState.collectAsState()
+            var mapRef by remember { mutableStateOf<org.maplibre.android.maps.MapLibreMap?>(null) }
+            val showAlersActive by rememberUpdatedState(uiState.showAlerts)
 
-    }
-    else{
-        Box(modifier = modifier.fillMaxSize()) {
-            AndroidView(
-                factory = { context ->
-                    MapView(context).apply {
-                        onCreate(null)
-                        getMapAsync { map ->
-                            mapRef = map
-                            val styleUrl = "https://tiles.openfreemap.org/styles/liberty"
-                            map.setStyle(Style.Builder().fromUri(styleUrl)) { style: Style ->
-                                map.cameraPosition = CameraPosition.Builder()
-                                    .target(LatLng(60.0, 11.0))
-                                    .zoom(5.0)
-                                    .build()
+            if (uiState.selectedAlert != null) {
+                AlertDetailScreen(
+                    alert = uiState.selectedAlert!!,
+                    onBack = { viewModel.selectAlert(null) }
+                )
 
-                                updateWmsLayer(style, uiState.wmsUrl, uiState.currentLayer?.name?: "none")
-                                updateAlertsLayer(style, uiState.showAlerts, uiState.alertsUrl)
-                            }
+            } else {
+                Box(modifier = modifier.fillMaxSize()) {
+                    AndroidView(
+                        factory = { context ->
+                            MapView(context).apply {
+                                onCreate(null)
+                                getMapAsync { map ->
+                                    mapRef = map
+                                    val styleUrl = "https://tiles.openfreemap.org/styles/liberty"
+                                    map.setStyle(
+                                        Style.Builder().fromUri(styleUrl)
+                                    ) { style: Style ->
+                                        map.cameraPosition = CameraPosition.Builder()
+                                            .target(LatLng(60.0, 11.0))
+                                            .zoom(5.0)
+                                            .build()
 
-
-                                map.addOnMapClickListener { point ->
-                                    if(showAlersActive){
-                                        return@addOnMapClickListener false
+                                        updateWmsLayer(
+                                            style,
+                                            uiState.wmsUrl,
+                                            uiState.currentLayer?.name ?: "none"
+                                        )
+                                        updateAlertsLayer(
+                                            style,
+                                            uiState.showAlerts,
+                                            uiState.alertsUrl
+                                        )
                                     }
 
-                                    val lat = point.latitude
-                                    val lon = point.longitude
-                                    Log.d("Map click", "Lat: $lat, Lng: $lon")
-                                    navController.navigate("forecast?lat=$lat&lon=$lon")
-                                    true
-                                }
 
-                            map.addOnMapClickListener { point ->
-                                val features = map.queryRenderedFeatures(map.projection.toScreenLocation(point), "alerts-layer")
-                                if (features.isNotEmpty()) {
-                                    val feature = features[0]
-                                    val alert = MetAlert(
-                                        event = feature.getStringProperty("event"),
-                                        severity = feature.getStringProperty("severity"),
-                                        description = feature.getStringProperty("description"),
-                                        area = feature.getStringProperty("area"),
-                                        instruction = feature.getStringProperty("instruction"),
-                                        consequence = feature.getStringProperty("consequence"),
-                                        title = feature.getStringProperty("title"),
-                                    )
-                                    viewModel.selectAlert(alert)
-                                    true
-                                }else{
-                                    false
+                                    map.addOnMapClickListener { point ->
+                                        if (showAlersActive) {
+                                            return@addOnMapClickListener false
+                                        }
+
+                                        val lat = point.latitude
+                                        val lon = point.longitude
+                                        Log.d("Map click", "Lat: $lat, Lng: $lon")
+                                        navController.navigate("forecast?lat=$lat&lon=$lon")
+                                        true
+                                    }
+
+                                    map.addOnMapClickListener { point ->
+                                        val features = map.queryRenderedFeatures(
+                                            map.projection.toScreenLocation(point), "alerts-layer"
+                                        )
+                                        if (features.isNotEmpty()) {
+                                            val feature = features[0]
+                                            val alert = MetAlert(
+                                                event = feature.getStringProperty("event"),
+                                                severity = feature.getStringProperty("severity"),
+                                                description = feature.getStringProperty("description"),
+                                                area = feature.getStringProperty("area"),
+                                                instruction = feature.getStringProperty("instruction"),
+                                                consequence = feature.getStringProperty("consequence"),
+                                                title = feature.getStringProperty("title"),
+                                            )
+                                            viewModel.selectAlert(alert)
+                                            true
+                                        } else {
+                                            false
+                                        }
+                                    }
                                 }
-                                }
+                            }
+
+                        },
+                        modifier = Modifier.fillMaxSize()
+                    )
+
+                    LaunchedEffect(uiState.wmsUrl, uiState.showAlerts) {
+                        val map = mapRef ?: return@LaunchedEffect
+
+                        map.getStyle { style ->
+                            updateWmsLayer(
+                                style,
+                                uiState.wmsUrl,
+                                uiState.currentLayer?.name ?: "none"
+                            )
+                            updateAlertsLayer(style, uiState.showAlerts, uiState.alertsUrl)
+                        }
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .align(Alignment.BottomCenter),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+
+                            Button(
+                                onClick = {
+                                    viewModel.onLayerSelected(WeatherLayer.TEMPERATURE)
+
+                                },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (uiState.currentLayer == WeatherLayer.TEMPERATURE) Color(
+                                        0xFF3F51B5
+                                    ) else Color.Gray
+                                )
+                            ) {
+                                Text(
+                                    "Temp",
+                                    maxLines = 1,
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            }
+
+                            Button(
+                                onClick = {
+                                    viewModel.onLayerSelected(WeatherLayer.PRECIPITATION)
+                                },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (uiState.currentLayer == WeatherLayer.PRECIPITATION) Color(
+                                        0xFF3F51B5
+                                    ) else Color.Gray
+                                )
+                            ) {
+                                Text(
+                                    "Nedbør",
+                                    maxLines = 1,
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            }
+
+                            Button(
+                                onClick = {
+                                    viewModel.onLayerSelected(WeatherLayer.WIND)
+                                },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (uiState.currentLayer == WeatherLayer.WIND) Color(
+                                        0xFF3F51B5
+                                    ) else Color.Gray
+                                )
+                            ) {
+                                Text(
+                                    "Vind",
+                                    maxLines = 1,
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            }
+
+                            Button(
+                                onClick = {
+                                    viewModel.onAlertsSelected()
+                                },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (uiState.showAlerts) Color(0xFFFF9800) else Color.Gray
+                                )
+                            ) {
+                                Text(
+                                    "Varsel",
+                                    maxLines = 1,
+                                    style = MaterialTheme.typography.labelSmall
+                                )
                             }
                         }
 
-                },
-                modifier = Modifier.fillMaxSize()
-            )
-
-            LaunchedEffect(uiState.wmsUrl, uiState.showAlerts) {
-                val map = mapRef ?: return@LaunchedEffect
-
-                map.getStyle { style ->
-                    updateWmsLayer(style, uiState.wmsUrl, uiState.currentLayer?.name?: "none")
-                    updateAlertsLayer(style, uiState.showAlerts, uiState.alertsUrl)
+                    }
                 }
             }
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .align(Alignment.BottomCenter),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-
-                    Button(
-                        onClick = { viewModel.onLayerSelected(WeatherLayer.TEMPERATURE)
-
-                            },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (uiState.currentLayer == WeatherLayer.TEMPERATURE) Color(
-                                0xFF3F51B5
-                            ) else Color.Gray
-                        )
-                    ) {
-                        Text("Temp", maxLines = 1, style = MaterialTheme.typography.labelSmall)
-                    }
-
-                    Button(
-                        onClick = { viewModel.onLayerSelected(WeatherLayer.PRECIPITATION)
-                            },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (uiState.currentLayer == WeatherLayer.PRECIPITATION) Color(
-                                0xFF3F51B5
-                            ) else Color.Gray
-                        )
-                    ) {
-                        Text("Nedbør", maxLines = 1, style = MaterialTheme.typography.labelSmall)
-                    }
-
-                    Button(
-                        onClick = {
-                            viewModel.onLayerSelected(WeatherLayer.WIND)
-                        },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (uiState.currentLayer == WeatherLayer.WIND) Color(
-                                0xFF3F51B5
-                            ) else Color.Gray
-                        )
-                    ) {
-                        Text("Vind", maxLines = 1, style = MaterialTheme.typography.labelSmall)
-                    }
-
-                    Button(
-                        onClick = { viewModel.onAlertsSelected()
-                            },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (uiState.showAlerts) Color(0xFFFF9800) else Color.Gray
-                        )
-                    ) {
-                        Text("Varsel", maxLines = 1, style = MaterialTheme.typography.labelSmall)
-                    }
-                }
-
-            }
-    }
-    }
 }
 
 
