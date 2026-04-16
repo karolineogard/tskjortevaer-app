@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
-import no.uio.ifi.in2000.ieulrich.team32.R
 import android.app.appsearch.SearchResults
 import android.graphics.pdf.models.ListItem
 import androidx.compose.foundation.clickable
@@ -38,7 +37,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.isTraversalGroup
@@ -84,14 +82,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Accessibility
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.*
@@ -100,6 +102,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+import no.uio.ifi.in2000.ieulrich.team32.R
 
 
 
@@ -299,7 +302,10 @@ fun weatherCard(navController : NavController){
         )
         ){
 
-        Column(modifier = Modifier.padding(16.dp)){
+        Column(modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ){
             val now = LocalDateTime.now()
             val today = LocalDate.now()
             val datePart = if (now.toLocalDate().isEqual(today)) {
@@ -324,16 +330,59 @@ fun weatherCard(navController : NavController){
 
             }
 
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text(text = "Oslo",
+                    fontSize = 40.sp,
+
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Icon(painter = painterResource(id = R.drawable.clearsky_day), contentDescription = null,
+                    modifier = Modifier
+                        .size(70.dp)
+                )
+
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(text = "8°C",
+                    modifier = Modifier,
+                    fontSize = 40.sp
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text(text = "Strålende sol",
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text(text = "H:14°  L: 5°",
+                )
+            }
+
+
         }
 
 
 
-        Text(
-            text = "Været nå",
-            modifier = Modifier
-                .padding(16.dp),
-            textAlign = TextAlign.Center,
-        )
+
 
     }
 
@@ -372,6 +421,8 @@ fun metalertCard(
 
 @Composable
 fun clothingCard(){
+
+    var clicked by rememberSaveable {mutableStateOf(false) }
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -382,6 +433,62 @@ fun clothingCard(){
         )
 
     ){
+        IconButton(onClick = { clicked = !clicked },) {
+            Icon(Icons.Default.Info, contentDescription = "Lukk søk")
+
+        }
+
+        if(clicked) {
+
+            ElevatedCard(
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 6.dp
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+
+            ) {
+                LazyColumn(modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    item {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+
+                            Text(
+                                text = "Bekledning",
+                                fontSize = 40.sp,
+
+                                )
+
+
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Anbefalningen tar utgangspunkt i fremkomst til og fra skole eller jobb. \n" +
+                                        "\n" +
+                                        "Vi antar at reisetidspunktet skjer mellom 8-10 på morgenen og 16-18 på kvelden."
+                            )
+                        }
+                    }
+
+                    item{
+                        //legg til en knapp her som tar deg til kles siden
+                    }
+                }
+
+
+
+        }
+        }
 
         Text(
             text = "Klesanbefaling",
@@ -389,6 +496,7 @@ fun clothingCard(){
                 .padding(16.dp),
             textAlign = TextAlign.Center,
         )
+
 
 
     }
