@@ -1,5 +1,13 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -59,16 +67,41 @@ fun MapApp(
         NavHost(
             navController = navController,
             startDestination = Routes.HOME,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
+            enterTransition = {
+                fadeIn(animationSpec = tween(400))
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(400))
+            },
+            popEnterTransition = {
+                fadeIn(animationSpec = tween(400))
+            },
+            popExitTransition = {
+                fadeOut(animationSpec = tween(400))
+            }
         ) {
-            composable(route = Routes.MAP) {
+            composable(route = Routes.MAP,
+                enterTransition = {
+                   EnterTransition.None
+                },
+                    exitTransition = {
+                ExitTransition.None
+                },
+                popEnterTransition = {
+                   EnterTransition.None
+                },
+                popExitTransition = {
+                    ExitTransition.None
+                })
+            {
                 MapScreen(navController = navController)
             }
 
             composable(route = "forecast?lat={lat}&lon={lon}") { backStackEntry ->
                 val lat = backStackEntry.arguments?.getString("lat")?.toDoubleOrNull()
                 val lon = backStackEntry.arguments?.getString("lon")?.toDoubleOrNull()
-                LocationForecastScreen(lat = lat, lon = lon)
+                LocationForecastScreen(lat = lat, lon = lon, navController = navController)
             }
 
             composable(route = Routes.HOME){

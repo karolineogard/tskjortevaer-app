@@ -2,8 +2,8 @@ package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
 import no.uio.ifi.in2000.ieulrich.team32.R
 import android.app.appsearch.SearchResults
+import android.graphics.pdf.models.ListItem
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -69,14 +69,29 @@ import java.net.URL
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
+import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
+import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
+import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.*
@@ -89,6 +104,13 @@ import java.util.*
 
 
 data class SimpleLatLng(val lat: Double, val lon: Double)
+
+// placeholder
+data class Farevarsel(
+    val tittel: String,
+    val beskrivelse: String,
+    val alvorlighet: String
+)
 
 suspend fun getCoordsFromService(sted: String): SimpleLatLng? {
     if (sted.isBlank()) return null
@@ -129,72 +151,103 @@ fun HomeScreen(
     val padding = 16.dp
     var søkeTekst by remember{mutableStateOf("")}
     var søkAktiv by remember { mutableStateOf(false) }
-    Column(modifier = Modifier.padding(padding),
+
+    //hardkodet
+    var isVisible by remember { mutableStateOf(true) }
+
+    LazyColumn(modifier = Modifier.padding(padding),
         verticalArrangement = Arrangement.spacedBy(padding)) {
-        val now = LocalDateTime.now()
-        val today = LocalDate.now()
-        val datePart = if (now.toLocalDate().isEqual(today)) {
-            "I dag"
-        } else {
-            now.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+//        val now = LocalDateTime.now()
+//        val today = LocalDate.now()
+//        val datePart = if (now.toLocalDate().isEqual(today)) {
+//            "I dag"
+//        } else {
+//            now.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+//        }
+//
+//        val timePart = now.format(DateTimeFormatter.ofPattern("HH:mm"))
+//        val currentDateAndTime = "$datePart $timePart"
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+//            Icon(painter = painterResource(id = R.drawable.klokke_ikon), contentDescription = null,
+//                modifier = Modifier.weight(weight = 0.4f)
+//            )
+//            Text(text = currentDateAndTime,
+//                modifier = Modifier.weight(weight = 3f)
+//               )
+                Text(text = "Noe?",  modifier = Modifier.weight(5f))
+
+
+                IconButton(onClick = { søkAktiv = !søkAktiv },) {
+                    Icon(Icons.Default.Search, contentDescription = "Lukk søk")
+
+                }
+            }
+
+
+            if (søkAktiv) {
+                TextField(
+                    value = søkeTekst,
+                    onValueChange = { søkeTekst = it },
+                    //leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    singleLine = true,
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(
+                        onSearch = {
+                            scope.launch {
+                                try {
+                                    val coords = getCoordsFromService(søkeTekst)
+                                    if (coords != null) {
+                                        navController.navigate("forecast?lat=${coords.lat}&lon=${coords.lon}")
+                                    }
+                                } catch (e: Exception) {
+
+                                }
+                            }
+                            søkAktiv = false
+                        }
+                    )
+                )
+            }
+
         }
 
-        val timePart = now.format(DateTimeFormatter.ofPattern("HH:mm"))
-        val currentDateAndTime = "$datePart $timePart"
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            Icon(painter = painterResource(id = R.drawable.klokke_ikon), contentDescription = null,
-                modifier = Modifier.weight(weight = 0.4f)
-            )
-            Text(text = currentDateAndTime,
-                modifier = Modifier.weight(weight = 3f)
-               )
-            IconButton(onClick = {søkAktiv =! søkAktiv}, modifier = Modifier.weight(weight = 1f)) {
-                Icon(Icons.Default.Search, contentDescription = "Lukk søk",
-                    modifier = Modifier.weight(weight = 1f))
+
+
+        item {
+        weatherCard(navController = navController)}
+
+        item {
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                Column {
+//                    Text(
+//                        text = "Farevarsler",
+//                        style = MaterialTheme.typography.titleMedium,
+//                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+//                    )
+                    MetalertCarousel(modifier = Modifier.height(80.dp))
+                   // Spacer(Modifier.height(padding))
+                }
             }
         }
 
-
-        if(søkAktiv){
-            TextField(
-                value = søkeTekst,
-                onValueChange = {søkeTekst = it},
-                //leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                singleLine = true,
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(
-                    onSearch = {
-                        scope.launch {
-                            try{
-                                val coords = getCoordsFromService(søkeTekst)
-                                if(coords != null) {
-                                    navController.navigate("forecast?lat=${coords.lat}&lon=${coords.lon}")
-                                }
-                            }catch (e: Exception){
-
-                            }
-                        }
-                        søkAktiv = false
-                    }
-                )
-            )}
-
-
-        weatherCard(navController = navController)
-        Spacer(Modifier.size(padding))
-        metalertCard()
-        Spacer(Modifier.size(padding))
-        clothingCard()
+        item {
+            clothingCard()
+        }
     }
 
 
@@ -202,7 +255,32 @@ fun HomeScreen(
     }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MetalertCarousel(modifier: Modifier = Modifier){
+    val varselTekster = listOf("Sterk vind", "Flom", "Orkan")
 
+    Column(modifier = modifier) {
+
+
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            //contentPadding = PaddingValues(horizontal = 16.dp), // Luft på sidene
+            horizontalArrangement = Arrangement.spacedBy(12.dp) // Luft mellom kortene
+        ) {
+            items(varselTekster.size) { index ->
+                val tekst = varselTekster[index]
+                Box(modifier = Modifier.width(280.dp)) {
+                    metalertCard(tekst = tekst)
+                }
+            }
+    }
+    }
+
+
+
+
+}
 
 
 
@@ -210,10 +288,7 @@ fun HomeScreen(
 @Composable
 fun weatherCard(navController : NavController){
 
-    //val textFieldState = rememberTextFieldState()
-//    var søkeTekst by remember{mutableStateOf("")}
-//    val scope = rememberCoroutineScope()
-//    var søkAktiv by remember { mutableStateOf(false) }
+
 
     Card(
         modifier = Modifier
@@ -225,58 +300,30 @@ fun weatherCard(navController : NavController){
         ){
 
         Column(modifier = Modifier.padding(16.dp)){
-            Text(
-                text = "Været nå",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(bottom=8.dp)
-            )
-//            if(søkAktiv){
-//            TextField(
-//                value = søkeTekst,
-//                onValueChange = {søkeTekst = it},
-//                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-//                trailingIcon = {
-//                    Row(modifier = Modifier.fillMaxWidth(),
-//                        horizontalArrangement = Arrangement.End) {
-//                    IconButton(onClick = {
-//                        søkAktiv = false
-//                        søkeTekst = ""
-//                    }){
-//                        Icon(Icons.Default.Close, contentDescription = "Lukk søk")
-//                    }
-//                    }
-//                },
-//                singleLine = true,
-//                colors = TextFieldDefaults.colors(
-//                    focusedIndicatorColor = Color.Transparent,
-//                    unfocusedIndicatorColor = Color.Transparent
-//                ),
-//                modifier = Modifier.fillMaxWidth(),
-//                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-//                keyboardActions = KeyboardActions(
-//                    onSearch = {
-//                        scope.launch {
-//                            try{
-//                                val coords = getCoordsFromService(søkeTekst)
-//                                if(coords != null) {
-//                                    navController.navigate("forecast?lat=${coords.lat}&lon=${coords.lon}")
-//                                }
-//                            }catch (e: Exception){
-//
-//                            }
-//                        }
-//                    }
-//                )
-//            )}
-//            else{
-//                Row(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalArrangement = Arrangement.End
-//                ) {
-//                IconButton(onClick = {søkAktiv = true}){
-//                    Icon(Icons.Default.Search, contentDescription = "Søk")
-//                }}
-//            }
+            val now = LocalDateTime.now()
+            val today = LocalDate.now()
+            val datePart = if (now.toLocalDate().isEqual(today)) {
+                "I dag"
+            } else {
+                now.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+            }
+
+            val timePart = now.format(DateTimeFormatter.ofPattern("HH:mm"))
+            val currentDateAndTime = "$datePart $timePart"
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Icon(painter = painterResource(id = R.drawable.klokke_ikon), contentDescription = null,
+                    modifier = Modifier.weight(weight = 0.4f)
+                )
+                Text(text = currentDateAndTime,
+                    modifier = Modifier.weight(weight = 3f)
+                )
+
+            }
+
         }
 
 
@@ -294,23 +341,32 @@ fun weatherCard(navController : NavController){
 
 
 @Composable
-fun metalertCard(){
+fun metalertCard(
+    tekst : String
+
+){
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(43.dp)
+            .height(80.dp)
             ,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
         )
 
     ){
-        Text(
-            text = "Farevarsel",
-            modifier = Modifier
-                .padding(16.dp),
-            textAlign = TextAlign.Center,
-        )
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Text(
+                text = tekst,
+                modifier = Modifier.padding(16.dp),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
     }
 }
 
@@ -338,6 +394,14 @@ fun clothingCard(){
     }
 
 }
+
+
+
+
+
+
+
+
 //
 //@OptIn(ExperimentalMaterial3Api::class)
 //@Composable
@@ -438,11 +502,11 @@ fun weatherCardPreview(){
     weatherCard(navController = rememberNavController())
 }
 
-@Preview
-@Composable
-fun metalertCardPreview(){
-    metalertCard()
-}
+//@Preview
+//@Composable
+//fun metalertCardPreview(){
+//    metalertCard()
+//}
 
 @Preview
 @Composable
@@ -452,9 +516,10 @@ fun clothingCardPreview(){
 
 
 
-@Preview
-@Composable
-fun searchBarPreview(){
 
-}
 
+//@Preview
+//@Composable
+//fun metalertCarouselPreview(){
+//    metalertCarousel()
+//}
