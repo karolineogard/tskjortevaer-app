@@ -51,6 +51,7 @@ dependencies {
     
     implementation(libs.maplibre.android)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.foundation.layout)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -61,6 +62,8 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+
+    implementation("androidx.compose.material:material-icons-extended")
 
     // network stuff
     implementation("io.ktor:ktor-client-core:2.3.7")

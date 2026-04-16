@@ -48,32 +48,8 @@ import org.maplibre.android.style.layers.FillLayer
 import org.maplibre.android.style.layers.PropertyFactory
 
 
-@Composable
-fun MapApp(
-    navController: NavHostController = rememberNavController(),
-    modifier: Modifier = Modifier
-){
 
-    Scaffold(
-        topBar = { } // TODO: fiks senere
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = "map",
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            composable(route = "map") {
-                MapScreen(navController = navController)
-            }
 
-            composable(route = "forecast?lat={lat}&lon={lon}") { backStackEntry ->
-                val lat = backStackEntry.arguments?.getString("lat")?.toDoubleOrNull()
-                val lon = backStackEntry.arguments?.getString("lon")?.toDoubleOrNull()
-                LocationForecastScreen(lat = lat, lon = lon)
-            }
-        }
-    }
-}
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
