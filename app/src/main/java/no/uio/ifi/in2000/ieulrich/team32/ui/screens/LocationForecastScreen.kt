@@ -1,12 +1,10 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -29,8 +27,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
 import androidx.navigation.NavController
-import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.FormatTime
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ForecastHour
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 
@@ -68,47 +66,59 @@ fun LocationForecastScreen(
                 }
             )
         }
-    ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
-
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    "Dato",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold
+        Row (
+            modifier = Modifier
+                .padding(start = 16.dp, end = 16.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Spacer(modifier = Modifier.weight(1.5f))
+            Text(
+                "Tid",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Left
+            )
+            Spacer(modifier = Modifier.weight(0.5f))
+            Text(
+                "Temp",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Left
+            )
+            Spacer(modifier = Modifier.weight(0.5f))
+            Text(
+                "Nedbør",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Left
                 )
-            }
+            Spacer(modifier = Modifier.weight(0.5f))
+            Text(
+                "Vind",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Left
+            )
 
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Spacer(modifier = Modifier.weight(1.5f))
-                Text("Tid", fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                Text("Temp", fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                Text("Vind", fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                items(forecast?.properties?.timeseries ?: emptyList()) { timeseries ->
-                    val time = FormatTime(timeseries.time)
-                    val data = timeseries.data.instant.details
-                    ForecastHour(
-                        time,
-                        data.airTemperature.toString(),
-                        data.windSpeed.toString(),
-                        timeseries.data.next1Hours?.summary?.symbolCode ?: ""
-                    )
-                }
+        }
+        LazyColumn() {
+            items(forecast?.properties?.timeseries ?: emptyList()) { timeseries ->
+                val time = Format.extractHour(timeseries.time)
+                val instantDetails = timeseries.data.instant.details
+                val next1HoursDetails = timeseries.data.next1Hours?.details?.precipitationAmount
+                val symbolCode = timeseries.data.next1Hours?.summary?.symbolCode ?: ""
+                ForecastHour(
+                    time,
+                    temp = instantDetails.airTemperature.toString(),
+                    windSpeed = instantDetails.windSpeed.toString(),
+                    symbolCode = symbolCode,
+                    precipitationAmount = next1HoursDetails.toString()
+                )
             }
         }
     }
