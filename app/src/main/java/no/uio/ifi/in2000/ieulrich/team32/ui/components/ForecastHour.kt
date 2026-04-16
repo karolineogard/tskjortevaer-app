@@ -22,7 +22,12 @@ import androidx.compose.ui.unit.sp
 import no.uio.ifi.in2000.ieulrich.team32.R
 
 @Composable
-fun ForecastHour(time: String, temp: String, windSpeed: String, symbolCode: String) {
+fun ForecastHour(
+    time: String,
+    temp: String,
+    windSpeed: String,
+    precipitationAmount: String,
+    symbolCode: String) {
     // TODO: må finne ut hvordan jeg kan bruke symbolCode til å hente riktig bilde, prøvde med et eksempel først
     val size = 24.sp
     Row(
@@ -60,6 +65,14 @@ fun ForecastHour(time: String, temp: String, windSpeed: String, symbolCode: Stri
         )
         Spacer(modifier = Modifier.weight(0.5f))
         Text(
+            text = precipitationAmount,
+            fontSize = size,
+            modifier = Modifier
+                .weight(1f),
+            textAlign = TextAlign.Left
+        )
+        Spacer(modifier = Modifier.weight(0.5f))
+        Text(
             windSpeed,
             fontSize = size,
             modifier = Modifier
@@ -74,5 +87,5 @@ fun ForecastHour(time: String, temp: String, windSpeed: String, symbolCode: Stri
 @Preview(showBackground = true)
 @Composable
 fun PreviewForecastHour(){
-    ForecastHour("16:00", "17°", "5 m/s", "clearsky_day")
+    ForecastHour("16:00", "17°", "5 m/s", precipitationAmount = "3 mm", symbolCode = "clearsky_day")
 }
