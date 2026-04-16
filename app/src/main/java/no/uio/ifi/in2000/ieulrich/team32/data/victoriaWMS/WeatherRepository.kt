@@ -20,7 +20,7 @@ class WeatherRepositoryImpl: WeatherRepository {
                 "&width=256" +
                 "&height=256" +
                 "&bbox={bbox-epsg-3857}" +
-                "&time=2026-03-26T12:00:00Z"
+                "&time=2026-04-16T12:00:00Z"
     }
     override fun getAlertsUrl(): String {
         return "https://api.met.no/weatherapi/metalerts/2.0/current.json"
