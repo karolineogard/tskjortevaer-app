@@ -30,7 +30,10 @@ class WeatherRepositoryImpl : WeatherRepository {
                 "&width=256" +
                 "&height=256" +
                 "&bbox={bbox-epsg-3857}" +
+
+
                 "&time=$currentTime"
+
 
     }
 
