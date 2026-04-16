@@ -40,10 +40,9 @@ fun LocationForecastScreen(
     lon: Double?,
     navController: NavController // Husk å legge til denne som parameter!
 ) {
-    if (lat == null || lon == null){
+    if (lat == null || lon == null) {
         // TODO: håndter null-verdier her
-    }
-    else {
+    } else {
         LaunchedEffect(lat, lon) {
             viewmodel.getForecast(lat, lon)
         }
@@ -66,7 +65,12 @@ fun LocationForecastScreen(
                 }
             )
         }
-        Row (
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+        ){
+        Row(
             modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp)
                 .fillMaxWidth(),
@@ -95,7 +99,7 @@ fun LocationForecastScreen(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Left
-                )
+            )
             Spacer(modifier = Modifier.weight(0.5f))
             Text(
                 "Vind",
@@ -122,5 +126,5 @@ fun LocationForecastScreen(
             }
         }
     }
-
+}
 }
