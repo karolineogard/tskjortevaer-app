@@ -1,8 +1,7 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
-import android.app.appsearch.SearchResults
-import android.graphics.pdf.models.ListItem
-import androidx.compose.foundation.clickable
+
+import android.R.attr.contentDescription
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,51 +11,29 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.placeCursorAtEnd
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarDefaults
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.isTraversalGroup
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import no.uio.ifi.in2000.ieulrich.team32.ui.Destination
-import no.uio.ifi.in2000.ieulrich.team32.ui.Routes
-import no.uio.ifi.in2000.ieulrich.team32.ui.victoriaWMS.MapViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -64,10 +41,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import java.net.URL
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -78,31 +51,25 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Accessibility
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
-import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
-import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
-import androidx.compose.material3.carousel.rememberCarouselState
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.*
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import no.uio.ifi.in2000.ieulrich.team32.R
+import no.uio.ifi.in2000.ieulrich.team32.ui.Destination
+import no.uio.ifi.in2000.ieulrich.team32.ui.Routes
+import java.net.HttpURLConnection
+
 
 
 
@@ -121,7 +88,7 @@ suspend fun getCoordsFromService(sted: String): SimpleLatLng? {
     return withContext(Dispatchers.IO) {
         try {
             val url = URL("https://nominatim.openstreetmap.org/search?q=${sted}&format=json&limit=1")
-            val connection = url.openConnection() as java.net.HttpURLConnection
+            val connection = url.openConnection() as HttpURLConnection
 
 
             connection.setRequestProperty("User-Agent", "IN2000-Team32-WeatherApp")
@@ -249,7 +216,7 @@ fun HomeScreen(
         }
 
         item {
-            clothingCard()
+            clothingCard(navController = navController)
         }
     }
 
@@ -420,37 +387,77 @@ fun metalertCard(
 }
 
 @Composable
-fun clothingCard(){
+fun clothingCard(navController: NavController,
+                 modifier: Modifier = Modifier
+) {
 
-    var clicked by rememberSaveable {mutableStateOf(false) }
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(118.5.dp)
-            ,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        )
+    var clicked by rememberSaveable { mutableStateOf(false) }
+    //var isVisible by remember { mutableStateOf(true) }
 
-    ){
-        IconButton(onClick = { clicked = !clicked },) {
-            Icon(Icons.Default.Info, contentDescription = "Lukk søk")
+    Box(modifier = Modifier.fillMaxWidth().height(300.dp),) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            )
 
-        }
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
-        if(clicked) {
+                    Spacer(modifier = Modifier.size(48.dp))
+                    Text(
+                        text = "Bekledning",
+                        fontSize = 30.sp,
+                        modifier = Modifier.weight(2f),
+                        textAlign = TextAlign.Center
+                    )
+                    IconButton(onClick = { clicked = !clicked },) {
+                        Icon(Icons.Default.Info, contentDescription = "Lukk søk")
 
+
+                    }
+
+
+                }
+
+
+
+            }
+
+            }
+
+
+    if (clicked) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp),
+            contentAlignment = Alignment.Center
+        ) {
             ElevatedCard(
                 elevation = CardDefaults.cardElevation(
                     defaultElevation = 6.dp
                 ),
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.width(320.dp),
 
-            ) {
-                LazyColumn(modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(12.dp)) {
+
+                ) {
+                LazyColumn(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
                     item {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -458,49 +465,55 @@ fun clothingCard(){
                             verticalAlignment = Alignment.CenterVertically
                         ) {
 
+                            Spacer(modifier = Modifier.size(48.dp))
                             Text(
-                                text = "Bekledning",
-                                fontSize = 40.sp,
-
+                                text = "Anbefaling",
+                                fontSize = 30.sp,
+                                modifier = Modifier.weight(2f),
+                                textAlign = TextAlign.Center
+                            )
+                            IconButton(onClick = { clicked = false }) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Close",
                                 )
+                            }
 
 
                         }
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+
+
+
+
+
+                        Text(
+                            text = "Anbefalningen tar utgangspunkt i fremkomst til og fra skole eller jobb. \n" +
+                                    "\n" +
+                                    "Vi antar at reisetidspunktet skjer mellom 8-10 på morgenen og 16-18 på kvelden."
+                        )
+
+                    }
+
+                    item {
+
+                        Button(
+                            onClick = { navController.navigate(Routes.ADJUSTMENT) }
                         ) {
                             Text(
-                                text = "Anbefalningen tar utgangspunkt i fremkomst til og fra skole eller jobb. \n" +
-                                        "\n" +
-                                        "Vi antar at reisetidspunktet skjer mellom 8-10 på morgenen og 16-18 på kvelden."
+                                text = "Jeg har andre behov ->"
                             )
-                        }
-                    }
 
-                    item{
-                        //legg til en knapp her som tar deg til kles siden
+                        }
+
                     }
                 }
-
+            }
 
 
         }
-        }
-
-        Text(
-            text = "Klesanbefaling",
-            modifier = Modifier
-                .padding(16.dp),
-            textAlign = TextAlign.Center,
-        )
-
-
-
     }
-
+    }
 }
 
 
@@ -595,20 +608,20 @@ fun clothingCard(){
 
 
 
-@Preview
-@Composable
-fun homescreenPreview(){
-    HomeScreen(modifier = Modifier,
-        navController = rememberNavController()
-    )
-
-}
-
-@Preview
-@Composable
-fun weatherCardPreview(){
-    weatherCard(navController = rememberNavController())
-}
+//@Preview
+//@Composable
+//fun homescreenPreview(){
+//    HomeScreen(modifier = Modifier,
+//        navController = rememberNavController()
+//    )
+//
+//}
+//
+//@Preview
+//@Composable
+//fun weatherCardPreview(){
+//    weatherCard(navController = rememberNavController())
+//}
 
 //@Preview
 //@Composable
@@ -616,11 +629,11 @@ fun weatherCardPreview(){
 //    metalertCard()
 //}
 
-@Preview
-@Composable
-fun clothingCardPreview(){
-    clothingCard()
-}
+//@Preview
+//@Composable
+//fun clothingCardPreview(){
+//    clothingCard(navController = NavController)
+//}
 
 
 

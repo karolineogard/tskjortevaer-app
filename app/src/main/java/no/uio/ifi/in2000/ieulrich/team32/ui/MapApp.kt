@@ -22,10 +22,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import no.uio.ifi.in2000.ieulrich.team32.ui.screens.AdjustmentScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.ClothesScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.HomeScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.LocationForecastScreen
@@ -115,6 +117,10 @@ fun MapApp(
 
             composable(route = Routes.CLOTHES){
                 ClothesScreen(navController=navController)
+            }
+
+            composable(route = Routes.ADJUSTMENT) {
+                AdjustmentScreen(navController = navController)
             }
         }
     }
