@@ -13,6 +13,7 @@ material3 = "1.4.0"
 foundationLayout = "1.10.6"
 
 composeBom = "2024.12.01"
+volley = "1.2.1"
 
 
 
@@ -35,6 +36,7 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 maplibre-android = { group = "org.maplibre.gl", name = "android-sdk", version.ref = "maplibre" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
+volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
