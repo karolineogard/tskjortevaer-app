@@ -23,18 +23,14 @@ class WeatherRepositoryImpl : WeatherRepository {
 
         return "https://public-victoria.met.no/wms?service=WMS&version=1.3.0&request=GetMap" +
                 "${layer.layerName}" +
-                "&styles=" +
+                "&styles=${layer.styleName}" +
                 "&crs=EPSG:3857" +
                 "&format=image/png" +
                 "&transparent=true" +
                 "&width=256" +
                 "&height=256" +
                 "&bbox={bbox-epsg-3857}" +
-
-
                 "&time=$currentTime"
-
-
     }
 
     override fun getAlertsUrl(): String {
