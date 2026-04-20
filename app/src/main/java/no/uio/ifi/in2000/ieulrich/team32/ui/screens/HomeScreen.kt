@@ -314,7 +314,8 @@ fun weatherCard(navController : NavController){
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Icon(painter = painterResource(id = R.drawable.clearsky_day), contentDescription = null,
+                Icon(painter = painterResource(id = R.drawable.clearsky_day
+                ), contentDescription = null,
                     modifier = Modifier
                         .size(70.dp)
                 )
@@ -446,8 +447,11 @@ fun clothingCard(navController: NavController,
             contentAlignment = Alignment.Center
         ) {
             ElevatedCard(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                ),
                 elevation = CardDefaults.cardElevation(
-                    defaultElevation = 6.dp
+                    defaultElevation = 2.dp,
                 ),
                 modifier = Modifier.width(320.dp),
 

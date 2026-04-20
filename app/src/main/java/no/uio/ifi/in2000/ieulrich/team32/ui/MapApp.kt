@@ -10,8 +10,10 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +22,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
@@ -33,6 +36,7 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.screens.HomeScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.LocationForecastScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.MapScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.SettingsScreen
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.*
 
 @Composable
 fun MapApp(
@@ -60,6 +64,19 @@ fun MapApp(
                             )
                         },
                         label = {Text(destination.label)}
+                        ,colors = NavigationBarItemDefaults.colors(
+
+                            // Dette er den blå pilla (din MediumBlue variabel)
+                            indicatorColor = MediumBlue,
+
+                            // Disse styrer fargene når tingen er valgt
+                            selectedIconColor = Grey,
+                            selectedTextColor = Grey,
+
+                            // Disse styrer fargene når tingen IKKE er valgt
+                            unselectedIconColor = Grey,
+                            unselectedTextColor = Grey
+                        )
                     )
                 }
             }

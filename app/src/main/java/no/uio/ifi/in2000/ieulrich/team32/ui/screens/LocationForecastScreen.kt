@@ -38,7 +38,7 @@ fun LocationForecastScreen(
     viewmodel: LocationForecastViewmodel = viewModel(),
     lat: Double?,
     lon: Double?,
-    navController: NavController // Husk å legge til denne som parameter!
+    navController: NavController
 ) {
     if (lat == null || lon == null) {
         // TODO: håndter null-verdier her
