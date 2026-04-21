@@ -305,6 +305,54 @@ fun PrecipitationLegendCard(modifier: Modifier = Modifier) {
         }
     }
 }
+@Composable
+fun WindLegendCard(modifier: Modifier = Modifier) {
+    val windRanges = listOf(
+        "0.3", "1.6",
+        "3.4", "5.5", "8.0", "10.8",
+        "13.9", "17.2", "20.8", "24.5",
+        "28.5", ">32.6"
+    )
+    val colors = listOf(
+        "#FCFFF2", "#EFF9CA", "#C4E898", "#88D079",
+        "#4DB85A", "#11A03C", "#FFB600", "#FF7E00",
+        "#F40009", "#D00028", "#AC0047", "#0000FF"
+    )
+
+    Surface(
+        modifier = modifier.width(70.dp),
+        shape = RoundedCornerShape(16.dp),
+        color = Color.White.copy(alpha = 0.9f),
+        shadowElevation = 2.dp
+    ) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Outlined.Air, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("m/s", style = MaterialTheme.typography.labelMedium)
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            LazyColumn(
+                modifier = Modifier.height(180.dp),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                itemsIndexed(windRanges) { index, range ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(12.dp)
+                                .clip(RoundedCornerShape(2.dp))
+                                .background(Color(android.graphics.Color.parseColor(colors[index])))
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(range, fontSize = 10.sp, color = Color.Black)
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 fun SearchBar(modifier: Modifier = Modifier) {
