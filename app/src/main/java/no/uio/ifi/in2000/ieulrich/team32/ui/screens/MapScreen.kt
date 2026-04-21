@@ -1,6 +1,8 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -11,8 +13,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
@@ -46,8 +50,10 @@ import org.maplibre.android.style.sources.RasterSource
 import org.maplibre.android.style.sources.TileSet
 import java.net.URI
 import java.time.Instant
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 @Composable
 fun MapScreen(
@@ -59,6 +65,13 @@ fun MapScreen(
     var mapRef by remember { mutableStateOf<org.maplibre.android.maps.MapLibreMap?>(null) }
     val showAlertsActive by rememberUpdatedState(uiState.showAlerts)
     var isMenuExpanded by remember { mutableStateOf(false) }
+    var isSearchExpanded by remember { mutableStateOf(false) }
+
+    // Dynamically calculate the top padding for the legend based on search bar state
+    val legendTopPadding by animateDpAsState(
+        targetValue = if (isSearchExpanded) 120.dp else 48.dp,
+        label = "legendTopPadding"
+    )
 
     if (uiState.selectedAlert != null) {
         AlertDetailScreen(
@@ -128,35 +141,43 @@ fun MapScreen(
             SearchBar(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .padding(top = 48.dp, start = 16.dp, end = 16.dp)
+                    .padding(top = 48.dp, start = 16.dp, end = 16.dp),
+                isExpanded = isSearchExpanded,
+                onToggleExpand = { isSearchExpanded = it }
             )
 
-            // Legend (Top Left)
+            // Legend (Top Left) - Padding adjusts based on search bar expansion
             if (uiState.currentLayer == WeatherLayer.TEMPERATURE) {
                 TemperatureLegendCard(
                     modifier = Modifier
                         .align(Alignment.TopStart)
-                        .padding(top = 110.dp, start = 16.dp)
+                        .padding(top = legendTopPadding, start = 16.dp)
                 )
             } else if (uiState.currentLayer == WeatherLayer.PRECIPITATION) {
                  PrecipitationLegendCard(
                     modifier = Modifier
                         .align(Alignment.TopStart)
-                        .padding(top = 110.dp, start = 16.dp),
+                        .padding(top = legendTopPadding, start = 16.dp),
+                )
+            } else if (uiState.currentLayer == WeatherLayer.WIND) {
+                WindLegendCard(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(top = legendTopPadding, start = 16.dp),
                 )
             }
 
-            // Layer Selection Menu (Right)
+            // Layer Selection Menu
             Column(
                 modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .padding(end = 16.dp, bottom = 100.dp),
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 16.dp, bottom = 150.dp),
+                horizontalAlignment = Alignment.End
             ) {
                 AnimatedVisibility(
                     visible = isMenuExpanded,
                     enter = fadeIn() + expandVertically(),
                     exit = fadeOut() + shrinkVertically(),
-                    modifier = Modifier.align(Alignment.End)
                 ) {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -164,32 +185,67 @@ fun MapScreen(
                     ) {
                         LayerButton("Nedbør", Icons.Outlined.WaterDrop, uiState.currentLayer == WeatherLayer.PRECIPITATION) {
                             viewModel.onLayerSelected(WeatherLayer.PRECIPITATION)
+                            isMenuExpanded = false
                         }
                         LayerButton("Temperatur", Icons.Outlined.DeviceThermostat, uiState.currentLayer == WeatherLayer.TEMPERATURE) {
                             viewModel.onLayerSelected(WeatherLayer.TEMPERATURE)
+                            isMenuExpanded = false
                         }
                         LayerButton("Vind", Icons.Outlined.Air, uiState.currentLayer == WeatherLayer.WIND) {
                             viewModel.onLayerSelected(WeatherLayer.WIND)
+                            isMenuExpanded = false
                         }
                         LayerButton("Farevarsler", Icons.Default.Warning, uiState.showAlerts) {
                             viewModel.onAlertsSelected()
+                            isMenuExpanded = false
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                if (isMenuExpanded) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    FloatingActionButton(
+                        onClick = { isMenuExpanded = false },
+                        containerColor = Color(0xFFB0BEC5),
+                        contentColor = Color.Black,
+                        shape = CircleShape,
+                        modifier = Modifier.size(56.dp)
+                    ) {
+                        Icon(Icons.Default.Close, contentDescription = "Lukk")
+                    }
+                } else {
+                    val currentLabel = when {
+                        uiState.showAlerts -> "Farevarsler"
+                        uiState.currentLayer == WeatherLayer.PRECIPITATION -> "Nedbør"
+                        uiState.currentLayer == WeatherLayer.TEMPERATURE -> "Temperatur"
+                        uiState.currentLayer == WeatherLayer.WIND -> "Vind"
+                        else -> "Lag"
+                    }
+                    val currentIcon = when {
+                        uiState.showAlerts -> Icons.Default.Warning
+                        uiState.currentLayer == WeatherLayer.PRECIPITATION -> Icons.Outlined.WaterDrop
+                        uiState.currentLayer == WeatherLayer.TEMPERATURE -> Icons.Outlined.DeviceThermostat
+                        uiState.currentLayer == WeatherLayer.WIND -> Icons.Outlined.Air
+                        else -> Icons.Outlined.WaterDrop
+                    }
 
-                FloatingActionButton(
-                    onClick = { isMenuExpanded = !isMenuExpanded },
-                    containerColor = Color.White.copy(alpha = 0.9f),
-                    contentColor = Color.Black,
-                    shape = CircleShape,
-                    modifier = Modifier.size(56.dp).align(Alignment.End)
-                ) {
-                    Icon(
-                        if (isMenuExpanded) Icons.Default.Close else Icons.Default.KeyboardArrowUp,
-                        contentDescription = "Meny"
-                    )
+                    Surface(
+                        onClick = { isMenuExpanded = true },
+                        shape = RoundedCornerShape(24.dp),
+                        color = Color(0xFFE1F5FE),
+                        shadowElevation = 2.dp
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(currentIcon, contentDescription = null, modifier = Modifier.size(24.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(currentLabel, style = MaterialTheme.typography.labelLarge, fontSize = 16.sp)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Icon(Icons.Default.KeyboardArrowDown, contentDescription = null, modifier = Modifier.size(24.dp))
+                        }
+                    }
                 }
             }
 
@@ -197,7 +253,11 @@ fun MapScreen(
             TimeSliderCard(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 32.dp, start = 16.dp, end = 16.dp)
+                    .padding(bottom = 32.dp, start = 16.dp, end = 16.dp),
+                selectionKey = uiState.currentLayer to uiState.showAlerts,
+                onTimeSelected = { newUtcTime ->
+                    viewModel.onTimeChanged(newUtcTime)
+                }
             )
         }
     }
@@ -230,7 +290,7 @@ fun TemperatureLegendCard(modifier: Modifier = Modifier) {
             }
             Spacer(modifier = Modifier.height(8.dp))
             LazyColumn(
-                modifier = Modifier.height(240.dp),
+                modifier = Modifier.height(220.dp),
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 itemsIndexed(tempRanges) { index, range ->
@@ -253,18 +313,10 @@ fun TemperatureLegendCard(modifier: Modifier = Modifier) {
 
 @Composable
 fun PrecipitationLegendCard(modifier: Modifier = Modifier) {
-    val tempRanges = listOf(
-        "0.2",
-        "1.0",
-        "2.0",
-        "5.0",
-        "10.0",
-        "15.0",
-        "20.0",
-        "25.0",
-        "30.0",
-        "35.0",
-        ">40.0"
+    val precipRanges = listOf(
+        "0.2", "1.0", "2.0",
+        "5.0", "10.0", "15.0", "20.0",
+        "25.0", "30.0", "35.0", ">40.0"
     )
     val colors = listOf(
         "#80EBFF", "#59CCFF", "#32A2FF", "#0C6BFF", "#0140E5",
@@ -289,7 +341,7 @@ fun PrecipitationLegendCard(modifier: Modifier = Modifier) {
                 modifier = Modifier.height(180.dp),
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
-                itemsIndexed(tempRanges) { index, range ->
+                itemsIndexed(precipRanges) { index, range ->
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             modifier = Modifier
@@ -355,26 +407,56 @@ fun WindLegendCard(modifier: Modifier = Modifier) {
 
 
 @Composable
-fun SearchBar(modifier: Modifier = Modifier) {
-    Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(56.dp),
-        shape = RoundedCornerShape(28.dp),
-        color = Color.White,
-        shadowElevation = 4.dp
-    ) {
-        Row(
+fun SearchBar(
+    modifier: Modifier = Modifier,
+    isExpanded: Boolean,
+    onToggleExpand: (Boolean) -> Unit
+) {
+    var searchText by remember { mutableStateOf("") }
+
+    Box(modifier = modifier.fillMaxWidth()) {
+        Surface(
             modifier = Modifier
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .align(Alignment.CenterEnd)
+                .animateContentSize()
+                .height(56.dp)
+                .then(if (isExpanded) Modifier.fillMaxWidth() else Modifier.width(56.dp)),
+            shape = RoundedCornerShape(28.dp),
+            color = Color.White,
+            shadowElevation = 4.dp
         ) {
-            Text(
-                text = "Søk her...",
-                color = Color.Gray,
-                modifier = Modifier.weight(1f)
-            )
-            Icon(Icons.Default.Search, contentDescription = "Søk", tint = Color.Black)
+            if (isExpanded) {
+                Row(
+                    modifier = Modifier.padding(start = 16.dp, end = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    BasicTextField(
+                        value = searchText,
+                        onValueChange = { searchText = it },
+                        modifier = Modifier.weight(1f),
+                        singleLine = true,
+                        decorationBox = { innerTextField ->
+                            if (searchText.isEmpty()) {
+                                Text("Søk her...", color = Color.Gray)
+                            }
+                            innerTextField()
+                        }
+                    )
+                    IconButton(onClick = { 
+                        // TODO: Legg til søke-logikk her
+                        onToggleExpand(false) 
+                    }) {
+                        Icon(Icons.Default.Search, contentDescription = "Søk", tint = Color.Black)
+                    }
+                }
+            } else {
+                IconButton(
+                    onClick = { onToggleExpand(true) },
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Icon(Icons.Default.Search, contentDescription = "Åpne søk", tint = Color.Black)
+                }
+            }
         }
     }
 }
@@ -404,14 +486,23 @@ fun LayerButton(
 }
 
 @Composable
-fun TimeSliderCard(modifier: Modifier = Modifier) {
-    var sliderPosition by remember { mutableFloatStateOf(0f) }
+fun TimeSliderCard(
+    modifier: Modifier = Modifier,
+    selectionKey: Any?,
+    onTimeSelected: (String) -> Unit
+) {
+    var sliderPosition by remember(selectionKey) { mutableFloatStateOf(0f) }
     
-    val now = Instant.now().atZone(ZoneOffset.UTC)
-    val baseTime = now.withHour((now.hour / 3) * 3).truncatedTo(java.time.temporal.ChronoUnit.HOURS)
-    val selectedTime = baseTime.plusHours((sliderPosition.toInt() * 3).toLong())
-    val timeLabel = if (selectedTime.toLocalDate() == now.toLocalDate()) "I dag" else "I morgen"
-    val formattedTime = selectedTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+    val nowUTC = Instant.now().atZone(ZoneOffset.UTC)
+    val baseTime = nowUTC.withHour((nowUTC.hour / 3) * 3).truncatedTo(ChronoUnit.HOURS)
+    val selectedTimeUTC = baseTime.plusHours((sliderPosition.toInt() * 3).toLong())
+
+    val userZone = ZoneId.systemDefault()
+    val selectedLocalTime = selectedTimeUTC.withZoneSameInstant(userZone)
+    val nowLocal = nowUTC.withZoneSameInstant(userZone)
+    val timeLabel = if (selectedLocalTime.toLocalDate() == nowLocal.toLocalDate()) "I dag" else "I morgen"
+    val formattedTime = selectedLocalTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+    val formattedTimeUTC = selectedTimeUTC.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))
 
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -419,12 +510,17 @@ fun TimeSliderCard(modifier: Modifier = Modifier) {
         color = Color.White.copy(alpha = 0.9f),
         shadowElevation = 4.dp
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(12.dp)) {
             Text("$timeLabel kl. $formattedTime", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Slider(
                 value = sliderPosition,
-                onValueChange = { sliderPosition = it },
+                onValueChange = { 
+                    sliderPosition = it 
+                },
+                onValueChangeFinished = {
+                    onTimeSelected(formattedTimeUTC)
+                },
                 valueRange = 0f..8f,
                 steps = 7,
                 colors = SliderDefaults.colors(
