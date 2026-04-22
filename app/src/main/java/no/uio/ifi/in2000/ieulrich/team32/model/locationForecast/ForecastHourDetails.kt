@@ -5,5 +5,6 @@ data class ForecastHourDetails(
     val timestamp: String,
     val windSpeed: String,
     val temperature: String,
-    val precipitationAmount: String
+    val precipitationAmount: String,
+    val duration: Int
 )
