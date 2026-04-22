@@ -9,7 +9,7 @@ import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDeta
 fun LocationForecastResponse.toForecastByDay(): Map<String, List<ForecastHourDetails>> {
     return properties.timeseries
         .mapNotNull { it.toForeCastHourDetails() }
-        .groupBy { it.timestamp.substringBefore("T") }
+        .groupBy { Format.extractDate(it.timestamp) }
 }
 fun TimeSeries.toForeCastHourDetails(): ForecastHourDetails?{
     val nextHours = data.next1Hours ?: data.next6Hours ?: return null
