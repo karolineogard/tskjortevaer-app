@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.text.color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
@@ -54,6 +55,9 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import org.maplibre.android.style.expressions.Expression.*
+import android.graphics.Color as AndroidColor
+
 
 @Composable
 fun MapScreen(
@@ -561,8 +565,24 @@ private fun updateAlertsLayer(style: Style, show: Boolean, alertsUrl: String) {
 
     val fillLayer = FillLayer("alerts-layer", "alerts-source")
     fillLayer.setProperties(
-        PropertyFactory.fillColor(Color(0x60FF0000).hashCode()),
-        PropertyFactory.fillOutlineColor(Color.Red.hashCode())
+        PropertyFactory.fillColor(
+            match(
+                get("severity"),
+                literal("Moderate"), color(AndroidColor.argb(0x60, 255, 255, 0)), // Gul med gjennomsiktighet
+                literal("Severe"),   color(AndroidColor.argb(0x60, 255, 165, 0)), // Oransje
+                literal("Extreme"),  color(AndroidColor.argb(0x60, 255, 0, 0)),   // Rød
+                color(AndroidColor.argb(0x60, 128, 128, 128)) // Fallback (Grå)
+            )
+        ),
+        PropertyFactory.fillOutlineColor(
+            match(
+                get("severity"),
+                literal("Moderate"), color(AndroidColor.YELLOW),
+                literal("Severe"),   color(AndroidColor.parseColor("#FFA500")),
+                literal("Extreme"),  color(AndroidColor.RED),
+                color(AndroidColor.GRAY)
+            )
+        )
     )
     style.addLayer(fillLayer)
 }
