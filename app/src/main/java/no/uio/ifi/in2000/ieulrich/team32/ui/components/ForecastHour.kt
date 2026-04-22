@@ -27,9 +27,14 @@ fun ForecastHour(
     temp: String,
     windSpeed: String,
     precipitationAmount: String,
-    symbolCode: String) {
+    symbolCode: String,
+    compact: Boolean = false
+)
+
+{
     // TODO: må finne ut hvordan jeg kan bruke symbolCode til å hente riktig bilde, prøvde med et eksempel først
-    val size = 24.sp
+    val size = if (compact) 14.sp else 24.sp
+    val imageSize = if (compact) 32.dp else 64.dp
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -43,7 +48,7 @@ fun ForecastHour(
             contentDescription = symbolCode,
             modifier = Modifier.padding(top = 12.dp)
                 .weight(1f)
-                .size(64.dp),
+                .size(imageSize),
             alignment = Alignment.Center
         )
         Spacer(modifier = Modifier.weight(0.5f))
