@@ -9,7 +9,10 @@ import no.uio.ifi.in2000.ieulrich.team32.data.victoriaWMS.WeatherRepository
 import no.uio.ifi.in2000.ieulrich.team32.data.victoriaWMS.WeatherRepositoryImpl
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
 import no.uio.ifi.in2000.ieulrich.team32.model.victoriaWMS.WeatherLayer
-import kotlin.Boolean
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 data class MapUiState(
     val currentLayer: WeatherLayer? = WeatherLayer.TEMPERATURE,
@@ -17,8 +20,7 @@ data class MapUiState(
     val showAlerts: Boolean = false,
     val alertsUrl: String = "",
     val selectedAlert: MetAlert? = null
-        )
-
+)
 
 class MapViewModel(
     private val repository: WeatherRepository = WeatherRepositoryImpl()
@@ -26,9 +28,7 @@ class MapViewModel(
     private val _uiState = MutableStateFlow(MapUiState(alertsUrl = repository.getAlertsUrl()))
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
 
-    var alertScreen : Boolean = false
-
-    init{
+    init {
         updateLayer(WeatherLayer.TEMPERATURE)
     }
 
@@ -36,36 +36,50 @@ class MapViewModel(
         updateLayer(layer)
     }
 
-    fun onAlertsSelected(){
+    fun onAlertsSelected() {
         _uiState.update { it.copy(
             currentLayer = null,
             wmsUrl = "",
             showAlerts = true,
-
-        )
-
-        }
-
+        ) }
     }
 
-    fun selectAlert(alert: MetAlert?){
+    fun selectAlert(alert: MetAlert?) {
         _uiState.update { it.copy(
             selectedAlert = alert
         ) }
-
     }
 
-    fun toggleAlerts(){
+    fun toggleAlerts() {
         _uiState.update { it.copy(showAlerts = !it.showAlerts) }
     }
 
     private fun updateLayer(layer: WeatherLayer) {
         _uiState.update { it.copy(
             currentLayer = layer,
-            wmsUrl = repository.getWmsUrl(layer),
+            wmsUrl = repository.getWmsUrl(layer, getCurrentTime()),
             showAlerts = false
         ) }
-
-
     }
+
+    fun getCurrentTime(): String{
+        val currentTime = Instant.now()
+            .atZone(ZoneOffset.UTC)
+            .let { zdt ->
+                val roundedHour = ((zdt.hour + 1) / 3) * 3  // runder til nærmeste, ikke alltid ned
+                zdt.withHour(roundedHour).truncatedTo(ChronoUnit.HOURS)
+            }
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))
+        return currentTime
+    }
+
+
+    fun onTimeChanged(formattedTimeUTC: String) {
+        val current = _uiState.value.currentLayer ?: return
+        _uiState.update { it.copy(
+            wmsUrl = repository.getWmsUrl(current, formattedTimeUTC)
+        ) }
+    }
+
+
 }
