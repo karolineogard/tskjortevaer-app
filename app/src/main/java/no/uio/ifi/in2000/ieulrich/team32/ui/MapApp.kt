@@ -66,14 +66,11 @@ fun MapApp(
                         label = {Text(destination.label)}
                         ,colors = NavigationBarItemDefaults.colors(
 
-                            // Dette er den blå pilla (din MediumBlue variabel)
                             indicatorColor = MediumBlue,
 
-                            // Disse styrer fargene når tingen er valgt
                             selectedIconColor = Grey,
                             selectedTextColor = Grey,
 
-                            // Disse styrer fargene når tingen IKKE er valgt
                             unselectedIconColor = Grey,
                             unselectedTextColor = Grey
                         )
@@ -117,10 +114,11 @@ fun MapApp(
                 MapScreen(navController = navController)
             }
 
-            composable(route = "forecast?lat={lat}&lon={lon}") { backStackEntry ->
+            composable(route = "forecast?lat={lat}&lon={lon}&city={city}") { backStackEntry ->
                 val lat = backStackEntry.arguments?.getString("lat")?.toDoubleOrNull()
                 val lon = backStackEntry.arguments?.getString("lon")?.toDoubleOrNull()
-                LocationForecastScreen(lat = lat, lon = lon, navController = navController)
+                val city = backStackEntry.arguments?.getString("city") ?: "Værvarsel"
+                LocationForecastScreen(lat = lat, lon = lon, city = city, navController = navController)
             }
 
             composable(route = Routes.HOME){

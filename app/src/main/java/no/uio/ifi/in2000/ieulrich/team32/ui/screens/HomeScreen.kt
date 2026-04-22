@@ -68,6 +68,7 @@ import java.util.*
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.ui.Destination
 import no.uio.ifi.in2000.ieulrich.team32.ui.Routes
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.Grey
 import java.net.HttpURLConnection
 
 
@@ -165,26 +166,30 @@ fun HomeScreen(
                     onValueChange = { søkeTekst = it },
                     //leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                     singleLine = true,
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    ),
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions(
                         onSearch = {
                             scope.launch {
                                 try {
+
                                     val coords = getCoordsFromService(søkeTekst)
                                     if (coords != null) {
-                                        navController.navigate("forecast?lat=${coords.lat}&lon=${coords.lon}")
-                                    }
+                                        navController.navigate("forecast?lat=${coords.lat}&lon=${coords.lon}&city=${søkeTekst}")                                    }
                                 } catch (e: Exception) {
 
                                 }
                             }
                             søkAktiv = false
                         }
+                    ),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        focusedTextColor = Grey,
+                        unfocusedTextColor = Grey,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
                     )
                 )
             }
@@ -204,13 +209,9 @@ fun HomeScreen(
                 exit = shrinkVertically() + fadeOut()
             ) {
                 Column {
-//                    Text(
-//                        text = "Farevarsler",
-//                        style = MaterialTheme.typography.titleMedium,
-//                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-//                    )
+
                     MetalertCarousel(modifier = Modifier.height(80.dp))
-                   // Spacer(Modifier.height(padding))
+
                 }
             }
         }
@@ -424,11 +425,10 @@ fun clothingCard(navController: NavController,
                         textAlign = TextAlign.Center
                     )
                     IconButton(onClick = { clicked = !clicked },) {
-                        Icon(Icons.Default.Info, contentDescription = "Lukk søk")
+                        Icon(Icons.Default.Info, contentDescription = "Lukk")
 
 
                     }
-
 
                 }
 
@@ -436,7 +436,56 @@ fun clothingCard(navController: NavController,
 
             }
 
+            HorizontalDivider()
+
+            Spacer(
+                modifier = Modifier
+                    .size(15.dp)
+            )
+
+            Row(
+                modifier = Modifier
+                    .padding(start = 16.dp, end = 16.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                Image(
+                    painter = painterResource(id = R.drawable.solbriller_ikon),
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp)
+                )
+                Spacer(modifier = Modifier.weight(0.5f))
+
+                Text(
+                    text = "Hatt og/eller solbriller for å beskytte mot solen."
+                )
             }
+
+            Spacer(
+                modifier = Modifier
+                    .size(15.dp)
+            )
+
+            Row(
+                modifier = Modifier
+                    .padding(start = 16.dp, end = 16.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                Image(
+                    painter = painterResource(id = R.drawable.caps_ikon),
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp)
+                )
+                Spacer(modifier = Modifier.weight(0.5f))
+
+                Text(
+                    text = "Hatt og/eller solbriller for å beskytte mot solen."
+                )
+            }
+        }
 
 
     if (clicked) {
