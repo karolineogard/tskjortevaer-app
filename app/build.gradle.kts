@@ -71,7 +71,11 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
     implementation("io.ktor:ktor-client-okhttp:2.3.7")
+    
+    // Coil 3 dependencies
+    implementation("io.coil-kt.coil3:coil-compose:3.3.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
+    implementation("io.coil-kt.coil3:coil-svg:3.3.0")
 
     // navigation stuff
     implementation("androidx.navigation:navigation-compose:2.7.4")
@@ -80,4 +84,3 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation("androidx.compose.material:material-icons-extended")
 }
-

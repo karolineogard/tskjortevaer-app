@@ -10,4 +10,5 @@ data class MetAlert(
     val awarnessResponse: String? = null,
     val awarnessLevel: String? = null,
     val title: String? = null,
+
 )
