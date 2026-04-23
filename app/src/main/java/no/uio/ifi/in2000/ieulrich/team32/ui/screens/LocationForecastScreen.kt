@@ -47,6 +47,7 @@ import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
 import androidx.navigation.NavController
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.dto.Instant
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.dto.TimeSeries
+import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ForecastHour
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 import java.time.LocalDate
@@ -258,7 +259,8 @@ fun DayForecastCard(dato: String, timeseries: List<TimeSeries>) {
                        windSpeed = Format.formatWind(instantDetails.windSpeed.toString()),
                        symbolCode = symbolCode,
                        precipitationAmount = Format.formatPrecipitation(nedbør.toString()),
-                       compact = true
+                       compact = true,
+                       //forecastHourDetails = ForecastHourDetails
                    )
                }
            }

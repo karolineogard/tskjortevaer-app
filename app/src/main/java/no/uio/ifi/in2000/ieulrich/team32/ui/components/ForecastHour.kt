@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -19,7 +22,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import no.uio.ifi.in2000.ieulrich.team32.R
+import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
+import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.imageUrl
 
 @Composable
 fun ForecastHour(
@@ -28,7 +34,8 @@ fun ForecastHour(
     windSpeed: String,
     precipitationAmount: String,
     symbolCode: String,
-    compact: Boolean = false
+    compact: Boolean = false,
+    forecastHourDetails: ForecastHourDetails?=null
 )
 
 {
@@ -43,13 +50,30 @@ fun ForecastHour(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        Image(
-            painter = painterResource(id = R.drawable.clearsky_day),
-            contentDescription = symbolCode,
-            modifier = Modifier.padding(top = 12.dp)
-                .weight(1f)
-                .size(imageSize),
-            alignment = Alignment.Center
+        AsyncImage(
+            model = "https://raw.githubusercontent.com/metno/weathericons/refs/heads/main/weather/svg/$symbolCode.svg",
+            contentDescription = "Ikon for ${forecastHourDetails?.symbolCode}",
+            modifier = Modifier
+                .size(60.dp)
+                .padding(vertical = 8.dp),
+            contentScale = ContentScale.Fit,
+            onState = { state ->
+                when (state) {
+                    is coil3.compose.AsyncImagePainter.State.Error -> {
+                        Log.e(
+                            "MetAlertIcon",
+                            "Feil ved lasting av ikon: ${state.result.throwable.message}"
+                        )
+                        Log.e("MetAlertIcon", "Prøvde å hente: ${forecastHourDetails?.imageUrl}")
+                    }
+
+                    is coil3.compose.AsyncImagePainter.State.Success -> {
+                        Log.d("MetAlertIcon", "Vellykket lasting av: ${forecastHourDetails?.imageUrl}")
+                    }
+
+                    else -> {}
+                }
+            }
         )
         Spacer(modifier = Modifier.weight(0.5f))
         Text(
@@ -89,8 +113,8 @@ fun ForecastHour(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewForecastHour(){
-    ForecastHour("16:00", "17°", "5 m/s", precipitationAmount = "3 mm", symbolCode = "clearsky_day")
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewForecastHour(){
+//    ForecastHour("16:00", "17°", "5 m/s", precipitationAmount = "3 mm", symbolCode = "clearsky_day")
+//}

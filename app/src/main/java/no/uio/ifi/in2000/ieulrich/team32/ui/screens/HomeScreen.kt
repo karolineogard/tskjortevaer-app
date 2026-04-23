@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
 
 import android.R.attr.contentDescription
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -56,19 +57,28 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil3.compose.AsyncImage
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import no.uio.ifi.in2000.ieulrich.team32.R
+import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
+import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.imageUrl
+import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.iconUrl
 import no.uio.ifi.in2000.ieulrich.team32.ui.Destination
 import no.uio.ifi.in2000.ieulrich.team32.ui.Routes
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.Grey
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 import java.net.HttpURLConnection
 
 
@@ -115,13 +125,15 @@ suspend fun getCoordsFromService(sted: String): SimpleLatLng? {
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    viewmodel: LocationForecastViewmodel = viewModel()
 ){
     val textFieldState = rememberTextFieldState()
     val scope = rememberCoroutineScope()
     val padding = 16.dp
     var søkeTekst by remember{mutableStateOf("")}
     var søkAktiv by remember { mutableStateOf(false) }
+    val forecastNow by viewmodel.forecastNow.collectAsState()
 
     //hardkodet
     var isVisible by remember { mutableStateOf(true) }
@@ -200,7 +212,7 @@ fun HomeScreen(
 
 
         item {
-        weatherCard(navController = navController)}
+        weatherCard(navController = navController, forecastHourDetails = forecastNow )}
 
         item {
             AnimatedVisibility(
@@ -257,7 +269,8 @@ fun MetalertCarousel(modifier: Modifier = Modifier){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun weatherCard(navController : NavController){
+fun weatherCard(navController : NavController,
+                forecastHourDetails: ForecastHourDetails?){
 
 
 
@@ -315,10 +328,30 @@ fun weatherCard(navController : NavController){
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Icon(painter = painterResource(id = R.drawable.clearsky_day
-                ), contentDescription = null,
+                AsyncImage(
+                    model = forecastHourDetails?.imageUrl,
+                    contentDescription = "Ikon for ${forecastHourDetails?.symbolCode}",
                     modifier = Modifier
-                        .size(70.dp)
+                        .size(120.dp)
+                        .padding(vertical = 8.dp),
+                    contentScale = ContentScale.Fit,
+                    onState = { state ->
+                        when (state) {
+                            is coil3.compose.AsyncImagePainter.State.Error -> {
+                                Log.e(
+                                    "MetAlertIcon",
+                                    "Feil ved lasting av ikon: ${state.result.throwable.message}"
+                                )
+                                Log.e("MetAlertIcon", "Prøvde å hente: ${forecastHourDetails?.imageUrl}")
+                            }
+
+                            is coil3.compose.AsyncImagePainter.State.Success -> {
+                                Log.d("MetAlertIcon", "Vellykket lasting av: ${forecastHourDetails?.imageUrl}")
+                            }
+
+                            else -> {}
+                        }
+                    }
                 )
 
                 Spacer(modifier = Modifier.width(5.dp))
