@@ -14,6 +14,12 @@ object Format {
     const val precipitationSuffix = " mm"
     const val windSuffix = " m/s"
 
+    fun extractDate(time: String): String {
+        val parsed = Instant.parse(time).atZone(ZoneId.systemDefault())
+        return parsed.format(DateTimeFormatter.ofPattern("DD.MM"))
+
+    }
+
     fun extractHour(time: String): String {
         val parsed = Instant.parse(time).atZone(ZoneId.systemDefault())
         return parsed.format(DateTimeFormatter.ofPattern("HH"))

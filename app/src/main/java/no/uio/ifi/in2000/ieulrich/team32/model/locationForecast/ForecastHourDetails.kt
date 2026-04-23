@@ -5,5 +5,11 @@ data class ForecastHourDetails(
     val timestamp: String,
     val windSpeed: String,
     val temperature: String,
-    val precipitationAmount: String
+    val precipitationAmount: String,
+    val duration: Int
 )
+
+val ForecastHourDetails.imageUrl: String
+    get() {
+        return "https://raw.githubusercontent.com/metno/weathericons/refs/heads/main/weather/svg/$symbolCode.svg"
+    }
