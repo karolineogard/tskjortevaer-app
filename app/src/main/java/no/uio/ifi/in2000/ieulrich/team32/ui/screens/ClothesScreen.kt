@@ -24,6 +24,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Button
@@ -33,9 +35,11 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
+import androidx.compose.material3.TimeInput
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,15 +70,6 @@ fun ClothesScreen(
     val scope = rememberCoroutineScope()
     var hasNavigated by remember { mutableStateOf(false) }
 
-    LaunchedEffect(sheetState.bottomSheetState.currentValue) {
-        if (sheetState.bottomSheetState.currentValue == SheetValue.Expanded && !hasNavigated) {
-            hasNavigated = true
-            delay(200)
-            navController.navigate(Routes.ADJUSTMENT)
-            sheetState.bottomSheetState.partialExpand()
-            hasNavigated = false
-        }
-    }
 
     BackHandler(enabled = sheetState.bottomSheetState.currentValue == SheetValue.Expanded) {
         scope.launch {
@@ -92,11 +87,63 @@ fun ClothesScreen(
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(horizontal = 16.dp)
-
             )
 
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text("Dra opp for å tilpasse klesanbefalinger")
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                val morningTimeState = rememberTimePickerState(
+                    initialHour = 8, initialMinute = 0, is24Hour = true
+                )
+                val eveningTimeState = rememberTimePickerState(
+                    initialHour = 16, initialMinute = 0, is24Hour = true
+                )
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 24.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Når reiser du?", fontSize = 32.sp, fontWeight = FontWeight.Bold)
+
+                        Text("Dra", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+                        TimeInput(state = morningTimeState)
+
+                        HorizontalDivider()
+
+                        Text("Tilbake", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+                        TimeInput(state = eveningTimeState)
+                    }
+                }
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        CheckboxMinimalExample()
+                    }
+                }
+
+                Button(
+                    onClick = {
+                        scope.launch { sheetState.bottomSheetState.partialExpand() }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Lagre")
+                }
             }
         }
     ) { innerPadding ->
