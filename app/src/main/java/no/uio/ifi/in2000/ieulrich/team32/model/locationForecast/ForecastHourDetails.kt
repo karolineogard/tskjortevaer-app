@@ -8,3 +8,4 @@ data class ForecastHourDetails(
     val precipitationAmount: String,
     val duration: Int
 )
+
