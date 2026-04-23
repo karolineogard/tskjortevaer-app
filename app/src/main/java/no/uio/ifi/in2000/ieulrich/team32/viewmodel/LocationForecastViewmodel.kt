@@ -17,6 +17,9 @@ class LocationForecastViewmodel(): ViewModel() {
     private val _forecastByDay = MutableStateFlow<Map<String, List<ForecastHourDetails>>?>(null)
     val forecastByDay: StateFlow<Map<String, List<ForecastHourDetails>>?> = _forecastByDay.asStateFlow()
 
+    private val _forecastNow = MutableStateFlow<ForecastHourDetails?>(null)
+    val forecastNow: StateFlow<ForecastHourDetails?> = _forecastNow.asStateFlow()
+
     fun getForecast(lat: Double, lon: Double){
         viewModelScope.launch {
             _forecast.value = repository.getForecast(lat, lon)
@@ -28,4 +31,13 @@ class LocationForecastViewmodel(): ViewModel() {
             _forecastByDay.value = repository.getForecastByDay(lat, lon)
         }
     }
+
+    fun getForecastNow(lat: Double, lon: Double){
+        viewModelScope.launch {
+            _forecastNow.value = repository.getForecastNow(lat, lon)
+        }
+    }
+
+
+
 }
