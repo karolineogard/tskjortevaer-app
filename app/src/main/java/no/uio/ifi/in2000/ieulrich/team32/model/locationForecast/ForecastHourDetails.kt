@@ -9,3 +9,7 @@ data class ForecastHourDetails(
     val duration: Int
 )
 
+val ForecastHourDetails.imageUrl: String
+    get() {
+        return "https://raw.githubusercontent.com/metno/weathericons/refs/heads/main/weather/svg/$symbolCode.svg"
+    }
