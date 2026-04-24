@@ -132,7 +132,7 @@ fun ClothesScreen(
                     )
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        CheckboxMinimalExample()
+                        Checkbox()
                     }
                 }
 
