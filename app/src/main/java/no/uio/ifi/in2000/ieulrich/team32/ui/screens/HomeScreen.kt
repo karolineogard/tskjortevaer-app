@@ -436,7 +436,8 @@ fun clothingCard(navController: NavController,
                 .height(300.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            )
+            ),
+            onClick = { navController.navigate(Routes.CLOTHES) }
 
         ) {
             Column(
@@ -694,39 +695,3 @@ fun clothingCard(navController: NavController,
 
 
 
-//@Preview
-//@Composable
-//fun homescreenPreview(){
-//    HomeScreen(modifier = Modifier,
-//        navController = rememberNavController()
-//    )
-//
-//}
-//
-//@Preview
-//@Composable
-//fun weatherCardPreview(){
-//    weatherCard(navController = rememberNavController())
-//}
-
-//@Preview
-//@Composable
-//fun metalertCardPreview(){
-//    metalertCard()
-//}
-
-//@Preview
-//@Composable
-//fun clothingCardPreview(){
-//    clothingCard(navController = NavController)
-//}
-
-
-
-
-
-//@Preview
-//@Composable
-//fun metalertCarouselPreview(){
-//    metalertCarousel()
-//}
