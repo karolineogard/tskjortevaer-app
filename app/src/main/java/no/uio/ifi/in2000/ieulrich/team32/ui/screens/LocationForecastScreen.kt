@@ -75,7 +75,7 @@ fun LocationForecastScreen(
         // TODO: håndter null-verdier her
     } else {
         LaunchedEffect(lat, lon) {
-            viewmodel.getForecast(lat, lon)
+            viewmodel.loadForecast(lat, lon)
         }
     }
     val forecast by viewmodel.forecast.collectAsState()
