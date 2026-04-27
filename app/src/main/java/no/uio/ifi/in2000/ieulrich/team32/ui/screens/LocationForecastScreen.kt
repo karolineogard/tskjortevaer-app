@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -100,99 +101,21 @@ fun LocationForecastScreen(
                 expandedHeight = 32.dp
             )
         }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-        ){
-        Row(
-            modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+    ) { innerPadding: PaddingValues ->
+
+
+        LazyColumn(
+            modifier = Modifier.padding(innerPadding)  // <- legg til denne
         ) {
-            Spacer(modifier = Modifier.weight(1.5f))
-            Text(
-                "Tid",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1.1f),
-                textAlign = TextAlign.Left
-            )
-            Spacer(modifier = Modifier.weight(0.5f))
-            Text(
-                "Temp",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f),
-                textAlign = TextAlign.Left
-            )
-            Spacer(modifier = Modifier.weight(0.5f))
-            Text(
-                "Nedbør",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1.3f),
-                textAlign = TextAlign.Left
-            )
-            Spacer(modifier = Modifier.weight(0.5f))
-            Text(
-                "Vind",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f),
-                textAlign = TextAlign.Left
-            )
-
-        }
-
-        LazyColumn() {
             groupedByDay.entries.forEach { (dato, timeseriesForDag) ->
                 item {
                     DayForecastCard(dato = dato, timeseries = timeseriesForDag)
                 }
             }
-
-//            groupedByDay.entries.forEach { (dato, timeseriesForDag) ->
-//                item{
-//                    Text(
-//                        text = dato,
-//                        fontSize = 20.sp,
-//                        fontWeight = FontWeight.Bold,
-//                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-//                    )
-//                }
-//
-//
-//            items(timeseriesForDag) { timeseries ->
-//                val time = Format.extractHour(timeseries.time)
-//                val instantDetails = timeseries.data.instant.details
-//                val next1HoursDetails = timeseries.data.next1Hours?.details?.precipitationAmount
-//                val symbolCode = timeseries.data.next1Hours?.summary?.symbolCode ?: ""
-//
-//                ForecastHour(
-//                    time = time,
-//                    temp = Format.formatTemp(instantDetails.airTemperature.toString()),
-//                    windSpeed = Format.formatWind(instantDetails.windSpeed.toString()),
-//                    symbolCode = symbolCode,
-//                    precipitationAmount = Format.formatPrecipitation(next1HoursDetails.toString()))
-
-//              items(forecast?.properties?.timeseries ?: emptyList()) { timeseries ->
-//                val time = Format.extractHour(timeseries.time)
-//                val instantDetails = timeseries.data.instant.details
-//                val next1HoursDetails = timeseries.data.next1Hours?.details?.precipitationAmount
-//                val symbolCode = timeseries.data.next1Hours?.summary?.symbolCode ?: ""
-//                ForecastHour(
-//                    time = time,
-//                    temp = instantDetails.airTemperature.toString(),
-//                    windSpeed = instantDetails.windSpeed.toString(),
-//                    symbolCode = symbolCode,
-//                    precipitationAmount = next1HoursDetails.toString()
-//                )
-//            }
+        }
             }
-            }
-    }
+
+
 }
 
 
