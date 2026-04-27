@@ -87,4 +87,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation(platform(libs.androidx.compose.bom))
     implementation("androidx.compose.material:material-icons-extended")
+
+    // location stuff
+    implementation(libs.play.services.location)
 }

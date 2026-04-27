@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -37,11 +38,13 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.screens.LocationForecastScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.MapScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.SettingsScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.*
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 
 @Composable
 fun MapApp(
     navController: NavHostController = rememberNavController(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: LocationForecastViewmodel = viewModel()
 ){
 
     val startDestination = Destination.HOME
@@ -122,7 +125,7 @@ fun MapApp(
             }
 
             composable(route = Routes.HOME){
-                HomeScreen(navController = navController)
+                HomeScreen(navController = navController, viewmodel = viewModel)
             }
 
 
