@@ -51,7 +51,7 @@ class LocationForecastViewmodel(
 
 suspend fun FusedLocationProviderClient.getDeviceLocation(context: Context): Location?{
     val hasPermission = ActivityCompat.checkSelfPermission(
-        context, android.Manifest.permission.ACCESS_FINE_LOCATION
+        context, android.Manifest.permission.ACCESS_COARSE_LOCATION
     ) == PackageManager.PERMISSION_GRANTED
 
     if (!hasPermission) return null
