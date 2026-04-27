@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -86,6 +87,10 @@ fun HomeScreen(
     navController: NavController,
     viewmodel: LocationForecastViewmodel = viewModel()
 ) {
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewmodel.loadForecastForDevice(context)
+    }
     val padding = 16.dp
     val forecastNow by viewmodel.forecastNow.collectAsState()
     var isVisible by remember { mutableStateOf(true) }
@@ -326,31 +331,59 @@ fun WeatherCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(painter = painterResource(id = R.drawable.klokke_ikon), contentDescription = null, modifier = Modifier.weight(0.4f))
+                Icon(
+                    painter = painterResource(id = R.drawable.klokke_ikon),
+                    contentDescription = null,
+                    modifier = Modifier.weight(0.4f)
+                )
                 Text(text = "$datePart $timePart", modifier = Modifier.weight(3f))
             }
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(text = "Oslo", fontSize = 40.sp)
             }
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                AsyncImage(
-                    model = forecastHourDetails?.imageUrl,
-                    contentDescription = "Ikon for ${forecastHourDetails?.symbolCode}",
-                    modifier = Modifier.size(120.dp).padding(vertical = 8.dp),
-                    contentScale = ContentScale.Fit,
-                    onState = { state ->
-                        when (state) {
-                            is coil3.compose.AsyncImagePainter.State.Error -> Log.e("WeatherCard", "Feil: ${state.result.throwable.message}")
-                            is coil3.compose.AsyncImagePainter.State.Success -> Log.d("WeatherCard", "Lastet: ${forecastHourDetails?.imageUrl}")
-                            else -> {}
+            forecastHourDetails?.let { details ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    AsyncImage(
+                        model = details.imageUrl,
+                        contentDescription = "Ikon for ${details.symbolCode}",
+                        modifier = Modifier.size(120.dp).padding(vertical = 8.dp),
+                        contentScale = ContentScale.Fit,
+                        onState = { state ->
+                            when (state) {
+                                is coil3.compose.AsyncImagePainter.State.Error -> Log.e(
+                                    "WeatherCard",
+                                    "Feil: ${state.result.throwable.message}"
+                                )
+
+                                is coil3.compose.AsyncImagePainter.State.Success -> Log.d(
+                                    "WeatherCard",
+                                    "Loaded: ${details.imageUrl}"
+                                )
+
+                                else -> {}
+                            }
                         }
-                    }
-                )
-                Spacer(modifier = Modifier.width(5.dp))
-                Text(text = "8°C", fontSize = 40.sp)
+                    )
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Text(text = details.temperature, fontSize = 40.sp)
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) { Text(text = "Strålende sol") }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) { Text(text = "H:14°  L: 5°") }
             }
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) { Text(text = "Strålende sol") }
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) { Text(text = "H:14°  L: 5°") }
         }
     }
 }

@@ -38,8 +38,9 @@ class LocationForecastViewmodel(
     }
 
     fun loadForecastForDevice(context: Context){
+        val appContext = context.applicationContext
         viewModelScope.launch {
-            val location = locationClient.getDeviceLocation(context) ?: return@launch
+            val location = locationClient.getDeviceLocation(appContext) ?: return@launch
             val response = repository.getForecast(location.latitude, location.longitude)
             _forecast.value = response
             _forecastByDay.value = response.toForecastByDay()
