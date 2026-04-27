@@ -19,6 +19,7 @@ fun TimeSeries.toForeCastHourDetails(): ForecastHourDetails?{
         windSpeed = Format.formatWind(data.instant.details.windSpeed.toString()),
         temperature = Format.formatTemp(data.instant.details.airTemperature.toString()),
         precipitationAmount = Format.formatPrecipitation(nextHours.details?.precipitationAmount.toString() ?: "0.0"),
+        humidity = data.instant.details.relativeHumidity,
         duration = when {
             data.next1Hours != null -> 1
             else -> 6
