@@ -3,6 +3,7 @@ package no.uio.ifi.in2000.ieulrich.team32.viewmodel
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,10 +33,18 @@ class LocationForecastViewmodel(
     private val _forecastNow = MutableStateFlow<ForecastHourDetails?>(null)
     val forecastNow: StateFlow<ForecastHourDetails?> = _forecastNow.asStateFlow()
 
+    init {
+        Log.d("LocationForecastViewModel", "ViewModel initialized")
+    }
+
     fun loadForecastForDevice(context: Context){
         viewModelScope.launch {
             val location = locationClient.getDeviceLocation(context) ?: return@launch
-            loadForecast(location.latitude, location.longitude)
+            val response = repository.getForecast(location.latitude, location.longitude)
+            _forecast.value = response
+            _forecastByDay.value = response.toForecastByDay()
+            _forecastNow.value = _forecastByDay.value?.values?.flatten()?.firstOrNull()
+
         }
     }
 
@@ -44,7 +53,6 @@ class LocationForecastViewmodel(
             val response = repository.getForecast(lat, lon)
             _forecast.value = response
             _forecastByDay.value = response.toForecastByDay()
-            _forecastNow.value = response.toForecastByDay().values.flatten().firstOrNull()
         }
     }
 }

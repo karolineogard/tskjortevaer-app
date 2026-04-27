@@ -57,6 +57,7 @@ class MainActivity : ComponentActivity() {
 
         // Initialize MapLibre before setContent
         MapLibre.getInstance(this, null, WellKnownTileServer.MapLibre)
+        // request location permission
         locationPermissionLauncher.launch(android.Manifest.permission.ACCESS_COARSE_LOCATION)
         enableEdgeToEdge()
         setContent {
