@@ -46,6 +46,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -63,7 +64,7 @@ fun ClothesScreen(
     val sheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberStandardBottomSheetState(
             initialValue = SheetValue.PartiallyExpanded,
-            skipHiddenState = false
+            skipHiddenState = true
         )
     )
 
@@ -79,14 +80,15 @@ fun ClothesScreen(
 
     BottomSheetScaffold(
         scaffoldState = sheetState,
-        sheetPeekHeight = 64.dp,
+        sheetPeekHeight = 48.dp,
         containerColor = MaterialTheme.colorScheme.background,
+        sheetDragHandle = null,
         sheetContent = {
             Text(
                 text = "Tilpass klesanbefaling",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
             )
 
             Column(
@@ -101,6 +103,12 @@ fun ClothesScreen(
                 val eveningTimeState = rememberTimePickerState(
                     initialHour = 16, initialMinute = 0, is24Hour = true
                 )
+
+                val focusManager = LocalFocusManager.current
+                LaunchedEffect(Unit) {
+                    delay(100)
+                    focusManager.clearFocus()
+                }
 
                 Card(
                     modifier = Modifier
