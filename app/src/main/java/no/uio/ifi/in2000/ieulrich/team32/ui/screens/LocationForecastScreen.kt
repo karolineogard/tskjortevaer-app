@@ -63,7 +63,7 @@ import kotlin.math.exp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationForecastScreen(
-    viewmodel: LocationForecastViewmodel = viewModel(),
+    viewmodel: LocationForecastViewmodel,
     lat: Double?,
     lon: Double?,
     city: String = "Værvarsel",

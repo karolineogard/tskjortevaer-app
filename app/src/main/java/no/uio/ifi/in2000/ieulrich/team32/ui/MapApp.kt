@@ -44,7 +44,7 @@ import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 fun MapApp(
     navController: NavHostController = rememberNavController(),
     modifier: Modifier = Modifier,
-    viewModel: LocationForecastViewmodel = viewModel()
+    viewModel: LocationForecastViewmodel
 ){
 
     val startDestination = Destination.HOME
@@ -121,7 +121,13 @@ fun MapApp(
                 val lat = backStackEntry.arguments?.getString("lat")?.toDoubleOrNull()
                 val lon = backStackEntry.arguments?.getString("lon")?.toDoubleOrNull()
                 val city = backStackEntry.arguments?.getString("city") ?: "Værvarsel"
-                LocationForecastScreen(lat = lat, lon = lon, city = city, navController = navController)
+                LocationForecastScreen(
+                    viewmodel = viewModel,  // ← send den inn
+                    lat = lat,
+                    lon = lon,
+                    city = city,
+                    navController = navController
+                )
             }
 
             composable(route = Routes.HOME){
@@ -145,8 +151,3 @@ fun MapApp(
 }
 
 
-@Preview
-@Composable
-fun NavbarPreview() {
-    MapApp()
-}

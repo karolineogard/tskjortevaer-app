@@ -85,7 +85,7 @@ suspend fun getCoordsFromService(sted: String): SimpleLatLng? {
 fun HomeScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    viewmodel: LocationForecastViewmodel = viewModel()
+    viewmodel: LocationForecastViewmodel
 ) {
     val context = LocalContext.current
     LaunchedEffect(Unit) {
@@ -94,6 +94,8 @@ fun HomeScreen(
     val padding = 16.dp
     val forecastNow by viewmodel.forecastNow.collectAsState()
     var isVisible by remember { mutableStateOf(true) }
+    val currentLocation by viewmodel.currentLocation.collectAsState()
+
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -106,10 +108,15 @@ fun HomeScreen(
         )
     ) {
         item {
-            HomeSearchBar(navController = navController)
+             HomeSearchBar(navController = navController, viewmodel = viewmodel)
         }
+
         item {
-            WeatherCard(navController = navController, forecastHourDetails = forecastNow)
+            WeatherCard(
+                navController = navController,
+                forecastHourDetails = forecastNow,
+                location = currentLocation  // ← send inn
+            )
         }
         item {
             AnimatedVisibility(
@@ -130,7 +137,9 @@ fun HomeScreen(
 @Composable
 fun HomeSearchBar(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    viewmodel: LocationForecastViewmodel // ← legg til
+
 ) {
     val scope = rememberCoroutineScope()
     var søkeTekst by remember { mutableStateOf("") }
@@ -139,6 +148,7 @@ fun HomeSearchBar(
     var sisteSearcher by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
     val søkeFlow = remember { MutableStateFlow("") }
     var harFokus by remember { mutableStateOf(false) }
+
 
 
     LaunchedEffect(Unit) {
@@ -309,11 +319,19 @@ fun MetalertCarousel(modifier: Modifier = Modifier) {
 fun WeatherCard(
     navController: NavController,
     forecastHourDetails: ForecastHourDetails?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    location: Pair<Double, Double>?, // ← legg til
+
 ) {
+
     Card(
         modifier = modifier.height(280.dp).fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        onClick = {  // ← gjør kortet klikkbart
+            location?.let { (lat, lon) ->
+                navController.navigate("forecast?lat=$lat&lon=$lon&city=Min posisjon")
+            }
+        }
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -375,14 +393,7 @@ fun WeatherCard(
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(text = details.temperature, fontSize = 40.sp)
                 }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) { Text(text = "Strålende sol") }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) { Text(text = "H:14°  L: 5°") }
+
             }
         }
     }
