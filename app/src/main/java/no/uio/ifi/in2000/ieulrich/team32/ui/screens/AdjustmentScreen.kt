@@ -110,7 +110,7 @@ fun AdjustmentScreen(
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         "Når reiser du?",
-                        fontSize = 32.sp,
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
                     )
 
@@ -220,7 +220,7 @@ fun Checkbox() {
                 .fillMaxWidth()
                 .padding(vertical = 4.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface // hvit i ditt scheme
+                containerColor = MaterialTheme.colorScheme.surface
             )
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {

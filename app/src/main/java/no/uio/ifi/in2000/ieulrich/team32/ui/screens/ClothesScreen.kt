@@ -88,7 +88,7 @@ fun ClothesScreen(
         sheetDragHandle = null,
         sheetShadowElevation = 16.dp,
         sheetTonalElevation = 16.dp,
-        sheetContainerColor = MaterialTheme.colorScheme.surface,
+        sheetContainerColor = MaterialTheme.colorScheme.background,
         sheetContent = {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -227,13 +227,13 @@ fun ClothesScreen(
                             Image(
                                 painter = painterResource(id = R.drawable.kl_r_ikon),
                                 contentDescription = null,
-                                modifier = Modifier.size(36.dp)
+                                modifier = Modifier.size(30.dp)
                             )
                             Spacer(modifier = Modifier.width(16.dp))
 
                             Text(
                                 text = "Detaljert klesanbefaling",
-                                fontSize = 12.sp,
+                                fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         }
@@ -255,13 +255,15 @@ fun ClothesScreen(
                             Image(
                                 painter = painterResource(id = R.drawable.solbriller_ikon),
                                 contentDescription = null,
-                                modifier = Modifier.size(48.dp)
+                                modifier = Modifier.size(40.dp)
                             )
                             Spacer(modifier = Modifier.width(16.dp))
 
                             Text(
-                                text = "Hatt og/eller solbriller for å beskytte mot solen."
-                            )
+                                text = "Hatt og/eller solbriller for å beskytte mot solen.",
+                                fontSize = 15.sp,
+
+                                )
                         }
                         Spacer(
                             modifier = Modifier
@@ -278,13 +280,15 @@ fun ClothesScreen(
                             Image(
                                 painter = painterResource(id = R.drawable.caps_ikon),
                                 contentDescription = null,
-                                modifier = Modifier.size(48.dp)
+                                modifier = Modifier.size(40.dp)
                             )
                             Spacer(modifier = Modifier.width(16.dp))
 
                             Text(
-                                text = "Hatt og/eller solbriller for å beskytte mot solen."
-                            )
+                                text = "Hatt og/eller solbriller for å beskytte mot solen.",
+                                fontSize = 15.sp,
+
+                                )
                         }
 
                         Spacer(
@@ -302,13 +306,15 @@ fun ClothesScreen(
                             Image(
                                 painter = painterResource(id = R.drawable.tskjorte_ikon),
                                 contentDescription = null,
-                                modifier = Modifier.size(48.dp)
+                                modifier = Modifier.size(40.dp)
                             )
                             Spacer(modifier = Modifier.width(16.dp))
 
                             Text(
-                                text = "dritvarmt ute, det er tskjorte vær."
-                            )
+                                text = "dritvarmt ute, det er tskjorte vær.",
+                                fontSize = 15.sp,
+
+                                )
                         }
                     }
 
@@ -333,11 +339,13 @@ fun ClothesScreen(
                         Image(
                             painter = painterResource(id = R.drawable.paraply_ikon),
                             contentDescription = null,
-                            modifier = Modifier.size(48.dp)
+                            modifier = Modifier.size(35.dp)
                         )
                         Spacer(modifier = Modifier.width(16.dp))
 
-                        Text(text = "Det kan være lurt å ta med paraply.")
+                        Text(text = "Det kan være lurt å ta med paraply.",
+                            fontSize = 15.sp,
+                        )
                     }
                 }
 
