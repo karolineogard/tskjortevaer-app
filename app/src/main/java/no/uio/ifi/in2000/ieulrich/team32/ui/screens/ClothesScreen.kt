@@ -1,7 +1,6 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +18,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.size
@@ -29,11 +30,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.TimeInput
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -83,13 +86,28 @@ fun ClothesScreen(
         sheetPeekHeight = 48.dp,
         containerColor = MaterialTheme.colorScheme.background,
         sheetDragHandle = null,
+        sheetShadowElevation = 16.dp,
+        sheetTonalElevation = 16.dp,
+        sheetContainerColor = MaterialTheme.colorScheme.surface,
         sheetContent = {
-            Text(
-                text = "Tilpass klesanbefaling",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Tilpass klesanbefaling",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+
+                )
+                Icon(
+                    painter = painterResource(id = R.drawable.arrow_up_icon),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
 
             Column(
                 modifier = Modifier
@@ -144,13 +162,20 @@ fun ClothesScreen(
                     }
                 }
 
-                Button(
-                    onClick = {
-                        scope.launch { sheetState.bottomSheetState.partialExpand() }
-                    },
-                    modifier = Modifier.fillMaxWidth()
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text("Lagre")
+                    OutlinedButton(
+                        onClick = {
+                            scope.launch { sheetState.bottomSheetState.partialExpand() }
+                        },
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    ) {
+                        Text("Lagre")
+                    }
                 }
             }
         }
@@ -170,20 +195,21 @@ fun ClothesScreen(
             item {
                 Text(
                     text = "Klær",
-                    fontSize = 48.sp
+                    fontSize = 30.sp
                 )
 
                 Text(
                     text = "Anbefalningen tar utgangspunkt i fremkomst til og fra skole eller jobb. Vi antar at reisetidspunktet skjer mellom 8-10 på morgenen og 16-18 på kvelden. \n" +
                             "\n" +
-                            "Swipe opp for å tilpasse klesanbefalingen!"
+                            "Swipe opp for å tilpasse klesanbefalingen!",
+                    fontSize = 15.sp
                 )
             }
             item {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                        .padding(horizontal = 4.dp, vertical = 4.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surface
                     )
@@ -207,7 +233,7 @@ fun ClothesScreen(
 
                             Text(
                                 text = "Detaljert klesanbefaling",
-                                fontSize = 18.sp,
+                                fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         }
@@ -293,7 +319,7 @@ fun ClothesScreen(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                        .padding(horizontal = 4.dp, vertical = 4.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surface
                     )

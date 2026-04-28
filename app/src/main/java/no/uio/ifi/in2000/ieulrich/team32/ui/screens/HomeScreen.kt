@@ -115,7 +115,7 @@ fun HomeScreen(
             WeatherCard(
                 navController = navController,
                 forecastHourDetails = forecastNow,
-                location = currentLocation  // ← send inn
+                location = currentLocation
             )
         }
         item {
@@ -138,7 +138,7 @@ fun HomeScreen(
 fun HomeSearchBar(
     modifier: Modifier = Modifier,
     navController: NavController,
-    viewmodel: LocationForecastViewmodel // ← legg til
+    viewmodel: LocationForecastViewmodel
 
 ) {
     val scope = rememberCoroutineScope()
@@ -447,20 +447,38 @@ fun ClothingCard(navController: NavController, modifier: Modifier = Modifier) {
             Box(modifier = Modifier.fillMaxWidth().height(300.dp), contentAlignment = Alignment.Center) {
                 ElevatedCard(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
                     modifier = Modifier.width(320.dp)
                 ) {
                     LazyColumn(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         item {
                             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                                 Spacer(modifier = Modifier.size(48.dp))
-                                Text(text = "Anbefaling", fontSize = 30.sp, modifier = Modifier.weight(2f), textAlign = TextAlign.Center)
-                                IconButton(onClick = { clicked = false }) { Icon(Icons.Default.Close, contentDescription = "Lukk") }
+                                Text(text = "Anbefaling",
+                                    fontSize = 30.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.weight(2f),
+                                    textAlign = TextAlign.Center)
+                                IconButton(onClick = { clicked = false }) {
+                                    Icon(Icons.Default.Close, contentDescription = "Lukk")
+                                }
                             }
-                            Text(text = "Anbefalningen tar utgangspunkt i fremkomst til og fra skole eller jobb. \n\nVi antar at reisetidspunktet skjer mellom 8-10 på morgenen og 16-18 på kvelden.")
+                            Text(text = "Anbefalningen tar utgangspunkt i fremkomst til og fra skole eller jobb. \n\nVi antar at reisetidspunktet skjer mellom 8-10 på morgenen og 16-18 på kvelden."
+                            ,fontSize = 15.sp)
                         }
                         item {
-                            Button(onClick = { navController.navigate(Routes.ADJUSTMENT) }) { Text(text = "Jeg har andre behov ->") }
+                            OutlinedButton(onClick = { navController.navigate(Routes.ADJUSTMENT) },
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                )
+                            )
+                            { Text(text = "Jeg har andre behov")
+                                Icon(
+                                    painter = painterResource(id = R.drawable.arrow_forward_icon),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp)
+                                )}
+
                         }
                     }
                 }
