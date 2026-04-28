@@ -57,4 +57,9 @@ object Format {
         val intervalEnd = intervalStart + 6
         return "%02d - %02d".format(intervalStart, intervalEnd)
     }
+
+    fun extractTime(time: String): String{
+        val parsed = Instant.parse(time).atZone(ZoneId.systemDefault())
+        return parsed.format(DateTimeFormatter.ofPattern("HH:mm"))
+    }
 }

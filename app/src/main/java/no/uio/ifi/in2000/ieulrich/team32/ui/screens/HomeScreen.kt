@@ -42,6 +42,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import no.uio.ifi.in2000.ieulrich.team32.R
+import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.imageUrl
 import no.uio.ifi.in2000.ieulrich.team32.ui.Routes
@@ -49,6 +50,7 @@ import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 import org.json.JSONArray
 import java.net.HttpURLConnection
 import java.net.URL
+import java.text.Normalizer
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -324,7 +326,8 @@ fun WeatherCard(
             val today = LocalDate.now()
             val datePart = if (now.toLocalDate().isEqual(today)) "I dag"
             else now.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
-            val timePart = now.format(DateTimeFormatter.ofPattern("HH:mm"))
+            val timePart = if (forecastHourDetails == null) "00:00"
+                else Format.extractTime(forecastHourDetails.timestamp)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
