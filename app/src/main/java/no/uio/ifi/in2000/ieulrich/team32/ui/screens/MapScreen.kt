@@ -543,10 +543,28 @@ private fun updateWmsLayer(style: Style, wmsUrl: String, layerId: String) {
 
     if (wmsUrl.isEmpty()) return
 
-    val sourceId = "victoria-source-$layerId"
-    val fullLayerId = "victoria-layer-$layerId"
+    if (layerId == "WIND") {
+        val speedUrl = wmsUrl
 
-    val tileSet = TileSet("2.1.0", wmsUrl)
+        addSingleLayer(style, speedUrl, "wind-speed")
+
+        val directionUrl = wmsUrl
+            .replace("wind_100m_speed", "wind_10m_vector")
+            .replace("&styles=", "&styles=wind_barb")
+
+        addSingleLayer(style, directionUrl, "wind-direction")
+    } else {
+        addSingleLayer(style, wmsUrl, layerId.lowercase())
+    }
+
+
+}
+
+private fun addSingleLayer(style: Style, url: String, id: String) {
+    val sourceId = "victoria-source-$id"
+    val fullLayerId = "victoria-layer-$id"
+
+    val tileSet = TileSet("2.1.0", url)
     val rasterSource = RasterSource(sourceId, tileSet, 256)
     style.addSource(rasterSource)
 
