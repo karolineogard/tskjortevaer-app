@@ -30,6 +30,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.compose.viewModel
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.AdjustmentScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.ClothesScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.HomeScreen
@@ -37,11 +38,13 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.screens.LocationForecastScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.MapScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.SettingsScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.*
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 
 @Composable
 fun MapApp(
     navController: NavHostController = rememberNavController(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    clothesViewModel: ClothesViewModel = viewModel()
 ){
 
     val startDestination = Destination.HOME
@@ -99,13 +102,13 @@ fun MapApp(
         ) {
             composable(route = Routes.MAP,
                 enterTransition = {
-                   EnterTransition.None
+                    EnterTransition.None
                 },
-                    exitTransition = {
-                ExitTransition.None
+                exitTransition = {
+                    ExitTransition.None
                 },
                 popEnterTransition = {
-                   EnterTransition.None
+                    EnterTransition.None
                 },
                 popExitTransition = {
                     ExitTransition.None
@@ -131,7 +134,7 @@ fun MapApp(
             }
 
             composable(route = Routes.CLOTHES){
-                ClothesScreen(navController=navController)
+                ClothesScreen(navController=navController, clothesViewModel=clothesViewModel)
             }
 
             composable(route = Routes.ADJUSTMENT) {
