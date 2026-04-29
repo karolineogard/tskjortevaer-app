@@ -29,6 +29,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import no.uio.ifi.in2000.ieulrich.team32.ui.screens.ActivityLevel
+import no.uio.ifi.in2000.ieulrich.team32.ui.screens.CheckboxSection
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -84,7 +86,7 @@ fun AdjustmentScreen(
         }
     ){
 
-        innerPadding ->
+            innerPadding ->
 
         Column(modifier = Modifier
             .padding(innerPadding)
@@ -131,11 +133,22 @@ fun AdjustmentScreen(
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface // hvit i ditt scheme
+                    containerColor = MaterialTheme.colorScheme.surface
                 )
-            ){Column(modifier = Modifier.padding(16.dp)) {
-                Checkbox()
-            }
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    var outdoors by remember { mutableStateOf(false) }
+                    var physically by remember { mutableStateOf(false) }
+                    var activityLevel by remember { mutableStateOf<ActivityLevel?>(null) }
+                    CheckboxSection(
+                        isOutdoors = outdoors,
+                        onOutdoorsChange = { outdoors = it; if (!it) { physically = false; activityLevel = null } },
+                        isPhysical = physically,
+                        onPhysicalChange = { physically = it; if (!it) activityLevel = null },
+                        activityLevel = activityLevel,
+                        onActivityLevelChange = { activityLevel = it }
+                    )
+                }
             }
 
             Button(
@@ -152,8 +165,8 @@ fun AdjustmentScreen(
         }
 
 
-        }
     }
+}
 
 
 enum class ActivityLevel { LOW, MEDIUM, HIGH }
@@ -239,7 +252,3 @@ fun Checkbox() {
         }
     }
 }
-
-
-
-
