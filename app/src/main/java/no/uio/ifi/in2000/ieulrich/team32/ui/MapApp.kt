@@ -133,7 +133,7 @@ fun MapApp(
             }
 
             composable(route = Routes.HOME){
-                HomeScreen(navController = navController, viewmodel = locationForecastViewmodel)
+                HomeScreen(navController = navController, viewmodel = locationForecastViewmodel, clothesViewModel = clothesViewModel)
             }
 
 
