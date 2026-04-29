@@ -23,6 +23,7 @@ fun TimeSeries.toForeCastHourDetails(): ForecastHourDetails?{
         duration = when {
             data.next1Hours != null -> 1
             else -> 6
-        }
+        },
+        windDirection = data.instant.details.windFromDirection
     )
 }
