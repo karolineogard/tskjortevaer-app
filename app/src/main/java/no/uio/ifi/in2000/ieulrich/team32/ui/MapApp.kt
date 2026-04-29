@@ -31,7 +31,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.lifecycle.viewmodel.compose.viewModel
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.AdjustmentScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.ClothesScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.HomeScreen
@@ -46,7 +45,8 @@ import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 fun MapApp(
     navController: NavHostController = rememberNavController(),
     modifier: Modifier = Modifier,
-    clothesViewModel: ClothesViewModel = viewModel()
+    clothesViewModel: ClothesViewModel = viewModel(),
+    locationForecastViewmodel: LocationForecastViewmodel
 ){
 
     val startDestination = Destination.HOME
@@ -124,7 +124,7 @@ fun MapApp(
                 val lon = backStackEntry.arguments?.getString("lon")?.toDoubleOrNull()
                 val city = backStackEntry.arguments?.getString("city") ?: "Værvarsel"
                 LocationForecastScreen(
-                    viewmodel = viewModel,  // ← send den inn
+                    viewmodel = locationForecastViewmodel,
                     lat = lat,
                     lon = lon,
                     city = city,
@@ -133,7 +133,7 @@ fun MapApp(
             }
 
             composable(route = Routes.HOME){
-                HomeScreen(navController = navController, viewmodel = viewModel)
+                HomeScreen(navController = navController, viewmodel = locationForecastViewmodel)
             }
 
 
@@ -151,5 +151,3 @@ fun MapApp(
         }
     }
 }
-
-

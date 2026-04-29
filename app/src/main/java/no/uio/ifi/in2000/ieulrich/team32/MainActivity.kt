@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Team32Theme {
-                MapApp(viewModel = viewModel)
+                MapApp(locationForecastViewmodel = viewModel)
             }
         }
     }
