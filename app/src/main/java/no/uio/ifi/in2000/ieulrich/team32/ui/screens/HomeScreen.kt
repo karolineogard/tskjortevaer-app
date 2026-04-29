@@ -385,10 +385,6 @@ fun WeatherCard(
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
-                ) { Text(text = "Strålende sol") }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
                 ) { Text(text = "H:14°  L: 5°") }
             }
         }
