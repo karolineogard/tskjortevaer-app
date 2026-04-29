@@ -6,7 +6,8 @@ data class ForecastHourDetails(
     val windSpeed: String,
     val temperature: String,
     val precipitationAmount: String,
-    val duration: Int
+    val duration: Int,
+    val humidity: Double
 )
 
 val ForecastHourDetails.imageUrl: String

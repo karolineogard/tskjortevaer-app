@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -39,6 +40,7 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.screens.MapScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.SettingsScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.*
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 
 @Composable
 fun MapApp(
@@ -121,11 +123,17 @@ fun MapApp(
                 val lat = backStackEntry.arguments?.getString("lat")?.toDoubleOrNull()
                 val lon = backStackEntry.arguments?.getString("lon")?.toDoubleOrNull()
                 val city = backStackEntry.arguments?.getString("city") ?: "Værvarsel"
-                LocationForecastScreen(lat = lat, lon = lon, city = city, navController = navController)
+                LocationForecastScreen(
+                    viewmodel = viewModel,  // ← send den inn
+                    lat = lat,
+                    lon = lon,
+                    city = city,
+                    navController = navController
+                )
             }
 
             composable(route = Routes.HOME){
-                HomeScreen(navController = navController)
+                HomeScreen(navController = navController, viewmodel = viewModel)
             }
 
 
@@ -145,8 +153,3 @@ fun MapApp(
 }
 
 
-@Preview
-@Composable
-fun NavbarPreview() {
-    MapApp()
-}

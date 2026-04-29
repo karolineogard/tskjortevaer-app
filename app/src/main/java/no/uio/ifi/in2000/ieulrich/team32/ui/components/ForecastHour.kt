@@ -40,8 +40,8 @@ fun ForecastHour(
 
 {
     // TODO: må finne ut hvordan jeg kan bruke symbolCode til å hente riktig bilde, prøvde med et eksempel først
-    val size = if (compact) 14.sp else 24.sp
-    val imageSize = if (compact) 32.dp else 64.dp
+    val size = if (compact) 14.sp else 14.sp
+    val imageSize = if (compact) 36.dp else 64.dp
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -54,8 +54,7 @@ fun ForecastHour(
             model = "https://raw.githubusercontent.com/metno/weathericons/refs/heads/main/weather/svg/$symbolCode.svg",
             contentDescription = "Ikon for ${forecastHourDetails?.symbolCode}",
             modifier = Modifier
-                .size(60.dp)
-                .padding(vertical = 8.dp),
+                .size(imageSize),
             contentScale = ContentScale.Fit,
             onState = { state ->
                 when (state) {

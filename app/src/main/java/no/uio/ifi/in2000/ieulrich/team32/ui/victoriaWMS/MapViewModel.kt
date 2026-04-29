@@ -55,11 +55,11 @@ class MapViewModel(
     }
 
     private fun updateLayer(layer: WeatherLayer) {
-        _uiState.update { it.copy(
-            currentLayer = layer,
-            wmsUrl = repository.getWmsUrl(layer, getCurrentTime()),
-            showAlerts = false
-        ) }
+            _uiState.update { it.copy(
+                currentLayer = layer,
+                wmsUrl = repository.getWmsUrl(layer, getCurrentTime()),
+                showAlerts = false
+            ) }
     }
 
     fun getCurrentTime(): String{
