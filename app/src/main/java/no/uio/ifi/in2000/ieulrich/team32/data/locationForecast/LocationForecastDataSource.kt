@@ -15,7 +15,7 @@ class LocationForecastDataSource (private val client: HttpClient = HttpClientPro
     private var lastUpdatedAt: String? = null
 
     suspend fun getForecast(lat: Double = 60.0, lon: Double = 11.0) : LocationForecastResponse {
-        Log.d("LocationForecast", "Api kall")
+        Log.d("LocationForecast", "Api kall for $lat, $lon")
         val response = client.get (
             "https://in2000.api.met.no/weatherapi/locationforecast/2.0/compact"
         ){

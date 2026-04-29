@@ -33,7 +33,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil3.ImageLoader
 import coil3.compose.AsyncImage
+import coil3.svg.SvgDecoder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -87,7 +89,7 @@ suspend fun getCoordsFromService(sted: String): SimpleLatLng? {
 fun HomeScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    viewmodel: LocationForecastViewmodel = viewModel()
+    viewmodel: LocationForecastViewmodel
 ) {
     val context = LocalContext.current
     LaunchedEffect(Unit) {
@@ -313,6 +315,7 @@ fun WeatherCard(
     forecastHourDetails: ForecastHourDetails?,
     modifier: Modifier = Modifier
 ) {
+    val svgLoader = rememberSvgImageLoader()
     Card(
         modifier = modifier.height(280.dp).fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
@@ -356,6 +359,7 @@ fun WeatherCard(
                 ) {
                     AsyncImage(
                         model = details.imageUrl,
+                        imageLoader = svgLoader,
                         contentDescription = "Ikon for ${details.symbolCode}",
                         modifier = Modifier.size(120.dp).padding(vertical = 8.dp),
                         contentScale = ContentScale.Fit,
@@ -458,5 +462,15 @@ fun ClothingCard(navController: NavController, modifier: Modifier = Modifier) {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun rememberSvgImageLoader(): ImageLoader{
+    val context = LocalContext.current
+    return remember {
+        ImageLoader.Builder(context)
+            .components { add(SvgDecoder.Factory()) }
+            .build()
     }
 }
