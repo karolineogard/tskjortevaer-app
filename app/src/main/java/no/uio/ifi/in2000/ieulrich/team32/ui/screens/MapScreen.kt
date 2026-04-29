@@ -263,15 +263,17 @@ fun MapScreen(
             }
 
             // Bottom Time Slider Card
-            TimeSliderCard(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 32.dp, start = 16.dp, end = 16.dp),
-                selectionKey = uiState.currentLayer to uiState.showAlerts,
-                onTimeSelected = { newUtcTime ->
-                    viewModel.onTimeChanged(newUtcTime)
-                }
-            )
+            if(!uiState.showAlerts) {
+                TimeSliderCard(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 32.dp, start = 16.dp, end = 16.dp),
+                    selectionKey = uiState.currentLayer,
+                    onTimeSelected = { newUtcTime ->
+                        viewModel.onTimeChanged(newUtcTime)
+                    }
+                )
+            }
         }
     }
 }
