@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -150,8 +151,16 @@ fun MapScreen(
                 onToggleExpand = { isSearchExpanded = it }
             )
 
+            if(uiState.showAlerts) {
+                AlertsLegendCard(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(top = legendTopPadding, start = 16.dp)
+                )
+            }
+
             // Legend (Top Left) - Padding adjusts based on search bar expansion
-            if (uiState.currentLayer == WeatherLayer.TEMPERATURE) {
+            else if (uiState.currentLayer == WeatherLayer.TEMPERATURE) {
                 TemperatureLegendCard(
                     modifier = Modifier
                         .align(Alignment.TopStart)
@@ -254,15 +263,17 @@ fun MapScreen(
             }
 
             // Bottom Time Slider Card
-            TimeSliderCard(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 32.dp, start = 16.dp, end = 16.dp),
-                selectionKey = uiState.currentLayer to uiState.showAlerts,
-                onTimeSelected = { newUtcTime ->
-                    viewModel.onTimeChanged(newUtcTime)
-                }
-            )
+            if(!uiState.showAlerts) {
+                TimeSliderCard(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 32.dp, start = 16.dp, end = 16.dp),
+                    selectionKey = uiState.currentLayer,
+                    onTimeSelected = { newUtcTime ->
+                        viewModel.onTimeChanged(newUtcTime)
+                    }
+                )
+            }
         }
     }
 }
@@ -409,6 +420,74 @@ fun WindLegendCard(modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+fun AlertsLegendCard(modifier: Modifier = Modifier) {
+    val severityLevel = listOf(
+        "Moderat fare",
+        "Stor fare",
+        "Ekstrem fare"
+    )
+
+    val colors = listOf(
+        "#FFFF00",
+        "#FFA500",
+        "#FF0000"
+    )
+
+    Surface(
+        modifier = modifier.width(160.dp),
+        shape = RoundedCornerShape(16.dp),
+        color = Color.White.copy(alpha = 0.9f),
+        shadowElevation = 2.dp
+    ) {
+        Column(modifier = Modifier.padding(8.dp)) {
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    Icons.Default.Warning,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    "Farevarsler",
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                severityLevel.forEachIndexed { index, level ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+
+                        Box(
+                            modifier = Modifier
+                                .size(12.dp)
+                                .clip(RoundedCornerShape(2.dp))
+                                .background(
+                                    Color(android.graphics.Color.parseColor(colors[index]))
+                                )
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Text(
+                            level,
+                            fontSize = 11.sp,
+                            color = Color.Black
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+
+}
+
 
 @Composable
 fun SearchBar(
@@ -543,10 +622,28 @@ private fun updateWmsLayer(style: Style, wmsUrl: String, layerId: String) {
 
     if (wmsUrl.isEmpty()) return
 
-    val sourceId = "victoria-source-$layerId"
-    val fullLayerId = "victoria-layer-$layerId"
+    if (layerId == "WIND") {
+        val speedUrl = wmsUrl
 
-    val tileSet = TileSet("2.1.0", wmsUrl)
+        addSingleLayer(style, speedUrl, "wind-speed")
+
+        val directionUrl = wmsUrl
+            .replace("wind_100m_speed", "wind_10m_vector")
+            .replace("&styles=", "&styles=wind_barb")
+
+        addSingleLayer(style, directionUrl, "wind-direction")
+    } else {
+        addSingleLayer(style, wmsUrl, layerId.lowercase())
+    }
+
+
+}
+
+private fun addSingleLayer(style: Style, url: String, id: String) {
+    val sourceId = "victoria-source-$id"
+    val fullLayerId = "victoria-layer-$id"
+
+    val tileSet = TileSet("2.1.0", url)
     val rasterSource = RasterSource(sourceId, tileSet, 256)
     style.addSource(rasterSource)
 

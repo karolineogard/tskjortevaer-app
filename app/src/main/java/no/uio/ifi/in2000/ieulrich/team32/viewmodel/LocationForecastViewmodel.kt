@@ -34,6 +34,9 @@ class LocationForecastViewmodel(
     private val _forecastNow = MutableStateFlow<ForecastHourDetails?>(null)
     val forecastNow: StateFlow<ForecastHourDetails?> = _forecastNow.asStateFlow()
 
+    private val _currentLocation = MutableStateFlow<Pair<Double, Double>?>(null)
+    val currentLocation: StateFlow<Pair<Double, Double>?> = _currentLocation.asStateFlow()
+
     init {
         Log.d("LocationForecastViewModel", "ViewModel initialized")
     }

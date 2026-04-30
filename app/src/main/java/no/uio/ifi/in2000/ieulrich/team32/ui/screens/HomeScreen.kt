@@ -48,6 +48,8 @@ import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.imageUrl
 import no.uio.ifi.in2000.ieulrich.team32.ui.Routes
+import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 import org.json.JSONArray
 import java.net.HttpURLConnection
@@ -89,15 +91,24 @@ suspend fun getCoordsFromService(sted: String): SimpleLatLng? {
 fun HomeScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    viewmodel: LocationForecastViewmodel
+    viewmodel: LocationForecastViewmodel,
+    clothesViewModel: ClothesViewModel
 ) {
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewmodel.loadForecastForDevice(context)
     }
+    // Send posisjon til ClothesViewModel når den er klar
+    val currentLocation by viewmodel.currentLocation.collectAsState()
+    LaunchedEffect(currentLocation) {
+        currentLocation?.let { (lat, lon) ->
+            clothesViewModel.updateLocation(lat, lon)
+        }
+    }
     val padding = 16.dp
     val forecastNow by viewmodel.forecastNow.collectAsState()
     var isVisible by remember { mutableStateOf(true) }
+
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -110,10 +121,15 @@ fun HomeScreen(
         )
     ) {
         item {
-            HomeSearchBar(navController = navController)
+            HomeSearchBar(navController = navController, viewmodel = viewmodel)
         }
+
         item {
-            WeatherCard(navController = navController, forecastHourDetails = forecastNow)
+            WeatherCard(
+                navController = navController,
+                forecastHourDetails = forecastNow,
+                location = currentLocation
+            )
         }
         item {
             AnimatedVisibility(
@@ -125,7 +141,7 @@ fun HomeScreen(
             }
         }
         item {
-            ClothingCard(navController = navController)
+            ClothingCard(navController = navController, clothesViewModel = clothesViewModel)
         }
     }
 }
@@ -134,7 +150,9 @@ fun HomeScreen(
 @Composable
 fun HomeSearchBar(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    viewmodel: LocationForecastViewmodel
+
 ) {
     val scope = rememberCoroutineScope()
     var søkeTekst by remember { mutableStateOf("") }
@@ -143,6 +161,7 @@ fun HomeSearchBar(
     var sisteSearcher by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
     val søkeFlow = remember { MutableStateFlow("") }
     var harFokus by remember { mutableStateOf(false) }
+
 
 
     LaunchedEffect(Unit) {
@@ -313,12 +332,19 @@ fun MetalertCarousel(modifier: Modifier = Modifier) {
 fun WeatherCard(
     navController: NavController,
     forecastHourDetails: ForecastHourDetails?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    location: Pair<Double, Double>?, // ← legg til
+
 ) {
     val svgLoader = rememberSvgImageLoader()
     Card(
         modifier = modifier.height(280.dp).fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        onClick = {  // ← gjør kortet klikkbart
+            location?.let { (lat, lon) ->
+                navController.navigate("forecast?lat=$lat&lon=$lon&city=Min posisjon")
+            }
+        }
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -404,55 +430,107 @@ fun MetalertCard(tekst: String) {
 }
 
 @Composable
-fun ClothingCard(navController: NavController, modifier: Modifier = Modifier) {
-    var clicked by rememberSaveable { mutableStateOf(false) }
+fun ClothingCard(
+    navController: NavController,
+    clothesViewModel: ClothesViewModel,
+    modifier: Modifier = Modifier
+) {
+    var showInfo by rememberSaveable { mutableStateOf(false) }
+    val recommendation by clothesViewModel.recommendation.collectAsState()
+    val isLoading by clothesViewModel.isLoading.collectAsState()
 
-    Box(modifier = modifier.fillMaxWidth().height(300.dp)) {
+    Box(modifier = modifier.fillMaxWidth()) {
         Card(
-            modifier = Modifier.fillMaxWidth().height(300.dp),
+            modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
             onClick = { navController.navigate(Routes.CLOTHES) }
         ) {
-            Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Tittelrad
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Spacer(modifier = Modifier.size(48.dp))
-                    Text(text = "Bekledning", fontSize = 30.sp, modifier = Modifier.weight(2f), textAlign = TextAlign.Center)
-                    IconButton(onClick = { clicked = !clicked }) { Icon(Icons.Default.Info, contentDescription = "Info") }
+                    Text(
+                        text = "Bekledning",
+                        fontSize = 30.sp,
+                        modifier = Modifier.weight(2f),
+                        textAlign = TextAlign.Center
+                    )
+                    IconButton(onClick = { showInfo = !showInfo }) {
+                        Icon(Icons.Default.Info, contentDescription = "Info")
+                    }
                 }
-            }
-            HorizontalDivider()
-            Spacer(modifier = Modifier.size(15.dp))
-            Row(modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Image(painter = painterResource(id = R.drawable.solbriller_ikon), contentDescription = null, modifier = Modifier.size(48.dp))
-                Spacer(modifier = Modifier.weight(0.5f))
-                Text(text = "Hatt og/eller solbriller for å beskytte mot solen.")
-            }
-            Spacer(modifier = Modifier.size(15.dp))
-            Row(modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Image(painter = painterResource(id = R.drawable.caps_ikon), contentDescription = null, modifier = Modifier.size(48.dp))
-                Spacer(modifier = Modifier.weight(0.5f))
-                Text(text = "Hatt og/eller solbriller for å beskytte mot solen.")
+
+                HorizontalDivider()
+
+                if (isLoading) {
+                    Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                    }
+                } else if (recommendation != null) {
+                    ClothingCardRecommendationRows(rec = recommendation!!)
+                } else {
+                    Text(
+                        text = "Ingen værdata tilgjengelig ennå.",
+                        modifier = Modifier.padding(8.dp),
+                        fontSize = 14.sp
+                    )
+                }
             }
         }
 
-        if (clicked) {
-            Box(modifier = Modifier.fillMaxWidth().height(300.dp), contentAlignment = Alignment.Center) {
+        // Info-overlay
+        if (showInfo) {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
                 ElevatedCard(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                    modifier = Modifier.width(320.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    LazyColumn(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        item {
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                                Spacer(modifier = Modifier.size(48.dp))
-                                Text(text = "Anbefaling", fontSize = 30.sp, modifier = Modifier.weight(2f), textAlign = TextAlign.Center)
-                                IconButton(onClick = { clicked = false }) { Icon(Icons.Default.Close, contentDescription = "Lukk") }
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Spacer(modifier = Modifier.size(48.dp))
+                            Text(
+                                text = "Anbefaling",
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.weight(2f),
+                                textAlign = TextAlign.Center
+                            )
+                            IconButton(onClick = { showInfo = false }) {
+                                Icon(Icons.Default.Close, contentDescription = "Lukk")
                             }
-                            Text(text = "Anbefalningen tar utgangspunkt i fremkomst til og fra skole eller jobb. \n\nVi antar at reisetidspunktet skjer mellom 8-10 på morgenen og 16-18 på kvelden.")
                         }
-                        item {
-                            Button(onClick = { navController.navigate(Routes.ADJUSTMENT) }) { Text(text = "Jeg har andre behov ->") }
+                        Text(
+                            text = "Anbefalingen tar utgangspunkt i fremkomst til og fra skole eller jobb. Vi antar at reisetidspunktet skjer mellom 8–10 på morgenen og 16–18 på kvelden.",
+                        fontSize = 15.sp
+                        )
+                        OutlinedButton(
+                            onClick = { navController.navigate(Routes.ADJUSTMENT) },
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(text = "Jeg har andre behov")
+                            Icon(
+                                painter = painterResource(id = R.drawable.arrow_forward_icon),
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
                         }
                     }
                 }
@@ -468,5 +546,67 @@ fun rememberSvgImageLoader(): ImageLoader{
         ImageLoader.Builder(context)
             .components { add(SvgDecoder.Factory()) }
             .build()
+    }
+}
+
+private fun ClothingCardRecommendationRows(rec: ClothesRecommendation) {
+    // Hodeplagg (kun hvis relevant)
+    if (rec.wearSunglasses) {
+        ClothingCardRow(iconRes = R.drawable.solbriller, text = "Solbriller anbefales — det er sol.")
+    }
+    if (rec.wearHatGloves) {
+        ClothingCardRow(iconRes = R.drawable.caps, text = "Lue og hansker anbefales.")
+    }
+    if (rec.wearScarf) {
+        ClothingCardRow(iconRes = R.drawable.skjerf, text = "Ta på skjerf.")
+    }
+
+    // Overkropp
+    when {
+        rec.wearTshirt      -> ClothingCardRow(iconRes = R.drawable.t_skjorte, text = "T-skjorte holder fint.")
+        rec.wearSweater     -> ClothingCardRow(iconRes = R.drawable.genser,     text = "Genser passer bra.")
+        rec.wearLightJacket -> ClothingCardRow(iconRes = R.drawable.lett_jakke,     text = "Ta på en lett jakke.")
+        rec.wearHeavyJacket -> ClothingCardRow(iconRes = R.drawable.tykk_jakke,     text = "Tykk jakke anbefales.")
+    }
+    if (rec.wearThermalUnderwear) {
+        ClothingCardRow(iconRes = R.drawable.tskjorte_ikon, text = "Ullundertøy er lurt.")
+    }
+
+    // Underkropp
+    if (rec.wearShorts) {
+        ClothingCardRow(iconRes = R.drawable.shorts, text = "Shorts passer fint.")
+    } else {
+        ClothingCardRow(iconRes = R.drawable.jeans, text = "Bukse passer til temperaturen.")
+    }
+
+    // Sko
+    when {
+        rec.wearWinterBoots     -> ClothingCardRow(iconRes = R.drawable.st_vler, text = "Vintersko/støvler anbefales.")
+        rec.wearWaterproofShoes -> ClothingCardRow(iconRes = R.drawable.st_vler, text = "Vanntette sko anbefales.")
+        else                    -> ClothingCardRow(iconRes = R.drawable.sneaker, text = "Hverdagssko passer fint.")
+    }
+
+    // Regn
+    if (rec.bringUmbrella) {
+        ClothingCardRow(iconRes = R.drawable.paraply_ikon, text = "Husk paraply.")
+    }
+    if (rec.wearRainGear) {
+        ClothingCardRow(iconRes = R.drawable.paraply_ikon, text = "Ta på regntøy.")
+    }
+}
+
+@Composable
+private fun ClothingCardRow(iconRes: Int, text: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(id = iconRes),
+            contentDescription = null,
+            modifier = Modifier.size(36.dp)
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(text = text, fontSize = 14.sp, modifier = Modifier.weight(1f))
     }
 }

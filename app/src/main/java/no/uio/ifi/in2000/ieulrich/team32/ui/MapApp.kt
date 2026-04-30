@@ -38,13 +38,15 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.screens.LocationForecastScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.MapScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.SettingsScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.*
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 
 @Composable
 fun MapApp(
     navController: NavHostController = rememberNavController(),
     modifier: Modifier = Modifier,
-    viewModel: LocationForecastViewmodel = viewModel()
+    clothesViewModel: ClothesViewModel = viewModel(),
+    locationForecastViewmodel: LocationForecastViewmodel
 ){
 
     val startDestination = Destination.HOME
@@ -102,13 +104,13 @@ fun MapApp(
         ) {
             composable(route = Routes.MAP,
                 enterTransition = {
-                   EnterTransition.None
+                    EnterTransition.None
                 },
-                    exitTransition = {
-                ExitTransition.None
+                exitTransition = {
+                    ExitTransition.None
                 },
                 popEnterTransition = {
-                   EnterTransition.None
+                    EnterTransition.None
                 },
                 popExitTransition = {
                     ExitTransition.None
@@ -121,11 +123,17 @@ fun MapApp(
                 val lat = backStackEntry.arguments?.getString("lat")?.toDoubleOrNull()
                 val lon = backStackEntry.arguments?.getString("lon")?.toDoubleOrNull()
                 val city = backStackEntry.arguments?.getString("city") ?: "Værvarsel"
-                LocationForecastScreen(lat = lat, lon = lon, city = city, navController = navController, viewmodel = viewModel)
+                LocationForecastScreen(
+                    viewmodel = locationForecastViewmodel,
+                    lat = lat,
+                    lon = lon,
+                    city = city,
+                    navController = navController
+                )
             }
 
             composable(route = Routes.HOME){
-                HomeScreen(navController = navController, viewmodel = viewModel)
+                HomeScreen(navController = navController, viewmodel = locationForecastViewmodel, clothesViewModel = clothesViewModel)
             }
 
 
@@ -134,7 +142,7 @@ fun MapApp(
             }
 
             composable(route = Routes.CLOTHES){
-                ClothesScreen(navController=navController)
+                ClothesScreen(navController=navController, clothesViewModel=clothesViewModel)
             }
 
             composable(route = Routes.ADJUSTMENT) {
@@ -142,11 +150,4 @@ fun MapApp(
             }
         }
     }
-}
-
-
-@Preview
-@Composable
-fun NavbarPreview() {
-    MapApp()
 }
