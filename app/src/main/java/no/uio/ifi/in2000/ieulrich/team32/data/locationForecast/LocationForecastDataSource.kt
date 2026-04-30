@@ -14,14 +14,15 @@ class LocationForecastDataSource (private val client: HttpClient = HttpClientPro
     private var cachedResponse: LocationForecastResponse? = null
     private var lastUpdatedAt: String? = null
 
-    suspend fun getForecast(lat: Double = 60.0, lon: Double = 11.0) : LocationForecastResponse {
-        Log.d("LocationForecast", "Api kall")
+    suspend fun getForecast(lat: Double, lon: Double) : LocationForecastResponse {
+        Log.d("LocationForecast", "Api kall for $lat, $lon")
         val response = client.get (
             "https://in2000.api.met.no/weatherapi/locationforecast/2.0/compact"
         ){
             parameter("lat", lat)
             parameter("lon", lon)
             header("User-Agent", "IN2000 Team 32")
+            // TODO: check coordinates against cached data
             lastUpdatedAt?.let { header("If-Modified-Since", it) }
         }
         return when (response.status) {

@@ -33,7 +33,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil3.ImageLoader
 import coil3.compose.AsyncImage
+import coil3.svg.SvgDecoder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,6 +44,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import no.uio.ifi.in2000.ieulrich.team32.R
+import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.imageUrl
 import no.uio.ifi.in2000.ieulrich.team32.ui.Routes
@@ -51,6 +54,7 @@ import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 import org.json.JSONArray
 import java.net.HttpURLConnection
 import java.net.URL
+import java.text.Normalizer
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -332,7 +336,7 @@ fun WeatherCard(
     location: Pair<Double, Double>?, // ← legg til
 
 ) {
-
+    val svgLoader = rememberSvgImageLoader()
     Card(
         modifier = modifier.height(280.dp).fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
@@ -351,7 +355,8 @@ fun WeatherCard(
             val today = LocalDate.now()
             val datePart = if (now.toLocalDate().isEqual(today)) "I dag"
             else now.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
-            val timePart = now.format(DateTimeFormatter.ofPattern("HH:mm"))
+            val timePart = if (forecastHourDetails == null) "00:00"
+                else Format.extractTime(forecastHourDetails.timestamp)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -380,6 +385,7 @@ fun WeatherCard(
                 ) {
                     AsyncImage(
                         model = details.imageUrl,
+                        imageLoader = svgLoader,
                         contentDescription = "Ikon for ${details.symbolCode}",
                         modifier = Modifier.size(120.dp).padding(vertical = 8.dp),
                         contentScale = ContentScale.Fit,
@@ -402,7 +408,10 @@ fun WeatherCard(
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(text = details.temperature, fontSize = 40.sp)
                 }
-
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) { Text(text = "H:14°  L: 5°") }
             }
         }
     }
@@ -531,6 +540,15 @@ fun ClothingCard(
 }
 
 @Composable
+fun rememberSvgImageLoader(): ImageLoader{
+    val context = LocalContext.current
+    return remember {
+        ImageLoader.Builder(context)
+            .components { add(SvgDecoder.Factory()) }
+            .build()
+    }
+}
+
 private fun ClothingCardRecommendationRows(rec: ClothesRecommendation) {
     // Hodeplagg (kun hvis relevant)
     if (rec.wearSunglasses) {

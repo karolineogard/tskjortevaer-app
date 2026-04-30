@@ -7,8 +7,10 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigationevent.NavigationEventDispatcher
 import com.google.android.gms.location.FusedLocationProviderClient
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +20,6 @@ import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.LocationForecastR
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.dto.LocationForecastResponse
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.mapper.toForecastByDay
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
-import java.util.jar.Manifest
 import kotlin.coroutines.resume
 
 class LocationForecastViewmodel(
@@ -43,13 +44,35 @@ class LocationForecastViewmodel(
     fun loadForecastForDevice(context: Context){
         val appContext = context.applicationContext
         viewModelScope.launch {
-            val location = locationClient.getDeviceLocation(appContext) ?: return@launch
-            _currentLocation.value = Pair(location.latitude, location.longitude)
+            val location = locationClient.getDeviceLocation(appContext)
 
-            val response = repository.getForecast(location.latitude, location.longitude)
+            val lat: Double
+            val lon: Double
+
+            if (location != null) {
+                lat = location.latitude
+                lon = location.longitude
+                Log.d("LocationDebug", "Using device location: $lat, $lon")
+            }
+            else {
+                lat = 59.91
+                lon = 10.75
+                Log.w("LocationDebug", "Location failed, using default (Oslo)")
+            }
+            val response = repository.getForecast(lat, lon)
             _forecast.value = response
-            _forecastByDay.value = response.toForecastByDay()
-            _forecastNow.value = _forecastByDay.value?.values?.flatten()?.firstOrNull()
+            val groupedByDay = response.toForecastByDay()
+            _forecastByDay.value = groupedByDay
+            val now = java.time.Instant.now()
+            val allHours = groupedByDay.values.flatten()
+            _forecastNow.value = allHours.minByOrNull { hour ->
+                try {
+                    val hourInstant = java.time.Instant.parse(hour.timestamp)
+                    java.time.Duration.between(hourInstant, now).abs().toMinutes()
+                } catch (e: Exception){
+                    Long.MAX_VALUE
+                }
+            }
 
         }
     }
@@ -70,11 +93,25 @@ suspend fun FusedLocationProviderClient.getDeviceLocation(context: Context): Loc
 
     if (!hasPermission) return null
 
+
     return suspendCancellableCoroutine { continuation ->
-        lastLocation.addOnSuccessListener { location ->
-            continuation.resume(location)
-        }.addOnFailureListener {
-            continuation.resume(null)
+        val cts = CancellationTokenSource()
+        getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, cts.token)
+            .addOnSuccessListener { location ->
+                if (location != null) {
+                    continuation.resume(location)
+                } else {
+                    lastLocation.addOnSuccessListener { lastLoc ->
+                        continuation.resume(lastLoc)
+                    }.addOnFailureListener {
+                        continuation.resume(null)
+                    }
+                }
+            }.addOnFailureListener {
+                continuation.resume(null)
+            }
+        continuation.invokeOnCancellation {
+            cts.cancel()
         }
     }
 }
