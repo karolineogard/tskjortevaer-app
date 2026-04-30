@@ -2,16 +2,20 @@ package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -58,6 +62,17 @@ import java.text.Normalizer
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+
 
 data class SimpleLatLng(val lat: Double, val lon: Double)
 
@@ -98,7 +113,6 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         viewmodel.loadForecastForDevice(context)
     }
-    // Send posisjon til ClothesViewModel når den er klar
     val currentLocation by viewmodel.currentLocation.collectAsState()
     LaunchedEffect(currentLocation) {
         currentLocation?.let { (lat, lon) ->
@@ -110,18 +124,33 @@ fun HomeScreen(
     var isVisible by remember { mutableStateOf(true) }
 
 
+    val focusManager = LocalFocusManager.current
+
+    var isSearchExpanded by remember { mutableStateOf(false) }
+
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) {
+                focusManager.clearFocus()
+            },
+
+
         verticalArrangement = Arrangement.spacedBy(padding),
         contentPadding = PaddingValues(
             start = padding,
             end = padding,
             top = padding,
             bottom = padding
-        )
+        ),
     ) {
         item {
-            HomeSearchBar(navController = navController, viewmodel = viewmodel)
+            HomeSearchBar(
+                navController = navController,
+                viewmodel = viewmodel
+            )
         }
 
         item {
@@ -152,7 +181,6 @@ fun HomeSearchBar(
     modifier: Modifier = Modifier,
     navController: NavController,
     viewmodel: LocationForecastViewmodel
-
 ) {
     val scope = rememberCoroutineScope()
     var søkeTekst by remember { mutableStateOf("") }
@@ -160,9 +188,10 @@ fun HomeSearchBar(
     var forslag by remember { mutableStateOf<List<Pair<String, SimpleLatLng>>>(emptyList()) }
     var sisteSearcher by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
     val søkeFlow = remember { MutableStateFlow("") }
+
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
     var harFokus by remember { mutableStateOf(false) }
-
-
 
     LaunchedEffect(Unit) {
         søkeFlow
@@ -185,7 +214,7 @@ fun HomeSearchBar(
                             }
                             withContext(Dispatchers.Main) {
                                 forslag = results
-                                visForslag = results.isNotEmpty()
+                                visForslag = results.isNotEmpty() && harFokus
                             }
                         } catch (e: Exception) {
                             e.printStackTrace()
@@ -204,11 +233,11 @@ fun HomeSearchBar(
         søkeTekst = ""
         forslag = emptyList()
         visForslag = false
+        focusManager.clearFocus()
+        harFokus = false
     }
 
-    Column(modifier = modifier.fillMaxWidth()
-        .onFocusChanged { harFokus = it.isFocused },
-    ) {
+    Column(modifier = modifier.fillMaxWidth()) {
         OutlinedTextField(
             value = søkeTekst,
             onValueChange = { nyTekst ->
@@ -219,7 +248,21 @@ fun HomeSearchBar(
             placeholder = { Text("Søk etter by...") },
             singleLine = true,
             shape = MaterialTheme.shapes.extraLarge,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester)
+                .onFocusChanged { focusState ->
+                    harFokus = focusState.isFocused
+                    if (!focusState.isFocused) {
+                        // Når man mister fokus, skjul forslag
+                        visForslag = false
+                    } else {
+                        // Når man får fokus og har tekst, vis forslag igjen
+                        if (søkeTekst.length >= 2) {
+                            visForslag = forslag.isNotEmpty()
+                        }
+                    }
+                },
             leadingIcon = {
                 Icon(Icons.Default.Search, contentDescription = null)
             },
@@ -230,12 +273,13 @@ fun HomeSearchBar(
                         forslag = emptyList()
                         visForslag = false
                         scope.launch { søkeFlow.emit("") }
+                        focusManager.clearFocus()
+                        harFokus = false
                     }) {
                         Icon(Icons.Default.Close, contentDescription = "Tøm")
                     }
                 }
             },
-
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(
                 onSearch = {
@@ -251,6 +295,26 @@ fun HomeSearchBar(
                 }
             )
         )
+
+        if (visForslag && forslag.isNotEmpty() && harFokus) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column {
+                    forslag.forEach { (navn, coords) ->
+                        ListItem(
+                            headlineContent = { Text(navn) },
+                            modifier = Modifier
+                                .clickable { navigerTilBy(navn, coords) }
+                                .fillMaxWidth()
+                        )
+                        HorizontalDivider()
+                    }
+                }
+            }
+        }
 
         if (søkeTekst.isEmpty() && sisteSearcher.isNotEmpty() && harFokus) {
             Card(
@@ -286,29 +350,9 @@ fun HomeSearchBar(
                 }
             }
         }
-
-        // Forslag mens man skriver
-        if (visForslag && forslag.isNotEmpty()) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Column {
-                    forslag.forEach { (navn, coords) ->
-                        ListItem(
-                            headlineContent = { Text(navn) },
-                            modifier = Modifier
-                                .clickable { navigerTilBy(navn, coords) }
-                                .fillMaxWidth()
-                        )
-                        HorizontalDivider()
-                    }
-                }
-            }
-        }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -333,7 +377,7 @@ fun WeatherCard(
     navController: NavController,
     forecastHourDetails: ForecastHourDetails?,
     modifier: Modifier = Modifier,
-    location: Pair<Double, Double>?, // ← legg til
+    location: Pair<Double, Double>?,
 
 ) {
     val svgLoader = rememberSvgImageLoader()
@@ -482,7 +526,6 @@ fun ClothingCard(
             }
         }
 
-        // Info-overlay
         if (showInfo) {
             Box(
                 modifier = Modifier.fillMaxWidth(),
