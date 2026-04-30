@@ -1,5 +1,7 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,11 +10,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -27,27 +32,30 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import kotlinx.coroutines.delay
+import kotlin.math.roundToInt
 import no.uio.ifi.in2000.ieulrich.team32.R
-import no.uio.ifi.in2000.ieulrich.team32.ui.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,6 +63,14 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
     navController: NavController
 ) {
+    var temperatureOffset by remember { mutableFloatStateOf(50f) }
+
+    var startHour by remember { mutableIntStateOf(8) }
+    var startMinute by remember { mutableIntStateOf(0) }
+
+    var endHour by remember { mutableIntStateOf(16) }
+    var endMinute by remember { mutableIntStateOf(0) }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
@@ -91,6 +107,9 @@ fun SettingsScreen(
                     containerColor = MaterialTheme.colorScheme.surface
                 )
             ) {
+                val degrees = ((temperatureOffset - 50f) / 50f * 5).roundToInt()
+                val sign = if (degrees >= 0) "+" else ""
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -100,7 +119,7 @@ fun SettingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text("Hvor varm er du?", fontWeight = FontWeight.Bold)
-                    Text("+0° C", fontWeight = FontWeight.Bold)
+                    Text("${sign}${degrees}° C", fontWeight = FontWeight.Bold)
                 }
 
                 Row(
@@ -111,12 +130,22 @@ fun SettingsScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(painter = painterResource(id = R.drawable.ispinne_ikon), contentDescription = null)
+                        Icon(
+                            painter = painterResource(id = R.drawable.ispinne_ikon),
+                            contentDescription = null
+                        )
                         Text("Ispinne", fontSize = 12.sp)
                     }
-                    AdjustmentSlider(modifier = Modifier.weight(1f))
+                    AdjustmentSlider(
+                        modifier = Modifier.weight(1f),
+                        value = temperatureOffset,
+                        onValueChange = { temperatureOffset = it }
+                    )
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(painter = painterResource(id = R.drawable.viking_ikon), contentDescription = null)
+                        Icon(
+                            painter = painterResource(id = R.drawable.viking_ikon),
+                            contentDescription = null
+                        )
                         Text("Viking", fontSize = 12.sp)
                     }
                 }
@@ -137,24 +166,30 @@ fun SettingsScreen(
                         fontWeight = FontWeight.Bold
                     )
 
-                    val morningTimeState = rememberTimePickerState(
-                        initialHour = 8, initialMinute = 0, is24Hour = true
-                    )
-                    val eveningTimeState = rememberTimePickerState(
-                        initialHour = 16, initialMinute = 0, is24Hour = true
-                    )
-
-                    val focusManager = LocalFocusManager.current
-                    LaunchedEffect(Unit) {
-                        delay(100)
-                        focusManager.clearFocus()
-                    }
-
+                    Spacer(modifier = Modifier.height(12.dp))
                     Text("Dra", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
-                    TimeInput(state = morningTimeState)
-                    HorizontalDivider()
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TimeInputField(
+                        initialHour = startHour,
+                        initialMinute = startMinute,
+                        onTimeChanged = { h: Int, m: Int ->
+                            startHour = h
+                            startMinute = m
+                        }
+                    )
+
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+
                     Text("Tilbake", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
-                    TimeInput(state = eveningTimeState)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TimeInputField(
+                        initialHour = endHour,
+                        initialMinute = endMinute,
+                        onTimeChanged = { h: Int, m: Int ->
+                            endHour = h
+                            endMinute = m
+                        }
+                    )
                 }
             }
 
@@ -163,7 +198,9 @@ fun SettingsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 OutlinedButton(
-                    onClick = { },
+                    onClick = {
+                        println("Lagrer reisetid: Fra $startHour:$startMinute til $endHour:$endMinute")
+                    },
                     colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
@@ -176,18 +213,21 @@ fun SettingsScreen(
 }
 
 @Composable
-fun AdjustmentSlider(modifier: Modifier = Modifier) {
-    var sliderPosition by remember { mutableFloatStateOf(50f) }
+fun AdjustmentSlider(
+    modifier: Modifier = Modifier,
+    value: Float,
+    onValueChange: (Float) -> Unit
+) {
     Column(modifier = modifier) {
         Slider(
-            value = sliderPosition,
-            onValueChange = { sliderPosition = it },
+            value = value,
+            onValueChange = onValueChange,
             colors = SliderDefaults.colors(
                 thumbColor = MaterialTheme.colorScheme.secondary,
                 activeTrackColor = MaterialTheme.colorScheme.secondary,
                 inactiveTrackColor = MaterialTheme.colorScheme.secondaryContainer,
             ),
-            steps = 11,
+            steps = 9,
             valueRange = 0f..100f
         )
     }

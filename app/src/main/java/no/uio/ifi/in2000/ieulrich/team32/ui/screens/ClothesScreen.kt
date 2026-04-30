@@ -38,10 +38,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SheetValue
-import androidx.compose.material3.TimeInput
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -55,6 +53,8 @@ import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
+import androidx.compose.runtime.mutableIntStateOf
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClothesScreen(
@@ -114,12 +114,10 @@ fun ClothesScreen(
             var localIsPhysical by remember { mutableStateOf(settings.isPhysicallyActive) }
             var localActivityLevel by remember { mutableStateOf(settings.activityLevel) }
 
-            val morningTimeState = rememberTimePickerState(
-                initialHour = settings.departureHour, initialMinute = 0, is24Hour = true
-            )
-            val eveningTimeState = rememberTimePickerState(
-                initialHour = settings.returnHour, initialMinute = 0, is24Hour = true
-            )
+            var localDepHour by remember { mutableIntStateOf(settings.departureHour) }
+            var localDepMinute by remember { mutableIntStateOf(0) }
+            var localRetHour by remember { mutableIntStateOf(settings.returnHour) }
+            var localRetMinute by remember { mutableIntStateOf(0) }
 
             Column(
                 modifier = Modifier
@@ -136,10 +134,24 @@ fun ClothesScreen(
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text("Når reiser du?", fontSize = 32.sp, fontWeight = FontWeight.Bold)
                         Text("Dra", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
-                        TimeInput(state = morningTimeState)
+                        TimeInputField(
+                            initialHour = localDepHour,
+                            initialMinute = localDepMinute,
+                            onTimeChanged = { hour, minute ->
+                                localDepHour = hour
+                                localDepMinute = minute
+                            }
+                        )
                         HorizontalDivider()
                         Text("Tilbake", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
-                        TimeInput(state = eveningTimeState)
+                        TimeInputField(
+                            initialHour = localRetHour,
+                            initialMinute = localRetMinute,
+                            onTimeChanged = { hour, minute ->
+                                localRetHour = hour
+                                localRetMinute = minute
+                            }
+                        )
                     }
                 }
 
@@ -167,18 +179,21 @@ fun ClothesScreen(
                     }
                 }
 
-                Button(
+                OutlinedButton(
                     onClick = {
                         clothesViewModel.updateSettings(
-                            departureHour = morningTimeState.hour,
-                            returnHour = eveningTimeState.hour,
+                            departureHour = localDepHour,
+                            returnHour = localRetHour,
                             isOutdoors = localIsOutdoors,
                             isPhysicallyActive = localIsPhysical,
                             activityLevel = localActivityLevel
                         )
                         scope.launch { sheetState.bottomSheetState.partialExpand() }
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
                 ) {
                     Text("Lagre og oppdater")
                 }
@@ -222,7 +237,7 @@ fun ClothesScreen(
                 } else {
                     item {
                         Text(
-                            text = "Ingen værdata tilgjengelig. Prøv å søke opp et sted på hjemskjermen først.",
+                            text = "Ingen værdata tilgjengelig. Prøv å søk opp et sted på hjemskjermen først.",
                             modifier = Modifier.padding(16.dp)
                         )
                     }
@@ -352,8 +367,6 @@ private fun RainCard(rec: ClothesRecommendation) {
     }
 }
 
-
-
 @Composable
 private fun ClothingRow(iconRes: Int, text: String) {
     Row(
@@ -367,63 +380,5 @@ private fun ClothingRow(iconRes: Int, text: String) {
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(text = text, modifier = Modifier.weight(1f))
-    }
-}
-
-// --- Stateless CheckboxSection brukt fra bottom sheet ---
-@Composable
-fun CheckboxSection(
-    isOutdoors: Boolean,
-    onOutdoorsChange: (Boolean) -> Unit,
-    isPhysical: Boolean,
-    onPhysicalChange: (Boolean) -> Unit,
-    activityLevel: ActivityLevel?,
-    onActivityLevelChange: (ActivityLevel?) -> Unit
-) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text("Skal du være utendørs")
-        androidx.compose.material3.Checkbox(
-            checked = isOutdoors,
-            onCheckedChange = onOutdoorsChange
-        )
-    }
-
-    if (isOutdoors) {
-        Card(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Skal du være fysisk aktiv")
-                androidx.compose.material3.Checkbox(
-                    checked = isPhysical,
-                    onCheckedChange = onPhysicalChange
-                )
-            }
-        }
-    }
-
-    if (isPhysical) {
-        Card(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Aktivitetsnivå?")
-                listOf(
-                    ActivityLevel.LOW to "Lavt",
-                    ActivityLevel.MEDIUM to "Middels",
-                    ActivityLevel.HIGH to "Høy"
-                ).forEach { (level, label) ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(label)
-                        androidx.compose.material3.Checkbox(
-                            checked = activityLevel == level,
-                            onCheckedChange = { if (it) onActivityLevelChange(level) else onActivityLevelChange(null) }
-                        )
-                    }
-                }
-            }
-        }
     }
 }
