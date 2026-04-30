@@ -25,9 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,18 +55,10 @@ fun AdjustmentScreen(
 
     val currentTime = Calendar.getInstance()
 
-    val morningTimeState = rememberTimePickerState(
-        initialHour = 8,
-        initialMinute = 0,
-        is24Hour = true
-    )
-
-    val eveningTimeState = rememberTimePickerState(
-        initialHour = 16,
-        initialMinute = 0,
-        is24Hour = true
-    )
-
+    var morningHour by remember { mutableStateOf(8) }
+    var morningMinute by remember { mutableStateOf(0) }
+    var eveningHour by remember { mutableStateOf(16) }
+    var eveningMinute by remember { mutableStateOf(0) }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -116,21 +106,27 @@ fun AdjustmentScreen(
                         fontWeight = FontWeight.Bold
                     )
 
-                    val morningTimeState =
-                        rememberTimePickerState(initialHour = 8, initialMinute = 0, is24Hour = true)
-                    val eveningTimeState = rememberTimePickerState(
-                        initialHour = 16,
-                        initialMinute = 0,
-                        is24Hour = true
-                    )
-
                     Text("Dra", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
-                    TimeInput(state = morningTimeState)
+                    TimeInputField(
+                        initialHour = morningHour,
+                        initialMinute = morningMinute,
+                        onTimeChanged = { hour, minute ->
+                            morningHour = hour
+                            morningMinute = minute
+                        }
+                    )
 
                     HorizontalDivider()
 
                     Text("Tilbake", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
-                    TimeInput(state = eveningTimeState)
+                    TimeInputField(
+                        initialHour = eveningHour,
+                        initialMinute = eveningMinute,
+                        onTimeChanged = { hour, minute ->
+                            eveningHour = hour
+                            eveningMinute = minute
+                        }
+                    )
 
                 }
             }
@@ -172,18 +168,12 @@ fun AdjustmentScreen(
                 }
             }
 
-
-
-
-
         }
-
 
     }
 }
 
 
-enum class ActivityLevel { LOW, MEDIUM, HIGH }
 
 @Composable
 fun Checkbox() {

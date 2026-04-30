@@ -146,7 +146,9 @@ fun MapApp(
             }
 
             composable(route = Routes.ADJUSTMENT) {
-                AdjustmentScreen(navController = navController)
+                AdjustmentScreen(
+                    navController = navController,
+                )
             }
         }
     }
