@@ -548,7 +548,7 @@ fun rememberSvgImageLoader(): ImageLoader{
             .build()
     }
 }
-
+@Composable
 private fun ClothingCardRecommendationRows(rec: ClothesRecommendation) {
     // Hodeplagg (kun hvis relevant)
     if (rec.wearSunglasses) {
