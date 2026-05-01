@@ -1,7 +1,7 @@
 package no.uio.ifi.in2000.ieulrich.team32.model.clothes
 
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
-import no.uio.ifi.in2000.ieulrich.team32.ui.screens.ActivityLevel
+import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
 
 data class UserSettings(
     val departureHour: Int = 8,
