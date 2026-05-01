@@ -312,9 +312,6 @@ private fun ClothingCard(rec: ClothesRecommendation) {
             }
 
             // Overkropp
-            if (rec.wearThermalUnderwear) {
-                ClothingRow(R.drawable.tskjorte_ikon, "Ullundertøy — det er kaldt nok til å trenge ekstra lag.")
-            }
             if (rec.wearHeavyJacket) {
                 ClothingRow(R.drawable.tykk_jakke, "Tykk jakke — det er skikkelig kaldt ute.")
             }
@@ -334,6 +331,9 @@ private fun ClothingCard(rec: ClothesRecommendation) {
             }
             if (rec.wearPants) {
                 ClothingRow(R.drawable.jeans, "Bukse passer til dagens temperatur.")
+            }
+            if (rec.wearThermalUnderwear) {
+                ClothingRow(R.drawable.jeggings, "Ullundertøy — det er kaldt nok til å trenge ekstra lag.")
             }
 
             // Sko nederst
