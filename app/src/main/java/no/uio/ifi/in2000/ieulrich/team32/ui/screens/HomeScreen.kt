@@ -115,6 +115,7 @@ fun HomeScreen(
     }
     val currentLocation by viewmodel.currentLocation.collectAsState()
     LaunchedEffect(currentLocation) {
+        Log.d("HomeScreen", "currentLocation: $currentLocation")
         currentLocation?.let { (lat, lon) ->
             clothesViewModel.updateLocation(lat, lon)
         }
@@ -384,7 +385,7 @@ fun WeatherCard(
     Card(
         modifier = modifier.height(280.dp).fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        onClick = {  // ← gjør kortet klikkbart
+        onClick = {
             location?.let { (lat, lon) ->
                 navController.navigate("forecast?lat=$lat&lon=$lon&city=Min posisjon")
             }
@@ -452,10 +453,10 @@ fun WeatherCard(
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(text = details.temperature, fontSize = 40.sp)
                 }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) { Text(text = "H:14°  L: 5°") }
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.Center
+//                ) { Text(text = "H:14°  L: 5°") }
             }
         }
     }
@@ -562,7 +563,7 @@ fun ClothingCard(
                         fontSize = 15.sp
                         )
                         OutlinedButton(
-                            onClick = { navController.navigate(Routes.ADJUSTMENT) },
+                            onClick = { navController.navigate(Routes.CLOTHES) },
                             colors = ButtonDefaults.outlinedButtonColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceVariant
                             ),
