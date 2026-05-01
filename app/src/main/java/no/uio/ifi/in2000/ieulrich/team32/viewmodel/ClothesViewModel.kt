@@ -12,8 +12,9 @@ import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendationEngine
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.UserSettings
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
-import no.uio.ifi.in2000.ieulrich.team32.ui.screens.ActivityLevel
 import android.util.Log
+import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
+
 
 class ClothesViewModel : ViewModel() {
 

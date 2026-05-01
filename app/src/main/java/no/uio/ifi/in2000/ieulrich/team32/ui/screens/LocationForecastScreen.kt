@@ -49,6 +49,7 @@ import coil3.compose.AsyncImage
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.dto.TimeSeries
+import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ForecastHour
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 import kotlin.collections.emptyList
@@ -73,8 +74,7 @@ fun LocationForecastScreen(
     }
 
     val forecast by viewmodel.forecast.collectAsState()
-    val groupedByDay = (forecast?.properties?.timeseries ?: emptyList())
-        .groupBy { Format.extractDate(it.time) }
+    val groupedByDay = viewmodel.forecastByDay.collectAsState()
 
     Scaffold(
         topBar = {
@@ -106,9 +106,9 @@ fun LocationForecastScreen(
                 bottom = 0.dp
             )
         ) {
-            groupedByDay.entries.forEach { (date, timeseriesForDay) ->
+            groupedByDay.value?.forEach { (date, forecastForDay) ->
                 item {
-                    DayForecastCard(date = date, timeseries = timeseriesForDay)
+                    DayForecastCard(date = date, forecastForDay = forecastForDay)
                 }
             }
         }
@@ -117,11 +117,11 @@ fun LocationForecastScreen(
 
 
 @Composable
-fun DayForecastCard(date: String, timeseries: List<TimeSeries>) {
+fun DayForecastCard(date: String, forecastForDay: List<ForecastHourDetails>) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
-    val groupedByInterval = timeseries.groupBy {
-        Format.extractSixHourInterval(it.time)
+    val groupedByInterval = forecastForDay.groupBy {
+        Format.extractSixHourInterval(it.timestamp)
     }
 
     Card(
@@ -158,30 +158,24 @@ fun DayForecastCard(date: String, timeseries: List<TimeSeries>) {
                     Text("Vind", fontSize = 13.sp, modifier = Modifier.weight(1f))
                 }
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-                timeseries.forEachIndexed { index, ts ->
-                    val symbolCode = ts.data.next1Hours?.summary?.symbolCode ?: ""
+                forecastForDay.forEachIndexed { index, details ->
                     if (index > 0) HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                     ForecastHour(
-                        time = Format.extractHour(ts.time),
-                        temp = Format.formatTemp("%.0f".format(ts.data.instant.details.airTemperature)),
-                        windSpeed = Format.formatWind("%.0f".format(ts.data.instant.details.windSpeed)),
-                        precipitationAmount = Format.formatPrecipitation(
-                            "%.0f".format(ts.data.next1Hours?.details?.precipitationAmount ?: 0.0)
-                        ),
-                        symbolCode = symbolCode,
+                        time = Format.extractHour(details.timestamp),
+                        temp = Format.formatTemp(details.temperature),
+                        windSpeed = Format.formatWind(details.windSpeed),
+                        precipitationAmount = Format.formatPrecipitation(details.precipitationAmount),
+                        symbolCode = details.symbolCode,
                         compact = true
                     )
 
                 }
             } else {
                 groupedByInterval.entries.forEachIndexed { index, (interval, hours) ->
-                    val maxTemp = hours.map { it.data.instant.details.airTemperature }.max()
-                    val avgWind = hours.map { it.data.instant.details.windSpeed }.average()
-                    val totalPrecipitation = hours.sumOf {
-                        it.data.next1Hours?.details?.precipitationAmount ?: 0.0
-                    }
-                    val symbolCode =
-                        hours.firstOrNull()?.data?.next1Hours?.summary?.symbolCode ?: ""
+                    val maxTemp = hours.maxOf { it.temperature }
+                    val avgWind = hours.map { it.windSpeed }.average()
+                    val totalPrecipitation = hours.sumOf { it.precipitationAmount }
+                    val symbolCode = hours.firstOrNull()?.symbolCode ?: ""
                     val imageUrl =
                         "https://raw.githubusercontent.com/metno/weathericons/main/weather/svg/$symbolCode.svg"
 
@@ -204,17 +198,17 @@ fun DayForecastCard(date: String, timeseries: List<TimeSeries>) {
                         )
                         Text(text = interval, fontSize = 13.sp, modifier = Modifier.weight(1.5f))
                         Text(
-                            text = Format.formatTemp("%.0f".format(maxTemp)),
+                            text = Format.formatTemp(maxTemp),
                             fontSize = 13.sp,
                             modifier = Modifier.weight(1f)
                         )
                         Text(
-                            text = Format.formatPrecipitation("%.0f".format(totalPrecipitation)),
+                            text = Format.formatPrecipitation(totalPrecipitation),
                             fontSize = 13.sp,
                             modifier = Modifier.weight(1f)
                         )
                         Text(
-                            text = Format.formatWind("%.0f".format(avgWind)),
+                            text = Format.formatWind(avgWind),
                             fontSize = 13.sp,
                             modifier = Modifier.weight(1f)
                         )

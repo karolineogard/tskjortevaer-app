@@ -1,7 +1,7 @@
 package no.uio.ifi.in2000.ieulrich.team32.model.clothes
 
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
-import no.uio.ifi.in2000.ieulrich.team32.ui.screens.ActivityLevel
+import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
 
 data class UserSettings(
     val departureHour: Int = 8,
@@ -135,15 +135,15 @@ object ClothesRecommendationEngine {
 
     /** Henter rå temperatur som Double fra ForecastHourDetails (fjerner °-tegnet) */
     private fun ForecastHourDetails.rawTemperature(): Double =
-        temperature.replace("°", "").trim().toDoubleOrNull() ?: 0.0
+        temperature
 
     /** Henter rå vindhastighet som Double (fjerner " m/s") */
     private fun ForecastHourDetails.rawWindSpeed(): Double =
-        windSpeed.replace(" m/s", "").trim().toDoubleOrNull() ?: 0.0
+        windSpeed
 
     /** Henter rå nedbør som Double */
     private fun ForecastHourDetails.rawPrecipitation(): Double =
-        precipitationAmount.trim().toDoubleOrNull() ?: 0.0
+        precipitationAmount
 
     /**
      * Skydekke-bonus basert på symbolCode.

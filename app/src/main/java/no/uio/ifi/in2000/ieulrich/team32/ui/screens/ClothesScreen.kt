@@ -21,21 +21,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -47,13 +44,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import androidx.compose.runtime.mutableIntStateOf
+import no.uio.ifi.in2000.ieulrich.team32.ui.components.CheckboxSection
+import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -166,7 +164,9 @@ fun ClothesScreen(
                             isOutdoors = localIsOutdoors,
                             onOutdoorsChange = {
                                 localIsOutdoors = it
-                                if (!it) { localIsPhysical = false; localActivityLevel = null }
+                                if (!it) {
+                                    localIsPhysical = false; localActivityLevel = null
+                                }
                             },
                             isPhysical = localIsPhysical,
                             onPhysicalChange = {

@@ -45,6 +45,8 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.screens.SettingsScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.*
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
+import androidx.navigation.compose.currentBackStackEntryAsState
+
 
 @Composable
 fun MapApp(
@@ -55,17 +57,19 @@ fun MapApp(
 ){
 
     val startDestination = Destination.HOME
-    var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
     Scaffold(
         modifier = modifier,
         bottomBar = {
             NavigationBar{
                 Destination.entries.forEachIndexed{ index, destination ->
                     NavigationBarItem(
-                        selected = selectedDestination == index,
+                        selected = currentRoute == destination.route,
                         onClick = {
-                            navController.navigate(route = destination.route)
-                            selectedDestination = index
+                            navController.navigate(destination.route) {
+                                launchSingleTop = true
+                            }
                         },
                         icon = {
                             Icon(

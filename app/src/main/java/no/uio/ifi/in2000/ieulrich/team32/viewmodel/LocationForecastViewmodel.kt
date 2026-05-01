@@ -7,7 +7,6 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigationevent.NavigationEventDispatcher
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
@@ -21,7 +20,6 @@ import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.dto.LocationForec
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.mapper.toForecastByDay
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import kotlin.coroutines.resume
-
 class LocationForecastViewmodel(
     private val locationClient: FusedLocationProviderClient
 ): ViewModel() {

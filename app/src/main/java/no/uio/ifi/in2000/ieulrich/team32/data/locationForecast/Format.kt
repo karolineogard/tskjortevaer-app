@@ -6,6 +6,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlin.math.roundToInt
 import kotlin.text.format
 
 
@@ -20,16 +21,16 @@ object Format {
         return parsed.format(DateTimeFormatter.ofPattern("HH"))
     }
 
-    fun formatTemp(temp: String): String {
-        return temp + degreeSign
+    fun formatTemp(temp: Double): String {
+        return "%.1f".format(temp) + degreeSign
     }
 
-    fun formatPrecipitation(amount: String): String{
-        return amount
+    fun formatPrecipitation(amount: Double): String{
+        return "%.1f".format(amount)
     }
 
-    fun formatWind(speed: String): String{
-        return speed + windSuffix
+    fun formatWind(speed: Double): String{
+        return speed.roundToInt().toString() + windSuffix
     }
 
     fun extractDate(time: String): String{

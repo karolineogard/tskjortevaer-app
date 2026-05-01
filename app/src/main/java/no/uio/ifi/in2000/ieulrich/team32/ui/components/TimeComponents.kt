@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.ieulrich.team32.ui.screens
+package no.uio.ifi.in2000.ieulrich.team32.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,7 +23,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-enum class ActivityLevel { LOW, MEDIUM, HIGH }
+enum class ActivityLevel(val displayValue: String) {
+    LOW("Lav"),
+    MEDIUM("Medium"),
+    HIGH("Høy")
+}
 
 @Composable
 fun TimeInputField(
@@ -147,7 +151,7 @@ fun CheckboxSection(
                         selected = activityLevel == level,
                         onClick = { onActivityLevelChange(level) }
                     )
-                    Text(level.name)
+                    Text(level.displayValue)
                 }
             }
         }

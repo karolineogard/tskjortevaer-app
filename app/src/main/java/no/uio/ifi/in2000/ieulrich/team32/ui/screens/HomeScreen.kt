@@ -451,7 +451,9 @@ fun WeatherCard(
                         }
                     )
                     Spacer(modifier = Modifier.width(5.dp))
-                    Text(text = details.temperature, fontSize = 40.sp)
+                    Text(
+                        text = Format.formatTemp(details.temperature),
+                        fontSize = 40.sp)
                 }
 //                Row(
 //                    modifier = Modifier.fillMaxWidth(),
