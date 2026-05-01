@@ -59,6 +59,9 @@ class LocationForecastViewmodel(
                 lon = 10.75
                 Log.w("LocationDebug", "Location failed, using default (Oslo)")
             }
+
+            _currentLocation.value = Pair(lat, lon)
+
             val response = repository.getForecast(lat, lon)
             _forecast.value = response
             val groupedByDay = response.toForecastByDay()
