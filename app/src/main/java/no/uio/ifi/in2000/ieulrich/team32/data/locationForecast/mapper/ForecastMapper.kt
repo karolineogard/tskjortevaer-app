@@ -16,9 +16,9 @@ fun TimeSeries.toForeCastHourDetails(): ForecastHourDetails?{
     return ForecastHourDetails(
         symbolCode = nextHours.summary.symbolCode,
         timestamp = time,
-        windSpeed = Format.formatWind(data.instant.details.windSpeed.toString()),
-        temperature = Format.formatTemp(data.instant.details.airTemperature.toString()),
-        precipitationAmount = Format.formatPrecipitation(nextHours.details?.precipitationAmount.toString() ?: "0.0"),
+        windSpeed = data.instant.details.windSpeed,
+        temperature = data.instant.details.airTemperature,
+        precipitationAmount = nextHours.details?.precipitationAmount ?: 0.0,
         humidity = data.instant.details.relativeHumidity,
         duration = when {
             data.next1Hours != null -> 1
