@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.ieulrich.team32.ui.screens
+package no.uio.ifi.in2000.ieulrich.team32.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
