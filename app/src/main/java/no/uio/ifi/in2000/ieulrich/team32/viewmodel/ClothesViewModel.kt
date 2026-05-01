@@ -12,7 +12,9 @@ import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendationEngine
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.UserSettings
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
+import android.util.Log
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
+
 
 class ClothesViewModel : ViewModel() {
 
@@ -32,6 +34,10 @@ class ClothesViewModel : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    init {
+        Log.d("ClothesViewModel", "Initialiserer ClothesViewModel")
+    }
 
     /** Kall denne fra andre skjermer (f.eks. LocationForecastScreen) for å sette posisjon. */
     fun updateLocation(lat: Double, lon: Double) {

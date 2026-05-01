@@ -13,6 +13,7 @@ import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import android.util.Log
 
 data class MapUiState(
     val currentLayer: WeatherLayer? = WeatherLayer.TEMPERATURE,
@@ -30,6 +31,7 @@ class MapViewModel(
 
     init {
         updateLayer(WeatherLayer.TEMPERATURE)
+        Log.d("MapViewModel", "Initialiserer MapViewModel")
     }
 
     fun onLayerSelected(layer: WeatherLayer) {
