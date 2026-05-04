@@ -58,6 +58,9 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import org.maplibre.android.style.expressions.Expression.*
 import android.graphics.Color as AndroidColor
+import android.app.Activity
+import android.content.pm.ActivityInfo
+import androidx.compose.ui.platform.LocalContext
 
 
 @Composable
@@ -71,6 +74,18 @@ fun MapScreen(
     val showAlertsActive by rememberUpdatedState(uiState.showAlerts)
     var isMenuExpanded by remember { mutableStateOf(false) }
     var isSearchExpanded by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val activity = context as Activity
+
+    DisposableEffect(Unit) {
+        val originalOrientation = activity.requestedOrientation
+        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+        onDispose {
+            activity.requestedOrientation = originalOrientation
+        }
+    }
 
     // Dynamically calculate the top padding for the legend based on search bar state
     val legendTopPadding by animateDpAsState(
