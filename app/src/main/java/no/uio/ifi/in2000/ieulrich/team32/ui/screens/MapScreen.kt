@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
@@ -10,6 +11,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,15 +31,23 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil3.compose.AsyncImage
+import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
+import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.iconUrl
 import no.uio.ifi.in2000.ieulrich.team32.model.victoriaWMS.WeatherLayer
 import no.uio.ifi.in2000.ieulrich.team32.ui.victoriaWMS.MapViewModel
 import org.maplibre.android.camera.CameraPosition
@@ -58,8 +68,19 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import org.maplibre.android.style.expressions.Expression.*
 import android.graphics.Color as AndroidColor
+import no.uio.ifi.in2000.ieulrich.team32.ui.screens.AlertDetailScreen
+import android.app.Activity
+import android.content.pm.ActivityInfo
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
@@ -71,6 +92,20 @@ fun MapScreen(
     val showAlertsActive by rememberUpdatedState(uiState.showAlerts)
     var isMenuExpanded by remember { mutableStateOf(false) }
     var isSearchExpanded by remember { mutableStateOf(false) }
+    val scaffoldState = rememberBottomSheetScaffoldState()
+
+    val context = LocalContext.current
+    val activity = context as Activity
+    val scope = rememberCoroutineScope()
+
+    DisposableEffect(Unit) {
+        val originalOrientation = activity.requestedOrientation
+        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+        onDispose {
+            activity.requestedOrientation = originalOrientation
+        }
+    }
 
     // Dynamically calculate the top padding for the legend based on search bar state
     val legendTopPadding by animateDpAsState(
@@ -84,195 +119,256 @@ fun MapScreen(
             onBack = { viewModel.selectAlert(null) }
         )
     } else {
-        Box(modifier = modifier.fillMaxSize()) {
-            AndroidView(
-                factory = { context ->
-                    MapView(context).apply {
-                        onCreate(null)
-                        getMapAsync { map ->
-                            mapRef = map
-                            val styleUrl = "https://tiles.openfreemap.org/styles/liberty"
-                            map.setStyle(Style.Builder().fromUri(styleUrl)) { style ->
-                                map.cameraPosition = CameraPosition.Builder()
-                                    .target(LatLng(60.0, 11.0))
-                                    .zoom(5.0)
-                                    .build()
-
-                                updateWmsLayer(style, uiState.wmsUrl, uiState.currentLayer?.name ?: "none")
-                                updateAlertsLayer(style, uiState.showAlerts, uiState.alertsUrl)
-                            }
-
-                            map.addOnMapClickListener { point ->
-                                if (showAlertsActive) {
-                                    val features = map.queryRenderedFeatures(
-                                        map.projection.toScreenLocation(point), "alerts-layer"
-                                    )
-                                    if (features.isNotEmpty()) {
-                                        val feature = features[0]
-                                        val alert = MetAlert(
-                                            event = feature.getStringProperty("event") ?: "",
-                                            severity = feature.getStringProperty("severity") ?: "",
-                                            description = feature.getStringProperty("description") ?: "",
-                                            area = feature.getStringProperty("area") ?: "",
-                                            instruction = feature.getStringProperty("instruction") ?: "",
-                                            consequence = feature.getStringProperty("consequence") ?: "",
-                                            title = feature.getStringProperty("title") ?: "",
-                                        )
-                                        viewModel.selectAlert(alert)
-                                        return@addOnMapClickListener true
-                                    }
-                                    return@addOnMapClickListener false
+        BottomSheetScaffold(
+            scaffoldState = scaffoldState,
+            sheetPeekHeight = if(uiState.showAlerts && uiState.alerts.isNotEmpty()) 90.dp else 0.dp,
+            sheetContainerColor = Color.White,
+            sheetShadowElevation = 16.dp,
+            sheetTonalElevation = 16.dp,
+            sheetContent = {
+                Column {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    AlertsSheetContent(
+                        alerts = uiState.alerts,
+                        onAlertClick = { viewModel.selectAlert(it) },
+                        onHeaderClick = {
+                            scope.launch {
+                                if (scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded) {
+                                    scaffoldState.bottomSheetState.partialExpand()
+                                } else {
+                                    scaffoldState.bottomSheetState.expand()
                                 }
-                                
-                                val lat = point.latitude
-                                val lon = point.longitude
-                                navController.navigate("forecast?lat=$lat&lon=$lon")
-                                true
+                            }
+                        }
+                    )
+                }
+            },
+            sheetDragHandle = null,
+            sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+        ) { innerPadding ->
+            Box(modifier = modifier.fillMaxSize()) {
+                AndroidView(
+                    factory = { context ->
+                        MapView(context).apply {
+                            onCreate(null)
+                            getMapAsync { map ->
+                                mapRef = map
+                                val styleUrl = "https://tiles.openfreemap.org/styles/liberty"
+                                map.setStyle(Style.Builder().fromUri(styleUrl)) { style ->
+                                    map.cameraPosition = CameraPosition.Builder()
+                                        .target(LatLng(60.0, 11.0))
+                                        .zoom(5.0)
+                                        .build()
+
+                                    updateWmsLayer(
+                                        style,
+                                        uiState.wmsUrl,
+                                        uiState.currentLayer?.name ?: "none"
+                                    )
+                                    updateAlertsLayer(style, uiState.showAlerts, uiState.alertsUrl)
+                                }
+
+                                map.addOnMapClickListener { point ->
+                                    if (showAlertsActive) {
+                                        val features = map.queryRenderedFeatures(
+                                            map.projection.toScreenLocation(point), "alerts-layer"
+                                        )
+                                        if (features.isNotEmpty()) {
+                                            val feature = features[0]
+                                            val alert = MetAlert(
+                                                event = feature.getStringProperty("event") ?: "",
+                                                severity = feature.getStringProperty("severity")
+                                                    ?: "",
+                                                description = feature.getStringProperty("description")
+                                                    ?: "",
+                                                area = feature.getStringProperty("area") ?: "",
+                                                instruction = feature.getStringProperty("instruction")
+                                                    ?: "",
+                                                consequence = feature.getStringProperty("consequence")
+                                                    ?: "",
+                                                title = feature.getStringProperty("title") ?: "",
+                                            )
+                                            viewModel.selectAlert(alert)
+                                            return@addOnMapClickListener true
+                                        }
+                                        return@addOnMapClickListener false
+                                    }
+
+                                    val lat = point.latitude
+                                    val lon = point.longitude
+                                    navController.navigate("forecast?lat=$lat&lon=$lon")
+                                    true
+                                }
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
+
+                LaunchedEffect(uiState.wmsUrl, uiState.showAlerts) {
+                    mapRef?.getStyle { style ->
+                        updateWmsLayer(style, uiState.wmsUrl, uiState.currentLayer?.name ?: "none")
+                        updateAlertsLayer(style, uiState.showAlerts, uiState.alertsUrl)
+                    }
+                }
+
+                // Top Search Bar
+                SearchBar(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = 48.dp, start = 16.dp, end = 16.dp),
+                    isExpanded = isSearchExpanded,
+                    onToggleExpand = { isSearchExpanded = it }
+                )
+
+                if (uiState.showAlerts) {
+                    AlertsLegendCard(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(top = legendTopPadding, start = 16.dp)
+                    )
+
+                }
+
+                // Legend (Top Left) - Padding adjusts based on search bar expansion
+                else if (uiState.currentLayer == WeatherLayer.TEMPERATURE) {
+                    TemperatureLegendCard(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(top = legendTopPadding, start = 16.dp)
+                    )
+                } else if (uiState.currentLayer == WeatherLayer.PRECIPITATION) {
+                    PrecipitationLegendCard(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(top = legendTopPadding, start = 16.dp),
+                    )
+                } else if (uiState.currentLayer == WeatherLayer.WIND) {
+                    WindLegendCard(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(top = legendTopPadding, start = 16.dp),
+                    )
+                }
+
+                // Layer Selection Menu
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 16.dp, bottom = 150.dp),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    AnimatedVisibility(
+                        visible = isMenuExpanded,
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically(),
+                    ) {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            horizontalAlignment = Alignment.End
+                        ) {
+                            LayerButton(
+                                "Nedbør",
+                                Icons.Outlined.WaterDrop,
+                                uiState.currentLayer == WeatherLayer.PRECIPITATION
+                            ) {
+                                viewModel.onLayerSelected(WeatherLayer.PRECIPITATION)
+                                isMenuExpanded = false
+                            }
+                            LayerButton(
+                                "Temperatur",
+                                Icons.Outlined.DeviceThermostat,
+                                uiState.currentLayer == WeatherLayer.TEMPERATURE
+                            ) {
+                                viewModel.onLayerSelected(WeatherLayer.TEMPERATURE)
+                                isMenuExpanded = false
+                            }
+                            LayerButton(
+                                "Vind",
+                                Icons.Outlined.Air,
+                                uiState.currentLayer == WeatherLayer.WIND
+                            ) {
+                                viewModel.onLayerSelected(WeatherLayer.WIND)
+                                isMenuExpanded = false
+                            }
+                            LayerButton("Farevarsler", Icons.Default.Warning, uiState.showAlerts) {
+                                viewModel.onAlertsSelected()
+                                isMenuExpanded = false
                             }
                         }
                     }
-                },
-                modifier = Modifier.fillMaxSize()
-            )
 
-            LaunchedEffect(uiState.wmsUrl, uiState.showAlerts) {
-                mapRef?.getStyle { style ->
-                    updateWmsLayer(style, uiState.wmsUrl, uiState.currentLayer?.name ?: "none")
-                    updateAlertsLayer(style, uiState.showAlerts, uiState.alertsUrl)
-                }
-            }
-
-            // Top Search Bar
-            SearchBar(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 48.dp, start = 16.dp, end = 16.dp),
-                isExpanded = isSearchExpanded,
-                onToggleExpand = { isSearchExpanded = it }
-            )
-
-            if(uiState.showAlerts) {
-                AlertsLegendCard(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(top = legendTopPadding, start = 16.dp)
-                )
-            }
-
-            // Legend (Top Left) - Padding adjusts based on search bar expansion
-            else if (uiState.currentLayer == WeatherLayer.TEMPERATURE) {
-                TemperatureLegendCard(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(top = legendTopPadding, start = 16.dp)
-                )
-            } else if (uiState.currentLayer == WeatherLayer.PRECIPITATION) {
-                 PrecipitationLegendCard(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(top = legendTopPadding, start = 16.dp),
-                )
-            } else if (uiState.currentLayer == WeatherLayer.WIND) {
-                WindLegendCard(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(top = legendTopPadding, start = 16.dp),
-                )
-            }
-
-            // Layer Selection Menu
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 16.dp, bottom = 150.dp),
-                horizontalAlignment = Alignment.End
-            ) {
-                AnimatedVisibility(
-                    visible = isMenuExpanded,
-                    enter = fadeIn() + expandVertically(),
-                    exit = fadeOut() + shrinkVertically(),
-                ) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        LayerButton("Nedbør", Icons.Outlined.WaterDrop, uiState.currentLayer == WeatherLayer.PRECIPITATION) {
-                            viewModel.onLayerSelected(WeatherLayer.PRECIPITATION)
-                            isMenuExpanded = false
-                        }
-                        LayerButton("Temperatur", Icons.Outlined.DeviceThermostat, uiState.currentLayer == WeatherLayer.TEMPERATURE) {
-                            viewModel.onLayerSelected(WeatherLayer.TEMPERATURE)
-                            isMenuExpanded = false
-                        }
-                        LayerButton("Vind", Icons.Outlined.Air, uiState.currentLayer == WeatherLayer.WIND) {
-                            viewModel.onLayerSelected(WeatherLayer.WIND)
-                            isMenuExpanded = false
-                        }
-                        LayerButton("Farevarsler", Icons.Default.Warning, uiState.showAlerts) {
-                            viewModel.onAlertsSelected()
-                            isMenuExpanded = false
-                        }
-                    }
-                }
-
-                if (isMenuExpanded) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    FloatingActionButton(
-                        onClick = { isMenuExpanded = false },
-                        containerColor = Color(0xFFB0BEC5),
-                        contentColor = Color.Black,
-                        shape = CircleShape,
-                        modifier = Modifier.size(56.dp)
-                    ) {
-                        Icon(Icons.Default.Close, contentDescription = "Lukk")
-                    }
-                } else {
-                    val currentLabel = when {
-                        uiState.showAlerts -> "Farevarsler"
-                        uiState.currentLayer == WeatherLayer.PRECIPITATION -> "Nedbør"
-                        uiState.currentLayer == WeatherLayer.TEMPERATURE -> "Temperatur"
-                        uiState.currentLayer == WeatherLayer.WIND -> "Vind"
-                        else -> "Lag"
-                    }
-                    val currentIcon = when {
-                        uiState.showAlerts -> Icons.Default.Warning
-                        uiState.currentLayer == WeatherLayer.PRECIPITATION -> Icons.Outlined.WaterDrop
-                        uiState.currentLayer == WeatherLayer.TEMPERATURE -> Icons.Outlined.DeviceThermostat
-                        uiState.currentLayer == WeatherLayer.WIND -> Icons.Outlined.Air
-                        else -> Icons.Outlined.WaterDrop
-                    }
-
-                    Surface(
-                        onClick = { isMenuExpanded = true },
-                        shape = RoundedCornerShape(24.dp),
-                        color = Color(0xFFE1F5FE),
-                        shadowElevation = 2.dp
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                    if (isMenuExpanded) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        FloatingActionButton(
+                            onClick = { isMenuExpanded = false },
+                            containerColor = Color(0xFFB0BEC5),
+                            contentColor = Color.Black,
+                            shape = CircleShape,
+                            modifier = Modifier.size(56.dp)
                         ) {
-                            Icon(currentIcon, contentDescription = null, modifier = Modifier.size(24.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(currentLabel, style = MaterialTheme.typography.labelLarge, fontSize = 16.sp)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Icon(Icons.Default.KeyboardArrowDown, contentDescription = null, modifier = Modifier.size(24.dp))
+                            Icon(Icons.Default.Close, contentDescription = "Lukk")
+                        }
+                    } else {
+                        val currentLabel = when {
+                            uiState.showAlerts -> "Farevarsler"
+                            uiState.currentLayer == WeatherLayer.PRECIPITATION -> "Nedbør"
+                            uiState.currentLayer == WeatherLayer.TEMPERATURE -> "Temperatur"
+                            uiState.currentLayer == WeatherLayer.WIND -> "Vind"
+                            else -> "Lag"
+                        }
+                        val currentIcon = when {
+                            uiState.showAlerts -> Icons.Default.Warning
+                            uiState.currentLayer == WeatherLayer.PRECIPITATION -> Icons.Outlined.WaterDrop
+                            uiState.currentLayer == WeatherLayer.TEMPERATURE -> Icons.Outlined.DeviceThermostat
+                            uiState.currentLayer == WeatherLayer.WIND -> Icons.Outlined.Air
+                            else -> Icons.Outlined.WaterDrop
+                        }
+
+                        Surface(
+                            onClick = { isMenuExpanded = true },
+                            shape = RoundedCornerShape(24.dp),
+                            color = Color(0xFFE1F5FE),
+                            shadowElevation = 2.dp
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    currentIcon,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    currentLabel,
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontSize = 16.sp
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Icon(
+                                    Icons.Default.KeyboardArrowDown,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
                         }
                     }
                 }
-            }
 
-            // Bottom Time Slider Card
-            if(!uiState.showAlerts) {
-                TimeSliderCard(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 32.dp, start = 16.dp, end = 16.dp),
-                    selectionKey = uiState.currentLayer,
-                    onTimeSelected = { newUtcTime ->
-                        viewModel.onTimeChanged(newUtcTime)
-                    }
-                )
+                // Bottom Time Slider Card
+                if (!uiState.showAlerts) {
+                    TimeSliderCard(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 32.dp, start = 16.dp, end = 16.dp),
+                        selectionKey = uiState.currentLayer,
+                        onTimeSelected = { newUtcTime ->
+                            viewModel.onTimeChanged(newUtcTime)
+                        }
+                    )
+                }
             }
         }
     }
@@ -575,9 +671,29 @@ fun TimeSliderCard(
     onTimeSelected: (String) -> Unit
 ) {
     var sliderPosition by remember(selectionKey) { mutableFloatStateOf(0f) }
-    
+    var isPlaying by remember { mutableStateOf(false) }
+
     val nowUTC = Instant.now().atZone(ZoneOffset.UTC)
     val baseTime = nowUTC.withHour((nowUTC.hour / 3) * 3).truncatedTo(ChronoUnit.HOURS)
+
+    LaunchedEffect(isPlaying, selectionKey) {
+        if (isPlaying) {
+            while (isPlaying) {
+                delay(2500L) // Wait 1 second per step
+                if (sliderPosition < 8f) {
+                    sliderPosition += 1f
+                    val currentSelectedTimeUTC = baseTime.plusHours((sliderPosition.toInt() * 3).toLong())
+                    val formattedTimeUTC = currentSelectedTimeUTC.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))
+                    onTimeSelected(formattedTimeUTC)
+                } else {
+                    isPlaying = false
+                }
+            }
+        }
+    }
+
+    
+
     val selectedTimeUTC = baseTime.plusHours((sliderPosition.toInt() * 3).toLong())
 
     val userZone = ZoneId.systemDefault()
@@ -596,21 +712,165 @@ fun TimeSliderCard(
         Column(modifier = Modifier.padding(12.dp)) {
             Text("$timeLabel kl. $formattedTime", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(4.dp))
-            Slider(
-                value = sliderPosition,
-                onValueChange = { 
-                    sliderPosition = it 
-                },
-                onValueChangeFinished = {
-                    onTimeSelected(formattedTimeUTC)
-                },
-                valueRange = 0f..8f,
-                steps = 7,
-                colors = SliderDefaults.colors(
-                    thumbColor = Color.Black,
-                    activeTrackColor = Color.Black,
-                    inactiveTrackColor = Color.LightGray
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(
+                    onClick = { isPlaying = !isPlaying },
+                    shape = CircleShape,
+                    color = Color(0xFFE1F5FE),
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(
+                        imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                        contentDescription = if (isPlaying) "Pause" else "Spill av",
+                        modifier = Modifier.padding(8.dp),
+                        tint = Color(0xFF0288D1)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Slider(
+                    value = sliderPosition,
+                    onValueChange = {
+                        sliderPosition = it
+                        isPlaying = false // Stop animation if user moves slider manually
+                    },
+                    onValueChangeFinished = {
+                        onTimeSelected(formattedTimeUTC)
+                    },
+                    valueRange = 0f..8f,
+                    steps = 7,
+                    modifier = Modifier.weight(1f),
+                    colors = SliderDefaults.colors(
+                        thumbColor = Color.Black,
+                        activeTrackColor = Color.Black,
+                        inactiveTrackColor = Color.LightGray
+                    )
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun AlertsSheetContent(
+    alerts: List<MetAlert>,
+    onAlertClick: (MetAlert) -> Unit,
+    onHeaderClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) { onHeaderClick() }
+            .padding(bottom = 32.dp)
+    ) {
+        Text(
+            text = "Gjeldende farevarsler",
+            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+            modifier = Modifier
+                .padding(horizontal = 12.dp, vertical = 4.dp)
+                .align(Alignment.CenterHorizontally)
+        )
+
+        if (alerts.isEmpty()) {
+            Text(
+                text = "Ingen aktive varsler i dette området",
+                modifier = Modifier.padding(20.dp),
+                color = Color.Gray
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(alerts.size) { index ->
+                    val alert = alerts[index]
+                    AlertListItem(alert = alert, onClick = { onAlertClick(alert) })
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun AlertListItem(
+    alert: MetAlert,
+    onClick: () -> Unit
+) {
+    val backgroundColor = when (alert.severity?.lowercase()) {
+        "moderate" -> Color(0xFFFF00)
+        "severe" -> Color(0xFFA500)
+        "extreme" -> Color(0xFF0000)
+        else -> Color(0xFFFF00)
+    }
+
+    Card(
+        onClick = onClick,
+        colors = CardDefaults.cardColors(containerColor = backgroundColor),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(12.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            AsyncImage(
+                model = alert.iconUrl,
+                contentDescription = "",
+                modifier = Modifier
+                    .size(64.dp)
+                    .padding(vertical = 8.dp),
+                contentScale = ContentScale.Fit,
+                onState = { state ->
+                    when (state) {
+                        is coil3.compose.AsyncImagePainter.State.Error -> {
+                            Log.e(
+                                "MetAlertIcon",
+                                "Feil ved lasting av ikon: ${state.result.throwable.message}"
+                            )
+                            Log.e("MetAlertIcon", "Prøvde å hente: ${alert.iconUrl}")
+                        }
+
+                        is coil3.compose.AsyncImagePainter.State.Success -> {
+                            Log.d("MetAlertIcon", "Vellykket lasting av: ${alert.iconUrl}")
+                        }
+
+                        else -> {}
+                    }
+                }
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "${FormatEventName(alert.event)}, ${alert.area}" ?: "Farevarsel",
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
+                    maxLines = 1
+                )
+
+                Text(
+                    text = when(alert.severity?.lowercase()) {
+                        "moderate" -> "Gult nivå"
+                        "severe" -> "Oransje nivå"
+                        "extreme" -> "Rødt nivå"
+                        else -> "Ukjent nivå"
+                    },
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowDown,
+                contentDescription = "Se detaljer",
+                modifier = Modifier.rotate(-90f)
             )
         }
     }

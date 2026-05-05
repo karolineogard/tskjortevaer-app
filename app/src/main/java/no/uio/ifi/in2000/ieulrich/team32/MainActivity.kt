@@ -20,6 +20,7 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.MapApp
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.Team32Theme
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
 import org.maplibre.android.MapLibre
 import org.maplibre.android.WellKnownTileServer
 import java.util.jar.Manifest
@@ -44,6 +45,10 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    private val settingsViewModel: SettingsViewModel by viewModels()
+
+
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission())
     { granted ->

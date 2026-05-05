@@ -47,6 +47,7 @@ import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
 
 
 @Composable
@@ -55,8 +56,9 @@ fun MapApp(
     modifier: Modifier = Modifier,
     clothesViewModel: ClothesViewModel = viewModel(),
     locationForecastViewmodel: LocationForecastViewmodel,
-    homeViewModel: HomeViewModel
-){
+    homeViewModel: HomeViewModel,
+    settingsViewModel: SettingsViewModel = viewModel()
+) {
 
     val startDestination = Destination.HOME
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -152,11 +154,10 @@ fun MapApp(
 
 
             composable(route = Routes.SETTINGS){
-                SettingsScreen(navController=navController)
-            }
+                SettingsScreen(navController = navController, settingsViewModel = settingsViewModel)}
 
             composable(route = Routes.CLOTHES){
-                ClothesScreen(navController=navController, clothesViewModel=clothesViewModel)
+                ClothesScreen(navController = navController, clothesViewModel = clothesViewModel, settingsViewModel = settingsViewModel)
             }
 
             composable(route = Routes.ADJUSTMENT) {

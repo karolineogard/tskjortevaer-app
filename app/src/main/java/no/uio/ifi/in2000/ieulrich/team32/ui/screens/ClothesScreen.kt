@@ -3,6 +3,8 @@ package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,21 +23,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -47,32 +47,71 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.draw.clip
+import no.uio.ifi.in2000.ieulrich.team32.ui.components.CheckboxSection
+import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
+import androidx.compose.animation.*
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.zIndex
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClothesScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    clothesViewModel: ClothesViewModel
+    clothesViewModel: ClothesViewModel,
+    settingsViewModel: SettingsViewModel
+
 ) {
+    val defaultDepHour by settingsViewModel.defaultDepartureHour.collectAsState()
+    val defaultRetHour by settingsViewModel.defaultReturnHour.collectAsState()
+
+    var localDepHour by remember(defaultDepHour) { mutableIntStateOf(defaultDepHour) }
+    var localDepMinute by remember { mutableIntStateOf(0) }
+    var localRetHour by remember(defaultRetHour) { mutableIntStateOf(defaultRetHour) }
+    var localRetMinute by remember { mutableIntStateOf(0) }
+
+    var showBanner by remember { mutableStateOf(false) }
+    var bannerMessage by remember { mutableStateOf("") }
+
+    val today = remember {
+        java.time.LocalDate.now()
+            .format(java.time.format.DateTimeFormatter.ofPattern("EEEE d. MMMM", java.util.Locale("no")))
+            .replaceFirstChar { it.uppercase() }
+    }
+
+
     val recommendation by clothesViewModel.recommendation.collectAsState()
     val settings by clothesViewModel.settings.collectAsState()
     val isLoading by clothesViewModel.isLoading.collectAsState()
 
+
+
     val sheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberStandardBottomSheetState(
             initialValue = SheetValue.PartiallyExpanded,
-            skipHiddenState = true
+            skipHiddenState = false
         )
     )
     val scope = rememberCoroutineScope()
+
+    val rotation by animateFloatAsState(
+        targetValue = if (sheetState.bottomSheetState.currentValue == SheetValue.Expanded) 180f else 0f,
+        animationSpec = tween(200)
+    )
 
     BackHandler(enabled = sheetState.bottomSheetState.currentValue == SheetValue.Expanded) {
         scope.launch { sheetState.bottomSheetState.partialExpand() }
@@ -92,7 +131,20 @@ fun ClothesScreen(
         sheetContainerColor = MaterialTheme.colorScheme.background,
         sheetContent = {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .fillMaxWidth()
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        scope.launch {
+                            if (sheetState.bottomSheetState.currentValue == SheetValue.Expanded) {
+                                sheetState.bottomSheetState.partialExpand()
+                            } else {
+                                sheetState.bottomSheetState.expand()
+                            }
+                        }
+                    },
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -107,6 +159,8 @@ fun ClothesScreen(
                     painter = painterResource(id = R.drawable.arrow_up_icon),
                     contentDescription = null,
                     modifier = Modifier.size(20.dp)
+                        .rotate(rotation)
+
                 )
             }
 
@@ -114,10 +168,10 @@ fun ClothesScreen(
             var localIsPhysical by remember { mutableStateOf(settings.isPhysicallyActive) }
             var localActivityLevel by remember { mutableStateOf(settings.activityLevel) }
 
-            var localDepHour by remember { mutableIntStateOf(settings.departureHour) }
-            var localDepMinute by remember { mutableIntStateOf(0) }
-            var localRetHour by remember { mutableIntStateOf(settings.returnHour) }
-            var localRetMinute by remember { mutableIntStateOf(0) }
+            var localDepHour by remember(settings) { mutableIntStateOf(settings.departureHour) }
+            var localDepMinute by remember(settings) { mutableIntStateOf(settings.departureMinute) }
+            var localRetHour by remember(settings) { mutableIntStateOf(settings.returnHour) }
+            var localRetMinute by remember(settings) { mutableIntStateOf(settings.returnMinute) }
 
             Column(
                 modifier = Modifier
@@ -166,7 +220,9 @@ fun ClothesScreen(
                             isOutdoors = localIsOutdoors,
                             onOutdoorsChange = {
                                 localIsOutdoors = it
-                                if (!it) { localIsPhysical = false; localActivityLevel = null }
+                                if (!it) {
+                                    localIsPhysical = false; localActivityLevel = null
+                                }
                             },
                             isPhysical = localIsPhysical,
                             onPhysicalChange = {
@@ -183,11 +239,15 @@ fun ClothesScreen(
                     onClick = {
                         clothesViewModel.updateSettings(
                             departureHour = localDepHour,
+                            departureMinute = localDepMinute,
                             returnHour = localRetHour,
+                            returnMinute = localRetMinute,
                             isOutdoors = localIsOutdoors,
                             isPhysicallyActive = localIsPhysical,
                             activityLevel = localActivityLevel
                         )
+                        bannerMessage = "Klesanbefalingen er oppdatert."
+                        showBanner = true
                         scope.launch { sheetState.bottomSheetState.partialExpand() }
                     },
                     modifier = Modifier.fillMaxWidth(),
@@ -202,6 +262,8 @@ fun ClothesScreen(
             }
         }
     ) { _ ->
+        Box(modifier = Modifier.fillMaxSize()) {
+
         if (isLoading) {
             Box(
                 modifier = Modifier.fillMaxWidth().padding(top = 64.dp),
@@ -225,6 +287,24 @@ fun ClothesScreen(
                         text = "Anbefalingen tar utgangspunkt i fremkomst til og fra skole eller jobb.\n" +
                                 "Swipe opp for å tilpasse klesanbefalingen!"
                     )
+
+                    Spacer(modifier = Modifier.size(4.dp))
+
+                    Text(
+                        text = today,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+
+                    Text(
+                        text = "Reise: %02d:%02d → %02d:%02d".format(
+                            settings.departureHour, settings.departureMinute, settings.returnHour, settings.returnMinute
+                        ),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
                 }
 
                 if (recommendation != null) {
@@ -243,6 +323,18 @@ fun ClothesScreen(
                     }
                 }
             }
+            AnimatedVisibility(
+                visible = showBanner,
+                enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
+                exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
+                modifier = Modifier.align(Alignment.TopCenter).zIndex(1f)
+            ) {
+                TopBanner(
+                    message = bannerMessage,
+                    onDismiss = { showBanner = false }
+                )
+            }
+        }
         }
     }
 }
@@ -380,5 +472,43 @@ private fun ClothingRow(iconRes: Int, text: String) {
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(text = text, modifier = Modifier.weight(1f))
+    }
+
+
+
+
+}
+
+@Composable
+fun TopBanner(message: String, onDismiss: () -> Unit) {
+    LaunchedEffect(message) {
+        kotlinx.coroutines.delay(3500)
+        onDismiss()
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(DarkBlue)
+            .clickable { onDismiss() }
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+       ,
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                painter = painterResource(id = R.drawable.kl_r_ikon),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.surfaceVariant,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(
+                text = message,
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                fontSize = 13.sp,
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
 }

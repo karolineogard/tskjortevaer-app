@@ -12,7 +12,9 @@ import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendationEngine
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.UserSettings
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
-import no.uio.ifi.in2000.ieulrich.team32.ui.screens.ActivityLevel
+import android.util.Log
+import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
+
 
 class ClothesViewModel : ViewModel() {
 
@@ -33,6 +35,10 @@ class ClothesViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    init {
+        Log.d("ClothesViewModel", "Initialiserer ClothesViewModel")
+    }
+
     /** Kall denne fra andre skjermer (f.eks. LocationForecastScreen) for å sette posisjon. */
     fun updateLocation(lat: Double, lon: Double) {
         currentLat = lat
@@ -48,14 +54,18 @@ class ClothesViewModel : ViewModel() {
     /** Oppdater brukerinnstillinger og beregn ny anbefaling. */
     fun updateSettings(
         departureHour: Int,
+        departureMinute: Int,
         returnHour: Int,
+        returnMinute: Int,
         isOutdoors: Boolean,
         isPhysicallyActive: Boolean,
         activityLevel: ActivityLevel?
     ) {
         _settings.value = UserSettings(
             departureHour = departureHour,
+            departureMinute = departureMinute,
             returnHour = returnHour,
+            returnMinute = returnMinute,
             isOutdoors = isOutdoors,
             isPhysicallyActive = isPhysicallyActive,
             activityLevel = activityLevel

@@ -13,12 +13,17 @@ import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import android.util.Log
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 
 data class MapUiState(
     val currentLayer: WeatherLayer? = WeatherLayer.TEMPERATURE,
     val wmsUrl: String = "",
     val showAlerts: Boolean = false,
     val alertsUrl: String = "",
+    val alerts: List<MetAlert> = emptyList(),
     val selectedAlert: MetAlert? = null
 )
 
@@ -30,6 +35,7 @@ class MapViewModel(
 
     init {
         updateLayer(WeatherLayer.TEMPERATURE)
+        Log.d("MapViewModel", "Initialiserer MapViewModel")
     }
 
     fun onLayerSelected(layer: WeatherLayer) {
@@ -37,11 +43,24 @@ class MapViewModel(
     }
 
     fun onAlertsSelected() {
+
         _uiState.update { it.copy(
-            currentLayer = null,
-            wmsUrl = "",
-            showAlerts = true,
-        ) }
+        currentLayer = null,
+        wmsUrl = "",
+        showAlerts = true,
+    ) }
+        viewModelScope.launch {
+            try {
+                val fetchedAlerts = repository.getAlerts()
+                _uiState.update { it.copy(
+                    alerts = fetchedAlerts
+                ) }
+                Log.d("MapViewModel", "Hentet ${fetchedAlerts.size} varsler")
+            } catch (e: Exception) {
+                Log.e("MapViewModel", "Feil ved henting av farevarsler")
+            }
+        }
+
     }
 
     fun selectAlert(alert: MetAlert?) {

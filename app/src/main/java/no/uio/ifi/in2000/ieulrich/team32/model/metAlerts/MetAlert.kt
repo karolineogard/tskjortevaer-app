@@ -1,5 +1,8 @@
 package no.uio.ifi.in2000.ieulrich.team32.model.metAlerts
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class MetAlert(
     val event: String? = null,
     val severity: String? = null,
@@ -11,4 +14,14 @@ data class MetAlert(
     val awarnessLevel: String? = null,
     val title: String? = null,
 
+)
+
+@Serializable
+data class MetAlertsResponse(
+    val features: List<MetFeature>
+)
+
+@Serializable
+data class MetFeature(
+    val properties: MetAlert
 )
