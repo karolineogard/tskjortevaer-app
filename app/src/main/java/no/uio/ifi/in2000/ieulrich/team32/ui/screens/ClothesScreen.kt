@@ -62,6 +62,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.zIndex
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.graphics.Color
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -482,21 +484,22 @@ fun TopBanner(message: String, onDismiss: () -> Unit) {
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.primaryContainer)
+            .background(DarkBlue)
             .clickable { onDismiss() }
             .padding(horizontal = 16.dp, vertical = 12.dp)
+       ,
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 painter = painterResource(id = R.drawable.kl_r_ikon),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                tint = MaterialTheme.colorScheme.surfaceVariant,
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = message,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = MaterialTheme.colorScheme.surfaceVariant,
                 fontSize = 13.sp,
                 modifier = Modifier.weight(1f)
             )

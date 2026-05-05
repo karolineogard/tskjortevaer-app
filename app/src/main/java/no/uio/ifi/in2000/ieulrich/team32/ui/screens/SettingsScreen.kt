@@ -25,6 +25,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -41,6 +42,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -50,6 +52,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,7 +77,16 @@ fun SettingsScreen(
     val scope = rememberCoroutineScope()
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = DarkBlue,
+                    contentColor = MaterialTheme.colorScheme.surfaceVariant,
+                    actionColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            }
+        },
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
