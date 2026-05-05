@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
+import android.location.Location
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -72,6 +73,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.UiState
 
 
 data class SimpleLatLng(val lat: Double, val lon: Double)
@@ -107,11 +110,14 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
     viewmodel: LocationForecastViewmodel,
-    clothesViewModel: ClothesViewModel
+    clothesViewModel: ClothesViewModel,
+    homeViewModel: HomeViewModel
 ) {
     val context = LocalContext.current
+    val uiState by homeViewModel.uiState.collectAsState()
     LaunchedEffect(Unit) {
         viewmodel.loadForecastForDevice(context)
+        homeViewModel.loadData(context)
     }
     val currentLocation by viewmodel.currentLocation.collectAsState()
     LaunchedEffect(currentLocation) {
@@ -121,7 +127,6 @@ fun HomeScreen(
         }
     }
     val padding = 16.dp
-    val forecastNow by viewmodel.forecastNow.collectAsState()
     var isVisible by remember { mutableStateOf(true) }
 
 
@@ -129,49 +134,62 @@ fun HomeScreen(
 
     var isSearchExpanded by remember { mutableStateOf(false) }
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
-            .clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            ) {
-                focusManager.clearFocus()
-            },
-
-
-        verticalArrangement = Arrangement.spacedBy(padding),
-        contentPadding = PaddingValues(
-            start = padding,
-            end = padding,
-            top = padding,
-            bottom = padding
-        ),
-    ) {
-        item {
-            HomeSearchBar(
-                navController = navController,
-                viewmodel = viewmodel
-            )
-        }
-
-        item {
-            WeatherCard(
-                navController = navController,
-                forecastHourDetails = forecastNow,
-                location = currentLocation
-            )
-        }
-        item {
-            AnimatedVisibility(
-                visible = isVisible,
-                enter = expandVertically() + fadeIn(),
-                exit = shrinkVertically() + fadeOut()
-            ) {
-                MetalertCarousel(modifier = Modifier.height(80.dp))
+    Box(modifier = Modifier.fillMaxSize()){
+        when (val state = uiState) {
+            is UiState.Loading -> {
+                // TODO: loading stuff
             }
-        }
-        item {
-            ClothingCard(navController = navController, clothesViewModel = clothesViewModel)
+            is UiState.Error -> {
+                // TODO: Error stuff
+            }
+            is UiState.Success -> {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) {
+                            focusManager.clearFocus()
+                        },
+
+
+                    verticalArrangement = Arrangement.spacedBy(padding),
+                    contentPadding = PaddingValues(
+                        start = padding,
+                        end = padding,
+                        top = padding,
+                        bottom = padding
+                    ),
+                ) {
+                    item {
+                        HomeSearchBar(
+                            navController = navController,
+                            viewmodel = viewmodel
+                        )
+                    }
+
+                    item {
+                        WeatherCard(
+                            navController = navController,
+                            forecastHourDetails = state.forecast,
+                            placeName = state.place, //TODO: forward api data
+                            location = state.location
+                        )
+                    }
+                    item {
+                        AnimatedVisibility(
+                            visible = isVisible,
+                            enter = expandVertically() + fadeIn(),
+                            exit = shrinkVertically() + fadeOut()
+                        ) {
+                            MetalertCarousel(modifier = Modifier.height(80.dp))
+                        }
+                    }
+                    item {
+                        ClothingCard(navController = navController, clothesViewModel = clothesViewModel)
+                    }
+                }
+            }
         }
     }
 }
@@ -378,17 +396,18 @@ fun WeatherCard(
     navController: NavController,
     forecastHourDetails: ForecastHourDetails?,
     modifier: Modifier = Modifier,
-    location: Pair<Double, Double>?,
-
+    location: Location,
+    placeName: String
 ) {
     val svgLoader = rememberSvgImageLoader()
     Card(
         modifier = modifier.height(280.dp).fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         onClick = {
-            location?.let { (lat, lon) ->
+            val lat = location.latitude
+            val lon = location.longitude
                 navController.navigate("forecast?lat=$lat&lon=$lon&city=Min posisjon")
-            }
+
         }
     ) {
         Column(
@@ -420,7 +439,7 @@ fun WeatherCard(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "Oslo", fontSize = 40.sp)
+                Text(text = placeName, fontSize = 40.sp)
             }
             forecastHourDetails?.let { details ->
                 Row(

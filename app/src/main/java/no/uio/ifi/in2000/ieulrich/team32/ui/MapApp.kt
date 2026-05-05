@@ -46,6 +46,7 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.theme.*
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 import androidx.navigation.compose.currentBackStackEntryAsState
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
 
 
@@ -55,6 +56,7 @@ fun MapApp(
     modifier: Modifier = Modifier,
     clothesViewModel: ClothesViewModel = viewModel(),
     locationForecastViewmodel: LocationForecastViewmodel,
+    homeViewModel: HomeViewModel,
     settingsViewModel: SettingsViewModel = viewModel()
 ) {
 
@@ -144,7 +146,10 @@ fun MapApp(
             }
 
             composable(route = Routes.HOME){
-                HomeScreen(navController = navController, viewmodel = locationForecastViewmodel, clothesViewModel = clothesViewModel)
+                HomeScreen(navController = navController,
+                    viewmodel = locationForecastViewmodel,
+                    clothesViewModel = clothesViewModel,
+                    homeViewModel = homeViewModel)
             }
 
 

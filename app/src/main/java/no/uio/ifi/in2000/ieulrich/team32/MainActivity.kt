@@ -18,6 +18,7 @@ import coil3.svg.SvgDecoder
 import com.google.android.gms.location.LocationServices
 import no.uio.ifi.in2000.ieulrich.team32.ui.MapApp
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.Team32Theme
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
 import org.maplibre.android.MapLibre
@@ -35,6 +36,15 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+    private val homeViewModel: HomeViewModel by viewModels {
+        object : ViewModelProvider.Factory{
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                val locationClient = LocationServices.getFusedLocationProviderClient(this@MainActivity)
+                @Suppress("UNCHECKED_CAST")
+                return HomeViewModel(locationClient) as T
+            }
+        }
+    }
 
     private val settingsViewModel: SettingsViewModel by viewModels()
 
@@ -44,6 +54,7 @@ class MainActivity : ComponentActivity() {
     { granted ->
         if (granted) {
             viewModel.loadForecastForDevice(this)
+            homeViewModel.loadData(this)
         }
     }
 
@@ -67,7 +78,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Team32Theme {
-                MapApp(locationForecastViewmodel = viewModel)
+                MapApp(locationForecastViewmodel = viewModel, homeViewModel = homeViewModel)
             }
         }
     }
