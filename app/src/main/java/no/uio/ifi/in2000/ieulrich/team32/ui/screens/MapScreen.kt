@@ -69,6 +69,12 @@ import java.time.temporal.ChronoUnit
 import org.maplibre.android.style.expressions.Expression.*
 import android.graphics.Color as AndroidColor
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.AlertDetailScreen
+import android.app.Activity
+import android.content.pm.ActivityInfo
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,6 +90,18 @@ fun MapScreen(
     var isMenuExpanded by remember { mutableStateOf(false) }
     var isSearchExpanded by remember { mutableStateOf(false) }
     val scaffoldState = rememberBottomSheetScaffoldState()
+
+    val context = LocalContext.current
+    val activity = context as Activity
+
+    DisposableEffect(Unit) {
+        val originalOrientation = activity.requestedOrientation
+        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+        onDispose {
+            activity.requestedOrientation = originalOrientation
+        }
+    }
 
     // Dynamically calculate the top padding for the legend based on search bar state
     val legendTopPadding by animateDpAsState(
@@ -637,9 +655,29 @@ fun TimeSliderCard(
     onTimeSelected: (String) -> Unit
 ) {
     var sliderPosition by remember(selectionKey) { mutableFloatStateOf(0f) }
-    
+    var isPlaying by remember { mutableStateOf(false) }
+
     val nowUTC = Instant.now().atZone(ZoneOffset.UTC)
     val baseTime = nowUTC.withHour((nowUTC.hour / 3) * 3).truncatedTo(ChronoUnit.HOURS)
+
+    LaunchedEffect(isPlaying, selectionKey) {
+        if (isPlaying) {
+            while (isPlaying) {
+                delay(2500L) // Wait 1 second per step
+                if (sliderPosition < 8f) {
+                    sliderPosition += 1f
+                    val currentSelectedTimeUTC = baseTime.plusHours((sliderPosition.toInt() * 3).toLong())
+                    val formattedTimeUTC = currentSelectedTimeUTC.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))
+                    onTimeSelected(formattedTimeUTC)
+                } else {
+                    isPlaying = false
+                }
+            }
+        }
+    }
+
+    
+
     val selectedTimeUTC = baseTime.plusHours((sliderPosition.toInt() * 3).toLong())
 
     val userZone = ZoneId.systemDefault()
@@ -658,22 +696,42 @@ fun TimeSliderCard(
         Column(modifier = Modifier.padding(12.dp)) {
             Text("$timeLabel kl. $formattedTime", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(4.dp))
-            Slider(
-                value = sliderPosition,
-                onValueChange = { 
-                    sliderPosition = it 
-                },
-                onValueChangeFinished = {
-                    onTimeSelected(formattedTimeUTC)
-                },
-                valueRange = 0f..8f,
-                steps = 7,
-                colors = SliderDefaults.colors(
-                    thumbColor = Color.Black,
-                    activeTrackColor = Color.Black,
-                    inactiveTrackColor = Color.LightGray
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(
+                    onClick = { isPlaying = !isPlaying },
+                    shape = CircleShape,
+                    color = Color(0xFFE1F5FE),
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(
+                        imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                        contentDescription = if (isPlaying) "Pause" else "Spill av",
+                        modifier = Modifier.padding(8.dp),
+                        tint = Color(0xFF0288D1)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Slider(
+                    value = sliderPosition,
+                    onValueChange = {
+                        sliderPosition = it
+                        isPlaying = false // Stop animation if user moves slider manually
+                    },
+                    onValueChangeFinished = {
+                        onTimeSelected(formattedTimeUTC)
+                    },
+                    valueRange = 0f..8f,
+                    steps = 7,
+                    modifier = Modifier.weight(1f),
+                    colors = SliderDefaults.colors(
+                        thumbColor = Color.Black,
+                        activeTrackColor = Color.Black,
+                        inactiveTrackColor = Color.LightGray
+                    )
                 )
-            )
+            }
         }
     }
 }

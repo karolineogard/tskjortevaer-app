@@ -25,40 +25,68 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    settingsViewModel: SettingsViewModel
+
 ) {
     var temperatureOffset by remember { mutableFloatStateOf(50f) }
 
-    var startHour by remember { mutableIntStateOf(8) }
-    var startMinute by remember { mutableIntStateOf(0) }
+    val defaultDepHour by settingsViewModel.defaultDepartureHour.collectAsState()
+    val defaultRetHour by settingsViewModel.defaultReturnHour.collectAsState()
 
-    var endHour by remember { mutableIntStateOf(16) }
+    var startHour by remember(defaultDepHour) { mutableIntStateOf(defaultDepHour) }
+    var startMinute by remember { mutableIntStateOf(0) }
+    var endHour by remember(defaultRetHour) { mutableIntStateOf(defaultRetHour) }
     var endMinute by remember { mutableIntStateOf(0) }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = DarkBlue,
+                    contentColor = MaterialTheme.colorScheme.surfaceVariant,
+                    actionColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            }
+        },
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
@@ -191,7 +219,22 @@ fun SettingsScreen(
             ) {
                 OutlinedButton(
                     onClick = {
-                        println("Lagrer reisetid: Fra $startHour:$startMinute til $endHour:$endMinute")
+                        settingsViewModel.updateDefaultTimes(
+                            departureHour = startHour,
+                            departureMinute = startMinute,
+                            returnHour = endHour,
+                            returnMinute = endMinute
+                        )
+                        scope.launch {
+                            val result = snackbarHostState.showSnackbar(
+                                message = "Innstillinger lagret!",
+                                actionLabel = "✕",
+                                duration = SnackbarDuration.Short
+                            )
+                            if (result == SnackbarResult.ActionPerformed) {
+                                snackbarHostState.currentSnackbarData?.dismiss()
+                            }
+                        }
                     },
                     colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant

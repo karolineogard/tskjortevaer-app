@@ -60,7 +60,7 @@ fun AlertDetailScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = SeverityColor(alert.severity).copy(alpha = 0.5f)
+                    containerColor = SeverityColor(alert.severity).copy(alpha = 0.3f)
                 ),
                 border = BorderStroke(2.dp, SeverityColor(alert.severity))
             ){

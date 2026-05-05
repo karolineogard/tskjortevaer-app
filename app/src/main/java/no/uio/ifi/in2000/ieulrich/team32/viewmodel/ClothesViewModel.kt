@@ -54,14 +54,18 @@ class ClothesViewModel : ViewModel() {
     /** Oppdater brukerinnstillinger og beregn ny anbefaling. */
     fun updateSettings(
         departureHour: Int,
+        departureMinute: Int,
         returnHour: Int,
+        returnMinute: Int,
         isOutdoors: Boolean,
         isPhysicallyActive: Boolean,
         activityLevel: ActivityLevel?
     ) {
         _settings.value = UserSettings(
             departureHour = departureHour,
+            departureMinute = departureMinute,
             returnHour = returnHour,
+            returnMinute = returnMinute,
             isOutdoors = isOutdoors,
             isPhysicallyActive = isPhysicallyActive,
             activityLevel = activityLevel
