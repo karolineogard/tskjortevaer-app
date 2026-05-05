@@ -35,15 +35,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-    private val locationPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission())
-    { granted ->
-        if (granted) {
-            viewModel.loadForecastForDevice(this)
-        }
-    }
-
     private val homeViewModel: HomeViewModel by viewModels {
         object : ViewModelProvider.Factory{
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -53,11 +44,11 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-    private val locationPermission = registerForActivityResult(
+    private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission())
     { granted ->
         if (granted) {
+            viewModel.loadForecastForDevice(this)
             homeViewModel.loadData(this)
         }
     }
