@@ -1,8 +1,5 @@
 package no.uio.ifi.in2000.ieulrich.team32.data.metAlert
 
-import io.ktor.client.HttpClient
-import no.uio.ifi.in2000.ieulrich.team32.data.client.HttpClientProvider
-
 interface AlertsRepository {
     suspend fun getCurrentAlerts(lat: Double, lon: Double): List<AlertFeature>
 }
