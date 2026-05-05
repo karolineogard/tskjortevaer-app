@@ -58,10 +58,12 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.components.CheckboxSection
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
 import androidx.compose.animation.*
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.zIndex
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
 
@@ -105,6 +107,11 @@ fun ClothesScreen(
         )
     )
     val scope = rememberCoroutineScope()
+
+    val rotation by animateFloatAsState(
+        targetValue = if (sheetState.bottomSheetState.currentValue == SheetValue.Expanded) 180f else 0f,
+        animationSpec = tween(200)
+    )
 
     BackHandler(enabled = sheetState.bottomSheetState.currentValue == SheetValue.Expanded) {
         scope.launch { sheetState.bottomSheetState.partialExpand() }
@@ -152,9 +159,8 @@ fun ClothesScreen(
                     painter = painterResource(id = R.drawable.arrow_up_icon),
                     contentDescription = null,
                     modifier = Modifier.size(20.dp)
-                        .clickable{
-                            sheetState.bottomSheetState.currentValue == SheetValue.Expanded
-                        }
+                        .rotate(rotation)
+
                 )
             }
 
