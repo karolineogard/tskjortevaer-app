@@ -71,10 +71,13 @@ import android.graphics.Color as AndroidColor
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.AlertDetailScreen
 import android.app.Activity
 import android.content.pm.ActivityInfo
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,6 +96,7 @@ fun MapScreen(
 
     val context = LocalContext.current
     val activity = context as Activity
+    val scope = rememberCoroutineScope()
 
     DisposableEffect(Unit) {
         val originalOrientation = activity.requestedOrientation
@@ -117,17 +121,29 @@ fun MapScreen(
     } else {
         BottomSheetScaffold(
             scaffoldState = scaffoldState,
-            sheetPeekHeight = if(uiState.showAlerts && uiState.alerts.isNotEmpty()) 140.dp else 0.dp,
-            sheetContainerColor = Color(0xFFF0F4F8),
+            sheetPeekHeight = if(uiState.showAlerts && uiState.alerts.isNotEmpty()) 90.dp else 0.dp,
+            sheetContainerColor = Color.White,
+            sheetShadowElevation = 16.dp,
+            sheetTonalElevation = 16.dp,
             sheetContent = {
-                AlertsSheetContent(
-                    alerts = uiState.alerts,
-                    onAlertClick = { viewModel.selectAlert(it)}
-                )
+                Column {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    AlertsSheetContent(
+                        alerts = uiState.alerts,
+                        onAlertClick = { viewModel.selectAlert(it) },
+                        onHeaderClick = {
+                            scope.launch {
+                                if (scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded) {
+                                    scaffoldState.bottomSheetState.partialExpand()
+                                } else {
+                                    scaffoldState.bottomSheetState.expand()
+                                }
+                            }
+                        }
+                    )
+                }
             },
-            sheetDragHandle = {
-                BottomSheetDefaults.DragHandle()
-            },
+            sheetDragHandle = null,
             sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
         ) { innerPadding ->
             Box(modifier = modifier.fillMaxSize()) {
@@ -739,12 +755,17 @@ fun TimeSliderCard(
 @Composable
 fun AlertsSheetContent(
     alerts: List<MetAlert>,
-    onAlertClick: (MetAlert) -> Unit
+    onAlertClick: (MetAlert) -> Unit,
+    onHeaderClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 32.dp) // Litt luft i bunnen,
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) { onHeaderClick() }
+            .padding(bottom = 32.dp)
     ) {
         Text(
             text = "Gjeldende farevarsler",
