@@ -133,7 +133,6 @@ fun InfoSection(label: String, value: String, color: Color = MaterialTheme.color
 
 
 fun SeverityColor(severity: String?): Color = when (severity?.lowercase()){
-    "minor"    -> Color(0xFFFFFF00)
     "moderate" -> Color(0xFFFFFF00)
     "severe"   -> Color(0xFFFFA500)
     "extreme"  -> Color(0xFFFF0000)
@@ -157,9 +156,8 @@ fun FormatEventName(event: String?): String = when (event?.lowercase()) {
 }
 
 fun FormatSeverity(severity: String?): String = when (severity?.lowercase()) {
-    "minor"    -> "Gul"
-    "moderate" -> "Oransje"
-    "severe"   -> "Rød"
-    "extreme"  -> "Ekstrem"
+    "moderate" -> "Gul"
+    "severe"   -> "Oransje"
+    "extreme"  -> "Rød"
     else       -> severity ?: "Ukjent"
 }
