@@ -1,5 +1,13 @@
 package no.uio.ifi.in2000.ieulrich.team32.data.victoriaWMS
 
+import android.util.Log
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.http.HttpHeaders
+import no.uio.ifi.in2000.ieulrich.team32.data.client.HttpClientProvider.client
+import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
+import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlertsResponse
 import no.uio.ifi.in2000.ieulrich.team32.model.victoriaWMS.WeatherLayer
 import java.time.Instant
 import java.time.ZoneOffset
@@ -9,6 +17,8 @@ import java.time.temporal.ChronoUnit
 interface WeatherRepository {
     fun getWmsUrl(layer: WeatherLayer, Time: String): String
     fun getAlertsUrl(): String
+
+    suspend fun getAlerts(): List<MetAlert>
 }
 
 class WeatherRepositoryImpl : WeatherRepository {
@@ -28,5 +38,18 @@ class WeatherRepositoryImpl : WeatherRepository {
 
     override fun getAlertsUrl(): String {
         return "https://api.met.no/weatherapi/metalerts/2.0/current.json"
+    }
+
+    override suspend fun getAlerts(): List<MetAlert> {
+        return try {
+            val response: MetAlertsResponse = client.get(getAlertsUrl()){
+                header(HttpHeaders.UserAgent, "IN2000 Team 32")
+            }.body()
+
+            response.features.map{ it.properties }
+        } catch (e: Exception) {
+            Log.e("WeatherRepository", "Kunne ikke hente farevarsler: ${e.message}")
+            emptyList()
+        }
     }
 }
