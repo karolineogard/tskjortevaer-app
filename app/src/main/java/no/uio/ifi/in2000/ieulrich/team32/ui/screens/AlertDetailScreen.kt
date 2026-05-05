@@ -12,15 +12,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.iconUrl
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.Grey
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.RobotoMono
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -117,8 +119,16 @@ fun AlertDetailScreen(
                     alert.instruction?.let {
                         InfoSection(label = "Instruksjon", value = it)
                     }
+                    Spacer(modifier = Modifier.height(2.dp))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f))
+                    Spacer(modifier = Modifier.height(2.dp))
+                    SeverityLegend()
+                    Spacer(modifier = Modifier.height(4.dp))
+
                 }
+
             }
+
         }
     }
 }
@@ -126,8 +136,17 @@ fun AlertDetailScreen(
 @Composable
 fun InfoSection(label: String, value: String, color: Color = MaterialTheme.colorScheme.onPrimary) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Text(text = label, style = MaterialTheme.typography.labelLarge, color = color)
-        Text(text = value, style = MaterialTheme.typography.bodyLarge)
+        Text(
+            text = label,
+            color = color,
+            fontFamily = RobotoMono,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = value,
+            fontFamily = RobotoMono,
+            style = MaterialTheme.typography.bodyLarge
+        )
     }
 }
 
@@ -160,4 +179,43 @@ fun FormatSeverity(severity: String?): String = when (severity?.lowercase()) {
     "severe"   -> "Oransje"
     "extreme"  -> "Rød"
     else       -> severity ?: "Ukjent"
+}
+
+@Composable
+fun SeverityLegend(modifier: Modifier = Modifier) {
+    val levels = listOf(
+        Triple("minor",    Color(0xFFFFFF00), "Gult: Moderat fare"),
+        Triple("moderate", Color(0xFFFFA500), "Oransj: Stor fare"),
+        Triple("severe",   Color(0xFFFF0000), "Rødt: Ekstrem fare og ekstremvær"),
+    )
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Text(
+            text = "Farenivåer",
+            fontFamily = RobotoMono,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onPrimary
+        )
+        levels.forEach { (_, color, label) ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(16.dp)
+                        .clip(RoundedCornerShape(3.dp))
+                        .background(color)
+                        .border(1.dp, Color.Black.copy(alpha = 0.3f), RoundedCornerShape(3.dp))
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = label,
+                    fontFamily = RobotoMono,
+                    //style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+        }
+    }
 }
