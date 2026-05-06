@@ -80,6 +80,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.SearchBar
 import org.maplibre.android.camera.CameraUpdateFactory
+import androidx.compose.ui.zIndex
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -87,8 +89,9 @@ import org.maplibre.android.camera.CameraUpdateFactory
 fun MapScreen(
     modifier: Modifier = Modifier,
     viewModel: MapViewModel = viewModel(),
-    navController: NavController
-) {
+    navController: NavController,
+    isOnline: Boolean
+){
     val uiState by viewModel.uiState.collectAsState()
     var mapRef by remember { mutableStateOf<org.maplibre.android.maps.MapLibreMap?>(null) }
     val showAlertsActive by rememberUpdatedState(uiState.showAlerts)
@@ -149,18 +152,44 @@ fun MapScreen(
             sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
         ) { innerPadding ->
             Box(modifier = modifier.fillMaxSize()) {
+                if (!isOnline) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background)
+                            .padding(32.dp)
+                            .zIndex(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(
+                                text = "Ingen internettforbindelse",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "Kartet krever internett for å laste inn.",
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
                 AndroidView(
                     factory = { context ->
                         MapView(context).apply {
                             onCreate(null)
                             getMapAsync { map ->
                                 mapRef = map
+
+                                map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                    uiState.mapCenter,
+                                    uiState.mapZoom))
+
                                 val styleUrl = "https://tiles.openfreemap.org/styles/liberty"
                                 map.setStyle(Style.Builder().fromUri(styleUrl)) { style ->
-                                    map.cameraPosition = CameraPosition.Builder()
-                                        .target(LatLng(60.0, 11.0))
-                                        .zoom(5.0)
-                                        .build()
 
                                     updateWmsLayer(
                                         style,
@@ -168,6 +197,11 @@ fun MapScreen(
                                         uiState.currentLayer?.name ?: "none"
                                     )
                                     updateAlertsLayer(style, uiState.showAlerts, uiState.alertsUrl)
+                                }
+
+                                map.addOnCameraIdleListener {
+                                    val pos = map.cameraPosition
+                                    viewModel.updateMapPosition(pos.target ?: LatLng(60.0, 11.0), pos.zoom)
                                 }
 
                                 map.addOnMapClickListener { point ->

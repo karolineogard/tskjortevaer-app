@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.ieulrich.team32.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,15 +13,12 @@ import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendationEngine
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.UserSettings
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
-import android.util.Log
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
-
 
 class ClothesViewModel : ViewModel() {
 
     private val repository = LocationForecastRepository()
 
-    // Koordinater — Oslo som fallback, settes utenfra via updateLocation()
     var currentLat: Double = 59.9139
         private set
     var currentLon: Double = 10.7522
@@ -35,18 +33,33 @@ class ClothesViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    // Temperaturoffset fra innstillinger (-5 til +5). Settes utenfra via MapApp.
+    private var temperatureOffset: Float = 0f
+
     init {
         Log.d("ClothesViewModel", "Initialiserer ClothesViewModel")
     }
 
-    /** Kall denne fra andre skjermer (f.eks. LocationForecastScreen) for å sette posisjon. */
+    fun clearRecommendationIfOffline(isOnline: Boolean) {
+        if (!isOnline) {
+            _recommendation.value = null
+        }
+    }
+
+    /** Kall fra MapApp når SettingsViewModel.temperatureOffset endres. */
+    fun updateTemperatureOffset(offset: Float) {
+        temperatureOffset = offset
+        computeRecommendation()
+    }
+
+    /** Kall fra andre skjermer (f.eks. HomeScreen) for å sette posisjon. */
     fun updateLocation(lat: Double, lon: Double) {
         currentLat = lat
         currentLon = lon
         computeRecommendation()
     }
 
-    /** Kall denne fra ClothesScreen ved oppstart for å laste anbefaling med nåværende posisjon. */
+    /** Kall fra ClothesScreen ved oppstart. */
     fun loadRecommendation() {
         computeRecommendation()
     }
@@ -87,7 +100,8 @@ class ClothesViewModel : ViewModel() {
                 val forecastsToUse = relevantForecasts.ifEmpty { todayForecasts }
                 _recommendation.value = ClothesRecommendationEngine.recommend(
                     forecasts = forecastsToUse,
-                    settings = _settings.value
+                    settings = _settings.value,
+                    temperatureOffset = temperatureOffset
                 )
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -97,10 +111,6 @@ class ClothesViewModel : ViewModel() {
         }
     }
 
-    /**
-     * Filtrerer timedata mellom avreise og hjemkomst.
-     * Håndterer også over-midnatt-scenariet.
-     */
     private fun filterByTimeWindow(
         forecasts: List<ForecastHourDetails>,
         departureHour: Int,

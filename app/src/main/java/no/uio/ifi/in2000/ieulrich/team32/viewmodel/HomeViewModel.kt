@@ -51,21 +51,18 @@ class HomeViewModel(
         Log.d("HomeViewModel", "ViewModel initialized")
     }
 
-    public fun loadData(context: Context){
+    fun loadData(context: Context){
         val appContext = context.applicationContext
         viewModelScope.launch {
             Log.d("HomeVIewModel", "Prøver å loade data")
             val location = locationClient.getDeviceLocation(appContext)
 
-            if (location == null) {
-                Log.d("HomeViewModel", "could not find location")
-                _uiState.value = UiState.Error
-                return@launch
-            }
-
             try {
-                val lat = location.latitude
-                val lon = location.longitude
+                if (location == null) {
+                    Log.d("HomeViewModel", "could not find location, using default")
+                }
+                val lat = location?.latitude ?: 59.91
+                val lon = location?.longitude ?: 10.73
 
                 coroutineScope {
                     val forecastDeferred = async { locationForecastRepository.getForecastNow(lat, lon) }
@@ -78,7 +75,9 @@ class HomeViewModel(
 
                     if (forecast != null){
                         _uiState.value = UiState.Success(
-                            location = location,
+                            location = location ?: Location("appDefault").apply {
+                                latitude = lat
+                                longitude = lon },
                             forecast = forecast,
                             place = place,
                             alerts = alerts
@@ -90,11 +89,12 @@ class HomeViewModel(
 
             }
             catch (e: Exception) {
-                Log.e("HomeViewModel", "Error loading data")
+                Log.e("HomeViewModel", "Error loading data", e)
                 _uiState.value = UiState.Error
             }
         }
     }
+
 }
 
 suspend fun FusedLocationProviderClient.getDeviceLocation(context: Context): Location?{
@@ -126,3 +126,4 @@ suspend fun FusedLocationProviderClient.getDeviceLocation(context: Context): Loc
         }
     }
 }
+

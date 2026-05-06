@@ -8,5 +8,7 @@ data class NominatimAddress(
     val road: String? = null,
     val suburb: String? = null,
     val city: String? = null,
+    val town: String? = null,
+    val county: String? = null,
     @SerialName("city_district") val cityDistrict: String? = null,
 )

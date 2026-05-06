@@ -11,18 +11,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,41 +22,51 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SheetValue
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
+import androidx.compose.animation.*
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.ui.draw.clip
-import no.uio.ifi.in2000.ieulrich.team32.ui.components.CheckboxSection
+import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
-import androidx.compose.animation.*
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.zIndex
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
+import androidx.compose.ui.text.style.TextAlign
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,16 +74,11 @@ fun ClothesScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
     clothesViewModel: ClothesViewModel,
-    settingsViewModel: SettingsViewModel
-
+    settingsViewModel: SettingsViewModel,
+    isOnline: Boolean
 ) {
     val defaultDepHour by settingsViewModel.defaultDepartureHour.collectAsState()
     val defaultRetHour by settingsViewModel.defaultReturnHour.collectAsState()
-
-    var localDepHour by remember(defaultDepHour) { mutableIntStateOf(defaultDepHour) }
-    var localDepMinute by remember { mutableIntStateOf(0) }
-    var localRetHour by remember(defaultRetHour) { mutableIntStateOf(defaultRetHour) }
-    var localRetMinute by remember { mutableIntStateOf(0) }
 
     var showBanner by remember { mutableStateOf(false) }
     var bannerMessage by remember { mutableStateOf("") }
@@ -93,12 +89,9 @@ fun ClothesScreen(
             .replaceFirstChar { it.uppercase() }
     }
 
-
     val recommendation by clothesViewModel.recommendation.collectAsState()
     val settings by clothesViewModel.settings.collectAsState()
     val isLoading by clothesViewModel.isLoading.collectAsState()
-
-
 
     val sheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberStandardBottomSheetState(
@@ -120,6 +113,9 @@ fun ClothesScreen(
     LaunchedEffect(Unit) {
         clothesViewModel.loadRecommendation()
     }
+    LaunchedEffect(Unit) {
+        clothesViewModel.clearRecommendationIfOffline(isOnline)
+    }
 
     BottomSheetScaffold(
         scaffoldState = sheetState,
@@ -131,7 +127,7 @@ fun ClothesScreen(
         sheetContainerColor = MaterialTheme.colorScheme.background,
         sheetContent = {
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
                     .fillMaxWidth()
                     .clickable(
                         indication = null,
@@ -153,19 +149,16 @@ fun ClothesScreen(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
-
                 )
                 Icon(
                     painter = painterResource(id = R.drawable.arrow_up_icon),
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                        .rotate(rotation)
-
+                    modifier = Modifier.size(20.dp).rotate(rotation)
                 )
             }
 
-            var localIsOutdoors by remember { mutableStateOf(settings.isOutdoors) }
-            var localIsPhysical by remember { mutableStateOf(settings.isPhysicallyActive) }
+            var localIsOutdoors by remember { mutableStateOf<Boolean?>(if (settings.isOutdoors) true else null) }
+            var localIsPhysical by remember { mutableStateOf<Boolean?>(if (settings.isPhysicallyActive) true else null) }
             var localActivityLevel by remember { mutableStateOf(settings.activityLevel) }
 
             var localDepHour by remember(settings) { mutableIntStateOf(settings.departureHour) }
@@ -179,10 +172,9 @@ fun ClothesScreen(
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                // Reisekort
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 24.dp),
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -209,29 +201,83 @@ fun ClothesScreen(
                     }
                 }
 
+                // Kort 1 — Utendørs
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp),
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        CheckboxSection(
-                            isOutdoors = localIsOutdoors,
-                            onOutdoorsChange = {
-                                localIsOutdoors = it
-                                if (!it) {
-                                    localIsPhysical = false; localActivityLevel = null
+                        Text("Skal du være utendørs")
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(
+                                checked = localIsOutdoors == true,
+                                onCheckedChange = {
+                                    localIsOutdoors = if (it) true else null
+                                    if (!it) { localIsPhysical = null; localActivityLevel = null }
                                 }
-                            },
-                            isPhysical = localIsPhysical,
-                            onPhysicalChange = {
-                                localIsPhysical = it
-                                if (!it) localActivityLevel = null
-                            },
-                            activityLevel = localActivityLevel,
-                            onActivityLevelChange = { localActivityLevel = it }
-                        )
+                            )
+                            Text("Ja")
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Checkbox(
+                                checked = localIsOutdoors == false,
+                                onCheckedChange = {
+                                    localIsOutdoors = if (it) false else null
+                                    if (it) { localIsPhysical = null; localActivityLevel = null }
+                                }
+                            )
+                            Text("Nei")
+                        }
+                    }
+                }
+
+                // Kort 2 — Fysisk aktiv, glir inn når ute = true
+                AnimatedVisibility(
+                    visible = localIsOutdoors == true,
+                    enter = expandVertically() + fadeIn(),
+                    exit = shrinkVertically() + fadeOut()
+                ) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text("Skal du være fysisk aktiv")
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(
+                                    checked = localIsPhysical == true,
+                                    onCheckedChange = {
+                                        localIsPhysical = if (it) true else null
+                                        if (!it) localActivityLevel = null
+                                    }
+                                )
+                                Text("Ja")
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Checkbox(
+                                    checked = localIsPhysical == false,
+                                    onCheckedChange = {
+                                        localIsPhysical = if (it) false else null
+                                        if (it) localActivityLevel = null
+                                    }
+                                )
+                                Text("Nei")
+                            }
+
+                            // Radioknapper, glir inn når fysisk = true
+                            AnimatedVisibility(visible = localIsPhysical == true) {
+                                Column {
+                                    Text("Nivå:")
+                                    ActivityLevel.entries.forEach { level ->
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            RadioButton(
+                                                selected = localActivityLevel == level,
+                                                onClick = { localActivityLevel = level }
+                                            )
+                                            Text(level.displayValue)
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -242,8 +288,8 @@ fun ClothesScreen(
                             departureMinute = localDepMinute,
                             returnHour = localRetHour,
                             returnMinute = localRetMinute,
-                            isOutdoors = localIsOutdoors,
-                            isPhysicallyActive = localIsPhysical,
+                            isOutdoors = localIsOutdoors == true,
+                            isPhysicallyActive = localIsPhysical == true,
                             activityLevel = localActivityLevel
                         )
                         bannerMessage = "Klesanbefalingen er oppdatert."
@@ -255,7 +301,7 @@ fun ClothesScreen(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 ) {
-                    Text("Lagre og oppdater")
+                    Text("Gi ny klesanbefaling")
                 }
 
                 Spacer(modifier = Modifier.size(24.dp))
@@ -263,78 +309,75 @@ fun ClothesScreen(
         }
     ) { _ ->
         Box(modifier = Modifier.fillMaxSize()) {
-
-        if (isLoading) {
-            Box(
-                modifier = Modifier.fillMaxWidth().padding(top = 64.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .padding(12.dp)
-                    .background(MaterialTheme.colorScheme.background),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(bottom = 80.dp)
-            ) {
-                item {
-                    Text(text = "Klær", fontSize = 48.sp)
-                    Spacer(modifier = Modifier.size(4.dp))
-                    Text(
-                        text = "Anbefalingen tar utgangspunkt i fremkomst til og fra skole eller jobb.\n" +
-                                "Swipe opp for å tilpasse klesanbefalingen!"
-                    )
-
-                    Spacer(modifier = Modifier.size(4.dp))
-
-                    Text(
-                        text = today,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-
-                    Text(
-                        text = "Reise: %02d:%02d → %02d:%02d".format(
-                            settings.departureHour, settings.departureMinute, settings.returnHour, settings.returnMinute
-                        ),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
+            if (isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(top = 64.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
                 }
-
-                if (recommendation != null) {
-                    item { EffectiveTempCard(recommendation!!) }
-                    item { ClothingCard(recommendation!!) }
-                    if (recommendation!!.bringUmbrella || recommendation!!.wearRainGear) {
-                        item { RainCard(recommendation!!) }
-                    }
-
-                } else {
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .background(MaterialTheme.colorScheme.background),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(bottom = 80.dp)
+                ) {
                     item {
+                        Text(text = "Klær", fontSize = 48.sp)
+                        Spacer(modifier = Modifier.size(4.dp))
                         Text(
-                            text = "Ingen værdata tilgjengelig. Prøv å søk opp et sted på hjemskjermen først.",
-                            modifier = Modifier.padding(16.dp)
+                            text = "Anbefalingen tar utgangspunkt i fremkomst til og fra skole eller jobb.\n" +
+                                    "Swipe opp for å tilpasse klesanbefalingen!"
+                        )
+                        Spacer(modifier = Modifier.size(4.dp))
+                        Text(
+                            text = today,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                        Text(
+                            text = "Reise: %02d:%02d → %02d:%02d".format(
+                                settings.departureHour, settings.departureMinute,
+                                settings.returnHour, settings.returnMinute
+                            ),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(top = 4.dp)
                         )
                     }
+
+                    if (recommendation != null) {
+                        item { EffectiveTempCard(recommendation!!) }
+                        item { ClothingCard(recommendation!!) }
+                        if (recommendation!!.bringUmbrella || recommendation!!.wearRainGear) {
+                            item { RainCard(recommendation!!) }
+                        }
+                    } else {
+                        item {
+                            Text(
+                                text = "Ingen værdata tilgjengelig. Prøv å søk opp et sted på hjemskjermen først.",
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+                }
+
+                AnimatedVisibility(
+                    visible = showBanner,
+                    enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
+                    exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
+                    modifier = Modifier.align(Alignment.TopCenter).zIndex(1f)
+                ) {
+                    TopBanner(
+                        message = bannerMessage,
+                        onDismiss = { showBanner = false }
+                    )
                 }
             }
-            AnimatedVisibility(
-                visible = showBanner,
-                enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
-                exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
-                modifier = Modifier.align(Alignment.TopCenter).zIndex(1f)
-            ) {
-                TopBanner(
-                    message = bannerMessage,
-                    onDismiss = { showBanner = false }
-                )
-            }
-        }
         }
     }
 }
@@ -392,43 +435,17 @@ private fun ClothingCard(rec: ClothesRecommendation) {
             }
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-            // Hodeplagg øverst
-            if (rec.wearSunglasses) {
-                ClothingRow(R.drawable.solbriller, "Solbriller anbefales — det er sol.")
-            }
-            if (rec.wearHatGloves) {
-                ClothingRow(R.drawable.caps, "Lue og hansker/votter anbefales.")
-            }
-            if (rec.wearScarf) {
-                ClothingRow(R.drawable.skjerf, "Hals/buff/skjerf er lurt i denne kulden.")
-            }
+            if (rec.wearSunglasses) ClothingRow(R.drawable.solbriller, "Solbriller anbefales — det er sol.")
+            if (rec.wearHatGloves) ClothingRow(R.drawable.caps, "Lue og hansker/votter anbefales.")
+            if (rec.wearScarf) ClothingRow(R.drawable.skjerf, "Hals/buff/skjerf er lurt i denne kulden.")
+            if (rec.wearHeavyJacket) ClothingRow(R.drawable.tykk_jakke, "Tykk jakke — det er skikkelig kaldt ute.")
+            if (rec.wearLightJacket) ClothingRow(R.drawable.lett_jakke, "Lett jakke eller mellomlag passer bra.")
+            if (rec.wearSweater) ClothingRow(R.drawable.genser, "En genser holder deg komfortabel.")
+            if (rec.wearTshirt) ClothingRow(R.drawable.t_skjorte, "T-skjorte holder — det er fint og varmt ute.")
+            if (rec.wearShorts) ClothingRow(R.drawable.shorts, "Shorts — det er varmt nok til å droppe lange bukser.")
+            if (rec.wearPants) ClothingRow(R.drawable.jeans, "Bukse passer til dagens temperatur.")
+            if (rec.wearThermalUnderwear) ClothingRow(R.drawable.jeggings, "Ullundertøy — det er kaldt nok til å trenge ekstra lag.")
 
-            // Overkropp
-            if (rec.wearHeavyJacket) {
-                ClothingRow(R.drawable.tykk_jakke, "Tykk jakke — det er skikkelig kaldt ute.")
-            }
-            if (rec.wearLightJacket) {
-                ClothingRow(R.drawable.lett_jakke, "Lett jakke eller mellomlag passer bra.")
-            }
-            if (rec.wearSweater) {
-                ClothingRow(R.drawable.genser, "En genser holder deg komfortabel.")
-            }
-            if (rec.wearTshirt) {
-                ClothingRow(R.drawable.t_skjorte, "T-skjorte holder — det er fint og varmt ute.")
-            }
-
-            // Underkropp
-            if (rec.wearShorts) {
-                ClothingRow(R.drawable.shorts, "Shorts — det er varmt nok til å droppe lange bukser.")
-            }
-            if (rec.wearPants) {
-                ClothingRow(R.drawable.jeans, "Bukse passer til dagens temperatur.")
-            }
-            if (rec.wearThermalUnderwear) {
-                ClothingRow(R.drawable.jeggings, "Ullundertøy — det er kaldt nok til å trenge ekstra lag.")
-            }
-
-            // Sko nederst
             if (rec.wearWinterBoots) {
                 ClothingRow(R.drawable.st_vler, "Vintersko/støvler — det er frost og nedbør.")
             } else if (rec.wearWaterproofShoes) {
@@ -473,10 +490,6 @@ private fun ClothingRow(iconRes: Int, text: String) {
         Spacer(modifier = Modifier.width(16.dp))
         Text(text = text, modifier = Modifier.weight(1f))
     }
-
-
-
-
 }
 
 @Composable
@@ -493,7 +506,6 @@ fun TopBanner(message: String, onDismiss: () -> Unit) {
             .background(DarkBlue)
             .clickable { onDismiss() }
             .padding(horizontal = 16.dp, vertical = 12.dp)
-       ,
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(

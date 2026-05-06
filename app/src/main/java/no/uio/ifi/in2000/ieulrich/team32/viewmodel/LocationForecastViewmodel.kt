@@ -30,7 +30,7 @@ class LocationForecastViewmodel(
         Log.d("LocationForecastViewModel", "ViewModel initialized")
     }
 
-    fun loadForecastForDevice(context: Context){
+    fun loadForecastForDevice(context: Context) {
         val appContext = context.applicationContext
         viewModelScope.launch {
             val location = locationClient.getDeviceLocation(appContext)
@@ -42,8 +42,7 @@ class LocationForecastViewmodel(
                 lat = location.latitude
                 lon = location.longitude
                 Log.d("LocationDebug", "Using device location: $lat, $lon")
-            }
-            else {
+            } else {
                 lat = 59.91
                 lon = 10.75
                 Log.w("LocationDebug", "Location failed, using default (Oslo)")
@@ -53,16 +52,15 @@ class LocationForecastViewmodel(
 
             val response = repository.getForecast(lat, lon)
             _forecast.value = response
-            val groupedByDay = response.toForecastByDay()
-            _forecastByDay.value = groupedByDay
+            _forecastByDay.value = response?.toForecastByDay()
         }
     }
 
-    fun loadForecast(lat: Double, lon: Double){
+    fun loadForecast(lat: Double, lon: Double) {
         viewModelScope.launch {
             val response = repository.getForecast(lat, lon)
             _forecast.value = response
-            _forecastByDay.value = response.toForecastByDay()
+            _forecastByDay.value = response?.toForecastByDay()
         }
     }
 }

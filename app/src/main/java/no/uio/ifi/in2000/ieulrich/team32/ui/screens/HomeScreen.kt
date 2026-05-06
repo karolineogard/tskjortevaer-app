@@ -2,11 +2,6 @@ package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
 import android.location.Location
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -24,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
@@ -32,7 +28,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -49,6 +44,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -57,12 +53,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import coil3.svg.SvgDecoder
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
+import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.AlertFeature
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.imageUrl
@@ -78,61 +76,89 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier,
     navController: NavController,
     viewmodel: LocationForecastViewmodel,
     clothesViewModel: ClothesViewModel,
-    homeViewModel: HomeViewModel
-) {
+    homeViewModel: HomeViewModel,
+    isOnline: Boolean
+){
     val context = LocalContext.current
-    val uiState by homeViewModel.uiState.collectAsState()
+    val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+    val focusManager = LocalFocusManager.current
+    val padding = 16.dp
+
     LaunchedEffect(Unit) {
         viewmodel.loadForecastForDevice(context)
         homeViewModel.loadData(context)
     }
-    val currentLocation by viewmodel.currentLocation.collectAsState()
-    LaunchedEffect(currentLocation) {
-        Log.d("HomeScreen", "currentLocation: $currentLocation")
-        currentLocation?.let { (lat, lon) ->
-            clothesViewModel.updateLocation(lat, lon)
-        }
-    }
-    val padding = 16.dp
-    var isVisible by remember { mutableStateOf(true) }
 
-
-    val focusManager = LocalFocusManager.current
-
-    var isSearchExpanded by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
+
         when (val state = uiState) {
             is UiState.Loading -> {
-                // TODO: loading stuff
+                if (!isOnline) {
+                    Box(
+                        modifier = Modifier.fillMaxSize().padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(
+                                text = "Ingen internettforbindelse",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "Koble til internett for å se værdata og klesanbefalinger.",
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
             }
 
             is UiState.Error -> {
-                // TODO: Error stuff
+                Box(
+                    modifier = Modifier.fillMaxSize().padding(32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "Kunne ikke hente værdata.",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "Sjekk at du har internettforbindelse og prøv igjen.",
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
             }
 
             is UiState.Success -> {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
                         .clickable(
                             indication = null,
                             interactionSource = remember { MutableInteractionSource() }
-                        ) {
-                            focusManager.clearFocus()
-                        },
-
-
+                        ) { focusManager.clearFocus() },
                     verticalArrangement = Arrangement.spacedBy(padding),
-                    contentPadding = PaddingValues(
-                        start = padding,
-                        end = padding,
-                        top = padding,
-                        bottom = padding
-                    ),
+                    contentPadding = PaddingValues(padding)
                 ) {
                     item {
                         SearchBar(onPlaceSelected = { name, location ->
@@ -148,20 +174,15 @@ fun HomeScreen(
                             location = state.location
                         )
                     }
-                    item {
-                        AnimatedVisibility(
-                            visible = isVisible,
-                            enter = expandVertically() + fadeIn(),
-                            exit = shrinkVertically() + fadeOut()
-                        ) {
-                            MetalertCarousel(modifier = Modifier.height(80.dp))
+
+                    if (state.alerts.isNotEmpty()) {
+                        item {
+                            MetalertCarousel(alerts = state.alerts)
                         }
                     }
+
                     item {
-                        ClothingCard(
-                            navController = navController,
-                            clothesViewModel = clothesViewModel
-                        )
+                        ClothingCard(navController = navController, clothesViewModel = clothesViewModel)
                     }
                 }
             }
@@ -169,20 +190,46 @@ fun HomeScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MetalertCarousel(modifier: Modifier = Modifier) {
-    val varselTekster = listOf("Sterk vind", "Flom", "Orkan")
+fun MetalertCarousel(alerts: List<AlertFeature>, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
+        Text(
+            text = "Farevarsler",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(varselTekster.size) { index ->
+            items(alerts) { alert ->
                 Box(modifier = Modifier.width(280.dp)) {
-                    MetalertCard(tekst = varselTekster[index])
+                    MetalertCard(alert = alert)
                 }
             }
+        }
+    }
+}
+@Composable
+fun MetalertCard(alert: AlertFeature) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0))
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = alert.properties.eventAwarenessName,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+            Text(
+                text = alert.properties.area,
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.DarkGray
+            )
         }
     }
 }
@@ -270,22 +317,13 @@ fun WeatherCard(
                         text = Format.formatTemp(details.temperature),
                         fontSize = 40.sp)
                 }
+
             }
         }
     }
 }
 
-@Composable
-fun MetalertCard(tekst: String) {
-    Card(
-        modifier = Modifier.fillMaxWidth().height(80.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-    ) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterStart) {
-            Text(text = tekst, modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        }
-    }
-}
+
 
 @Composable
 fun ClothingCard(

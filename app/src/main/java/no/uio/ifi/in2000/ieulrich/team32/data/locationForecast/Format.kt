@@ -22,7 +22,7 @@ object Format {
     }
 
     fun formatTemp(temp: Double): String {
-        return "%.1f".format(temp) + degreeSign
+        return temp.roundToInt().toString() + degreeSign
     }
 
     fun formatPrecipitation(amount: Double): String{

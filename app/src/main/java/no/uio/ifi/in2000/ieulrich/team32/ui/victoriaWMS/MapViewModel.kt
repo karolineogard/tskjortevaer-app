@@ -18,6 +18,7 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
+import org.maplibre.android.geometry.LatLng
 
 data class MapUiState(
     val currentLayer: WeatherLayer? = WeatherLayer.TEMPERATURE,
@@ -25,7 +26,9 @@ data class MapUiState(
     val showAlerts: Boolean = false,
     val alertsUrl: String = "",
     val alerts: List<MetAlert> = emptyList(),
-    val selectedAlert: MetAlert? = null
+    val selectedAlert: MetAlert? = null,
+    val mapCenter: LatLng = LatLng(60.0, 11.0),
+    val mapZoom: Double = 5.0
 )
 
 class MapViewModel(
@@ -101,6 +104,19 @@ class MapViewModel(
         val current = _uiState.value.currentLayer ?: return
         _uiState.update { it.copy(
             wmsUrl = repository.getWmsUrl(current, formattedTimeUTC)
+        ) }
+    }
+
+    fun updateMapPosition(latLng: LatLng, zoom: Double) {
+
+        if (latLng.latitude == 0.0 && latLng.longitude == 0.0 && zoom < 1.0) {
+            Log.d("MapPos", "Ignorerer ugyldig start-posisjon")
+            return
+        }
+        Log.d("MapPos", "Lagrer posisjon: ${latLng.latitude}, ${latLng.longitude} Zoom: $zoom")
+        _uiState.update { it.copy(
+            mapCenter = latLng,
+            mapZoom = zoom
         ) }
     }
 

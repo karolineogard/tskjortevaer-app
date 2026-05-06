@@ -46,7 +46,9 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private val settingsViewModel: SettingsViewModel by viewModels()
+    private val settingsViewModel: SettingsViewModel by viewModels {
+        SettingsViewModel.Factory(applicationContext)
+    }
 
 
     private val locationPermissionLauncher = registerForActivityResult(
@@ -78,7 +80,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Team32Theme {
-                MapApp(locationForecastViewmodel = viewModel, homeViewModel = homeViewModel)
+                MapApp(
+                    locationForecastViewmodel = viewModel,
+                    homeViewModel = homeViewModel,
+                    settingsViewModel = settingsViewModel
+                )
             }
         }
     }

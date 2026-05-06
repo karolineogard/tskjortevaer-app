@@ -27,4 +27,4 @@ class LocationRepository (
 }
 
 fun NominatimAddress.bestName(): String =
-    city ?: suburb ?: cityDistrict ?: "Unknown"
+    city ?: town?: suburb ?: cityDistrict ?: county ?: "Ukjent lokasjon"
