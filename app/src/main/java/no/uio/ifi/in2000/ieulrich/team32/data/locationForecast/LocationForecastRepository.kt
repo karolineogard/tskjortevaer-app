@@ -11,15 +11,16 @@ class LocationForecastRepository(
     var forecastByDay: Map<String, List<ForecastHourDetails>> = emptyMap()
 
     suspend fun getForecastByDay(lat: Double, lon: Double): Map<String, List<ForecastHourDetails>> {
-        forecastByDay = dataSource.getForecast(lat, lon).toForecastByDay()
+        val response = dataSource.getForecast(lat, lon) ?: return forecastByDay
+        forecastByDay = response.toForecastByDay()
         return forecastByDay
     }
 
-    suspend fun getForecast(lat: Double, lon: Double): LocationForecastResponse{
+    suspend fun getForecast(lat: Double, lon: Double): LocationForecastResponse? {
         return dataSource.getForecast(lat, lon)
     }
 
     suspend fun getForecastNow(lat: Double, lon: Double): ForecastHourDetails? {
-        return getForecast(lat, lon).properties.timeseries[0].toForeCastHourDetails()
+        return getForecast(lat, lon)?.properties?.timeseries?.firstOrNull()?.toForeCastHourDetails()
     }
 }
