@@ -40,6 +40,12 @@ class ClothesViewModel : ViewModel() {
         Log.d("ClothesViewModel", "Initialiserer ClothesViewModel")
     }
 
+    fun clearRecommendationIfOffline(isOnline: Boolean) {
+        if (!isOnline) {
+            _recommendation.value = null
+        }
+    }
+
     /** Kall fra MapApp når SettingsViewModel.temperatureOffset endres. */
     fun updateTemperatureOffset(offset: Float) {
         temperatureOffset = offset

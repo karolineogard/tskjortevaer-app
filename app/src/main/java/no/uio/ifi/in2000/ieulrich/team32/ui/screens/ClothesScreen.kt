@@ -66,6 +66,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
+import androidx.compose.ui.text.style.TextAlign
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,8 +75,8 @@ fun ClothesScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
     clothesViewModel: ClothesViewModel,
-    settingsViewModel: SettingsViewModel
-
+    settingsViewModel: SettingsViewModel,
+    isOnline: Boolean
 ) {
     val defaultDepHour by settingsViewModel.defaultDepartureHour.collectAsState()
     val defaultRetHour by settingsViewModel.defaultReturnHour.collectAsState()
@@ -119,6 +121,9 @@ fun ClothesScreen(
 
     LaunchedEffect(Unit) {
         clothesViewModel.loadRecommendation()
+    }
+    LaunchedEffect(Unit) {
+        clothesViewModel.clearRecommendationIfOffline(isOnline)
     }
 
     BottomSheetScaffold(
@@ -314,14 +319,31 @@ fun ClothesScreen(
                         item { RainCard(recommendation!!) }
                     }
 
-                } else {
-                    item {
-                        Text(
-                            text = "Ingen værdata tilgjengelig. Prøv å søk opp et sted på hjemskjermen først.",
-                            modifier = Modifier.padding(16.dp)
-                        )
+                }  else {
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(
+                                text = if (!isOnline) "Ingen internettforbindelse"
+                                else "Ingen værdata tilgjengelig",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = if (!isOnline) "Koble til internett for å få klesanbefalinger."
+                                else "Prøv å søk opp et sted på hjemskjermen først.",
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
                 }
+            }
             }
             AnimatedVisibility(
                 visible = showBanner,
