@@ -13,7 +13,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,12 +24,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -40,10 +36,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,70 +45,36 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import coil3.svg.SvgDecoder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.imageUrl
 import no.uio.ifi.in2000.ieulrich.team32.ui.Routes
+import no.uio.ifi.in2000.ieulrich.team32.ui.components.SearchBar
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SearchViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.UiState
-import org.json.JSONArray
-import java.net.HttpURLConnection
-import java.net.URL
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
-
-data class SimpleLatLng(val lat: Double, val lon: Double)
-
-suspend fun getCoordsFromService(sted: String): SimpleLatLng? {
-    if (sted.isBlank()) return null
-    return withContext(Dispatchers.IO) {
-        try {
-            val url = URL("https://nominatim.openstreetmap.org/search?q=${sted}&format=json&limit=1")
-            val connection = url.openConnection() as HttpURLConnection
-            connection.setRequestProperty("User-Agent", "IN2000-Team32-WeatherApp")
-            val response = connection.inputStream.bufferedReader().readText()
-            val jsonArray = JSONArray(response)
-            if (jsonArray.length() > 0) {
-                val firstResult = jsonArray.getJSONObject(0)
-                SimpleLatLng(firstResult.getDouble("lat"), firstResult.getDouble("lon"))
-            } else null
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
-}
 
 @Composable
 fun HomeScreen(
@@ -145,14 +105,16 @@ fun HomeScreen(
 
     var isSearchExpanded by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxSize()){
+    Box(modifier = Modifier.fillMaxSize()) {
         when (val state = uiState) {
             is UiState.Loading -> {
                 // TODO: loading stuff
             }
+
             is UiState.Error -> {
                 // TODO: Error stuff
             }
+
             is UiState.Success -> {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
@@ -175,7 +137,7 @@ fun HomeScreen(
                     item {
                         SearchBar(onPlaceSelected = { name, location ->
                             navController.navigate("forecast?lat=${location.latitude}&lon=${location.longitude}&city=$name")
-                        } )
+                        })
                     }
 
                     item {
@@ -196,127 +158,16 @@ fun HomeScreen(
                         }
                     }
                     item {
-                        ClothingCard(navController = navController, clothesViewModel = clothesViewModel)
+                        ClothingCard(
+                            navController = navController,
+                            clothesViewModel = clothesViewModel
+                        )
                     }
                 }
             }
         }
     }
 }
-
-@OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
-@Composable
-fun SearchBar(
-    modifier: Modifier = Modifier,
-    viewModel: SearchViewModel = viewModel(),
-    onPlaceSelected: (name: String, location: Location) -> Unit
-) {
-    val scope = rememberCoroutineScope()
-    var searchText by remember { mutableStateOf("") }
-    var hasFocus by remember { mutableStateOf(false) }
-
-    val suggestions by viewModel.suggestions.collectAsState()
-    val recentSearches by viewModel.recentSearches.collectAsState()
-
-    val showSuggestions = hasFocus && suggestions.isNotEmpty()
-    val showRecent = hasFocus && searchText.isEmpty() && recentSearches.isNotEmpty()
-
-    fun selectPlace(name: String, location: Location) {
-        viewModel.addRecentSearch(name)
-        searchText = ""
-        onPlaceSelected(name, location)
-    }
-
-    Column(modifier = modifier.fillMaxWidth()) {
-        OutlinedTextField(
-            value = searchText,
-            onValueChange = { newText ->
-                searchText = newText
-                viewModel.onQueryChange(newText)
-            },
-            placeholder = { Text("Søk etter by...") },
-            singleLine = true,
-            shape = MaterialTheme.shapes.extraLarge,
-            modifier = Modifier
-                .fillMaxWidth()
-                .onFocusChanged { hasFocus = it.isFocused },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Søk") },
-            trailingIcon = {
-                if (searchText.isNotEmpty()){
-                    IconButton(onClick = {
-                        searchText = ""
-                        viewModel.onQueryChange("")
-                    }) {
-                        Icon(Icons.Default.Close, contentDescription = "Tøm")
-                    }
-                }
-            },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(
-                onSearch = {
-                    val first = suggestions.firstOrNull()
-                    if (first != null){
-                        selectPlace(first.first, first.second)
-                    } else {
-                        scope.launch {
-                            val location = viewModel.getCoordinatesForName(searchText)
-                            if (location != null) selectPlace(searchText, location)
-                        }
-                    }
-                }
-            )
-        )
-
-        if (showSuggestions) {
-            SearchCard {
-                suggestions.forEach { (name, location) ->
-                    ListItem(
-                        headlineContent = { Text(name) },
-                        modifier = Modifier.clickable { selectPlace(name, location) }
-                    )
-                    HorizontalDivider()
-                }
-            }
-        }
-
-        if (showRecent) {
-            SearchCard {
-                Text(
-                    text = "Sist søkt",
-                    style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                )
-                recentSearches.forEach { name ->
-                    ListItem(
-                        headlineContent = { Text(name) },
-                        leadingContent = {
-                            Icon(painterResource(android.R.drawable.ic_menu_recent_history), "Nylige søk")
-                        },
-                        modifier = Modifier.clickable {
-                            scope.launch {
-                                val location = viewModel.getCoordinatesForName(name)
-                                if (location != null) selectPlace(name, location)
-                            }
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun SearchCard(content: @Composable ColumnScope.() -> Unit){
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(content = content)
-    }
-}
-
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
