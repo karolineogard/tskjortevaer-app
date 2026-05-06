@@ -3,7 +3,6 @@ package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 import android.location.Location
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -11,31 +10,62 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil3.ImageLoader
@@ -43,47 +73,28 @@ import coil3.compose.AsyncImage
 import coil3.svg.SvgDecoder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
+import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.imageUrl
 import no.uio.ifi.in2000.ieulrich.team32.ui.Routes
-import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SearchViewModel
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.UiState
 import org.json.JSONArray
 import java.net.HttpURLConnection
 import java.net.URL
-import java.text.Normalizer
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.FocusState
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.focus.onFocusEvent
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.UiState
 
 
 data class SimpleLatLng(val lat: Double, val lon: Double)
-
-data class Farevarsel(
-    val tittel: String,
-    val beskrivelse: String,
-    val alvorlighet: String
-)
 
 suspend fun getCoordsFromService(sted: String): SimpleLatLng? {
     if (sted.isBlank()) return null
@@ -162,17 +173,16 @@ fun HomeScreen(
                     ),
                 ) {
                     item {
-                        HomeSearchBar(
-                            navController = navController,
-                            viewmodel = viewmodel
-                        )
+                        SearchBar(onPlaceSelected = { name, location ->
+                            navController.navigate("forecast?lat=${location.latitude}&lon=${location.longitude}&city=$name")
+                        } )
                     }
 
                     item {
                         WeatherCard(
                             navController = navController,
                             forecastHourDetails = state.forecast,
-                            placeName = state.place, //TODO: forward api data
+                            placeName = state.place,
                             location = state.location
                         )
                     }
@@ -196,104 +206,46 @@ fun HomeScreen(
 
 @OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
 @Composable
-fun HomeSearchBar(
+fun SearchBar(
     modifier: Modifier = Modifier,
-    navController: NavController,
-    viewmodel: LocationForecastViewmodel
+    viewModel: SearchViewModel = viewModel(),
+    onPlaceSelected: (name: String, location: Location) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    var søkeTekst by remember { mutableStateOf("") }
-    var visForslag by remember { mutableStateOf(false) }
-    var forslag by remember { mutableStateOf<List<Pair<String, SimpleLatLng>>>(emptyList()) }
-    var sisteSearcher by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
-    val søkeFlow = remember { MutableStateFlow("") }
+    var searchText by remember { mutableStateOf("") }
+    var hasFocus by remember { mutableStateOf(false) }
 
-    val focusRequester = remember { FocusRequester() }
-    val focusManager = LocalFocusManager.current
-    var harFokus by remember { mutableStateOf(false) }
+    val suggestions by viewModel.suggestions.collectAsState()
+    val recentSearches by viewModel.recentSearches.collectAsState()
 
-    LaunchedEffect(Unit) {
-        søkeFlow
-            .debounce(300)
-            .distinctUntilChanged()
-            .collect { tekst ->
-                if (tekst.length >= 2) {
-                    withContext(Dispatchers.IO) {
-                        try {
-                            val url = URL("https://nominatim.openstreetmap.org/search?q=${tekst}&format=json&limit=5&featuretype=city")
-                            val connection = url.openConnection() as HttpURLConnection
-                            connection.setRequestProperty("User-Agent", "IN2000-Team32-WeatherApp")
-                            val response = connection.inputStream.bufferedReader().readText()
-                            val jsonArray = JSONArray(response)
-                            val results = mutableListOf<Pair<String, SimpleLatLng>>()
-                            for (i in 0 until jsonArray.length()) {
-                                val obj = jsonArray.getJSONObject(i)
-                                val name = obj.optString("display_name").split(",").take(2).joinToString(", ")
-                                results.add(Pair(name, SimpleLatLng(obj.getDouble("lat"), obj.getDouble("lon"))))
-                            }
-                            withContext(Dispatchers.Main) {
-                                forslag = results
-                                visForslag = results.isNotEmpty() && harFokus
-                            }
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
-                } else {
-                    forslag = emptyList()
-                    visForslag = false
-                }
-            }
-    }
+    val showSuggestions = hasFocus && suggestions.isNotEmpty()
+    val showRecent = hasFocus && searchText.isEmpty() && recentSearches.isNotEmpty()
 
-    fun navigerTilBy(navn: String, coords: SimpleLatLng) {
-        navController.navigate("forecast?lat=${coords.lat}&lon=${coords.lon}&city=${navn}")
-        sisteSearcher = (listOf(navn) + sisteSearcher).distinct().take(5)
-        søkeTekst = ""
-        forslag = emptyList()
-        visForslag = false
-        focusManager.clearFocus()
-        harFokus = false
+    fun selectPlace(name: String, location: Location) {
+        viewModel.addRecentSearch(name)
+        searchText = ""
+        onPlaceSelected(name, location)
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
         OutlinedTextField(
-            value = søkeTekst,
-            onValueChange = { nyTekst ->
-                søkeTekst = nyTekst
-                scope.launch { søkeFlow.emit(nyTekst) }
-                if (nyTekst.isEmpty()) visForslag = false
+            value = searchText,
+            onValueChange = { newText ->
+                searchText = newText
+                viewModel.onQueryChange(newText)
             },
             placeholder = { Text("Søk etter by...") },
             singleLine = true,
             shape = MaterialTheme.shapes.extraLarge,
             modifier = Modifier
                 .fillMaxWidth()
-                .focusRequester(focusRequester)
-                .onFocusChanged { focusState ->
-                    harFokus = focusState.isFocused
-                    if (!focusState.isFocused) {
-                        // Når man mister fokus, skjul forslag
-                        visForslag = false
-                    } else {
-                        // Når man får fokus og har tekst, vis forslag igjen
-                        if (søkeTekst.length >= 2) {
-                            visForslag = forslag.isNotEmpty()
-                        }
-                    }
-                },
-            leadingIcon = {
-                Icon(Icons.Default.Search, contentDescription = null)
-            },
+                .onFocusChanged { hasFocus = it.isFocused },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Søk") },
             trailingIcon = {
-                if (søkeTekst.isNotEmpty()) {
+                if (searchText.isNotEmpty()){
                     IconButton(onClick = {
-                        søkeTekst = ""
-                        forslag = emptyList()
-                        visForslag = false
-                        scope.launch { søkeFlow.emit("") }
-                        focusManager.clearFocus()
-                        harFokus = false
+                        searchText = ""
+                        viewModel.onQueryChange("")
                     }) {
                         Icon(Icons.Default.Close, contentDescription = "Tøm")
                     }
@@ -302,75 +254,68 @@ fun HomeSearchBar(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(
                 onSearch = {
-                    val første = forslag.firstOrNull()
-                    if (første != null) {
-                        navigerTilBy(første.first, første.second)
+                    val first = suggestions.firstOrNull()
+                    if (first != null){
+                        selectPlace(first.first, first.second)
                     } else {
                         scope.launch {
-                            val coords = getCoordsFromService(søkeTekst)
-                            if (coords != null) navigerTilBy(søkeTekst, coords)
+                            val location = viewModel.getCoordinatesForName(searchText)
+                            if (location != null) selectPlace(searchText, location)
                         }
                     }
                 }
             )
         )
 
-        if (visForslag && forslag.isNotEmpty() && harFokus) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Column {
-                    forslag.forEach { (navn, coords) ->
-                        ListItem(
-                            headlineContent = { Text(navn) },
-                            modifier = Modifier
-                                .clickable { navigerTilBy(navn, coords) }
-                                .fillMaxWidth()
-                        )
-                        HorizontalDivider()
-                    }
+        if (showSuggestions) {
+            SearchCard {
+                suggestions.forEach { (name, location) ->
+                    ListItem(
+                        headlineContent = { Text(name) },
+                        modifier = Modifier.clickable { selectPlace(name, location) }
+                    )
+                    HorizontalDivider()
                 }
             }
         }
 
-        if (søkeTekst.isEmpty() && sisteSearcher.isNotEmpty() && harFokus) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Column {
-                    Text(
-                        text = "Sist søkt",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                    )
-                    sisteSearcher.forEach { navn ->
-                        ListItem(
-                            headlineContent = { Text(navn) },
-                            leadingContent = {
-                                Icon(
-                                    painter = painterResource(id = android.R.drawable.ic_menu_recent_history),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            },
-                            modifier = Modifier.clickable {
-                                scope.launch {
-                                    val coords = getCoordsFromService(navn)
-                                    if (coords != null) navigerTilBy(navn, coords)
-                                }
+        if (showRecent) {
+            SearchCard {
+                Text(
+                    text = "Sist søkt",
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+                recentSearches.forEach { name ->
+                    ListItem(
+                        headlineContent = { Text(name) },
+                        leadingContent = {
+                            Icon(painterResource(android.R.drawable.ic_menu_recent_history), "Nylige søk")
+                        },
+                        modifier = Modifier.clickable {
+                            scope.launch {
+                                val location = viewModel.getCoordinatesForName(name)
+                                if (location != null) selectPlace(name, location)
                             }
-                        )
-                    }
+                        }
+                    )
                 }
             }
         }
     }
 }
+
+@Composable
+fun SearchCard(content: @Composable ColumnScope.() -> Unit){
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(content = content)
+    }
+}
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -474,10 +419,6 @@ fun WeatherCard(
                         text = Format.formatTemp(details.temperature),
                         fontSize = 40.sp)
                 }
-//                Row(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalArrangement = Arrangement.Center
-//                ) { Text(text = "H:14°  L: 5°") }
             }
         }
     }
