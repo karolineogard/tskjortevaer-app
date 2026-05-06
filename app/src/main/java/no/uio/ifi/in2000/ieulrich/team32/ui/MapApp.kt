@@ -48,6 +48,8 @@ import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 
 
 @Composable
@@ -59,7 +61,11 @@ fun MapApp(
     homeViewModel: HomeViewModel,
     settingsViewModel: SettingsViewModel = viewModel()
 ) {
-
+    // Sync temperatureOffset fra innstillinger til klesanbefalingen
+    val temperatureOffset by settingsViewModel.temperatureOffset.collectAsState()
+    LaunchedEffect(temperatureOffset) {
+        clothesViewModel.updateTemperatureOffset(temperatureOffset)
+    }
     val startDestination = Destination.HOME
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
