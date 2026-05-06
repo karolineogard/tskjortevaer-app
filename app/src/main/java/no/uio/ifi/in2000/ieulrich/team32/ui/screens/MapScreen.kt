@@ -78,6 +78,7 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.maplibre.android.camera.CameraUpdateFactory
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -153,12 +154,13 @@ fun MapScreen(
                             onCreate(null)
                             getMapAsync { map ->
                                 mapRef = map
+
+                                map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                    uiState.mapCenter,
+                                    uiState.mapZoom))
+
                                 val styleUrl = "https://tiles.openfreemap.org/styles/liberty"
                                 map.setStyle(Style.Builder().fromUri(styleUrl)) { style ->
-                                    map.cameraPosition = CameraPosition.Builder()
-                                        .target(LatLng(60.0, 11.0))
-                                        .zoom(5.0)
-                                        .build()
 
                                     updateWmsLayer(
                                         style,
@@ -166,6 +168,11 @@ fun MapScreen(
                                         uiState.currentLayer?.name ?: "none"
                                     )
                                     updateAlertsLayer(style, uiState.showAlerts, uiState.alertsUrl)
+                                }
+
+                                map.addOnCameraIdleListener {
+                                    val pos = map.cameraPosition
+                                    viewModel.updateMapPosition(pos.target ?: LatLng(60.0, 11.0), pos.zoom)
                                 }
 
                                 map.addOnMapClickListener { point ->
