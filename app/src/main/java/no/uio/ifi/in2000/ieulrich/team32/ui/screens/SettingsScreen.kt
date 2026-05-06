@@ -42,7 +42,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -61,17 +60,22 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
     settingsViewModel: SettingsViewModel
-
 ) {
-    var temperatureOffset by remember { mutableFloatStateOf(50f) }
+    val savedDepHour   by settingsViewModel.defaultDepartureHour.collectAsState()
+    val savedDepMinute by settingsViewModel.defaultDepartureMinute.collectAsState()
+    val savedRetHour   by settingsViewModel.defaultReturnHour.collectAsState()
+    val savedRetMinute by settingsViewModel.defaultReturnMinute.collectAsState()
+    val savedOffset    by settingsViewModel.temperatureOffset.collectAsState()
 
-    val defaultDepHour by settingsViewModel.defaultDepartureHour.collectAsState()
-    val defaultRetHour by settingsViewModel.defaultReturnHour.collectAsState()
+    var startHour   by remember(savedDepHour)   { mutableIntStateOf(savedDepHour) }
+    var startMinute by remember(savedDepMinute) { mutableIntStateOf(savedDepMinute) }
+    var endHour     by remember(savedRetHour)   { mutableIntStateOf(savedRetHour) }
+    var endMinute   by remember(savedRetMinute) { mutableIntStateOf(savedRetMinute) }
 
-    var startHour by remember(defaultDepHour) { mutableIntStateOf(defaultDepHour) }
-    var startMinute by remember { mutableIntStateOf(0) }
-    var endHour by remember(defaultRetHour) { mutableIntStateOf(defaultRetHour) }
-    var endMinute by remember { mutableIntStateOf(0) }
+    // Slider internt 0..100, der 50 = nøytral (0°), 0 = ispinne (-5°), 100 = viking (+5°)
+    var sliderValue by remember(savedOffset) {
+        mutableFloatStateOf(savedOffset / 5f * 50f + 50f)
+    }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -115,7 +119,6 @@ fun SettingsScreen(
                     end = 16.dp,
                     bottom = innerPadding.calculateBottomPadding()
                 )
-            ,
         ) {
             Text("Preferanser", fontWeight = FontWeight.Bold)
 
@@ -127,7 +130,7 @@ fun SettingsScreen(
                     containerColor = MaterialTheme.colorScheme.surface
                 )
             ) {
-                val degrees = ((temperatureOffset - 50f) / 50f * 5).roundToInt()
+                val degrees = ((sliderValue - 50f) / 50f * 5).roundToInt()
                 val sign = if (degrees >= 0) "+" else ""
 
                 Row(
@@ -152,19 +155,19 @@ fun SettingsScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
                             painter = painterResource(id = R.drawable.ispinne_ikon),
-                            contentDescription = null
+                            contentDescription = "Ispinne – fryser lett"
                         )
                         Text("Ispinne", fontSize = 12.sp)
                     }
                     AdjustmentSlider(
                         modifier = Modifier.weight(1f),
-                        value = temperatureOffset,
-                        onValueChange = { temperatureOffset = it }
+                        value = sliderValue,
+                        onValueChange = { sliderValue = it }
                     )
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
                             painter = painterResource(id = R.drawable.viking_ikon),
-                            contentDescription = null
+                            contentDescription = "Viking – varm av seg"
                         )
                         Text("Viking", fontSize = 12.sp)
                     }
@@ -192,7 +195,7 @@ fun SettingsScreen(
                     TimeInputField(
                         initialHour = startHour,
                         initialMinute = startMinute,
-                        onTimeChanged = { h: Int, m: Int ->
+                        onTimeChanged = { h, m ->
                             startHour = h
                             startMinute = m
                         }
@@ -205,7 +208,7 @@ fun SettingsScreen(
                     TimeInputField(
                         initialHour = endHour,
                         initialMinute = endMinute,
-                        onTimeChanged = { h: Int, m: Int ->
+                        onTimeChanged = { h, m ->
                             endHour = h
                             endMinute = m
                         }
@@ -219,11 +222,13 @@ fun SettingsScreen(
             ) {
                 OutlinedButton(
                     onClick = {
-                        settingsViewModel.updateDefaultTimes(
-                            departureHour = startHour,
-                            departureMinute = startMinute,
-                            returnHour = endHour,
-                            returnMinute = endMinute
+                        val offsetDegrees = (sliderValue - 50f) / 50f * 5f
+                        settingsViewModel.saveSettings(
+                            departureHour     = startHour,
+                            departureMinute   = startMinute,
+                            returnHour        = endHour,
+                            returnMinute      = endMinute,
+                            temperatureOffset = offsetDegrees
                         )
                         scope.launch {
                             val result = snackbarHostState.showSnackbar(

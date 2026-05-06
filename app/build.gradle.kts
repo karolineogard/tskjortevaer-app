@@ -90,4 +90,6 @@ dependencies {
 
     // location stuff
     implementation(libs.play.services.location)
+    // persistent storage
+    implementation(libs.androidx.datastore.preferences)
 }
