@@ -18,8 +18,7 @@ data class AlertProperties(
     val description: String? = null,
     val severity: String,
     val event: String,
-    @SerialName("effective") val validFrom: String,
-    @SerialName("expires") val validTo: String,
+    @SerialName("when") val timeInterval: TimeInterval? = null,
     val awarenessResponse: String? = null,
     val instruction: String? = null
 ) {

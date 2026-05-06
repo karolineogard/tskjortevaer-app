@@ -89,7 +89,7 @@ class HomeViewModel(
 
             }
             catch (e: Exception) {
-                Log.e("HomeViewModel", "Error loading data")
+                Log.e("HomeViewModel", "Error loading data", e)
                 _uiState.value = UiState.Error
             }
         }
