@@ -20,6 +20,10 @@ class LocationRepository (
     suspend fun getCoordinatesFromName(name: String): Location?{
         return api.getCoordinatesFromName(name)
     }
+
+    suspend fun searchPlaces(query: String): List<Pair<String, Location>> {
+        return api.searchPlaces(query)
+    }
 }
 
 fun NominatimAddress.bestName(): String =
