@@ -94,6 +94,7 @@ class HomeViewModel(
             }
         }
     }
+
 }
 
 suspend fun FusedLocationProviderClient.getDeviceLocation(context: Context): Location?{
@@ -125,3 +126,4 @@ suspend fun FusedLocationProviderClient.getDeviceLocation(context: Context): Loc
         }
     }
 }
+
