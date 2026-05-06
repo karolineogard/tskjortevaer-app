@@ -96,8 +96,9 @@ fun HomeScreen(
     navController: NavController,
     viewmodel: LocationForecastViewmodel,
     clothesViewModel: ClothesViewModel,
-    homeViewModel: HomeViewModel
-) {
+    homeViewModel: HomeViewModel,
+    isOnline: Boolean
+){
     val context = LocalContext.current
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
@@ -113,13 +114,54 @@ fun HomeScreen(
 
         when (val state = uiState) {
             is UiState.Loading -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+                if (!isOnline) {
+                    Box(
+                        modifier = Modifier.fillMaxSize().padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(
+                                text = "Ingen internettforbindelse",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "Koble til internett for å se værdata og klesanbefalinger.",
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
             }
             is UiState.Error -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Noe gikk galt ved henting av værdata.")
+                Box(
+                    modifier = Modifier.fillMaxSize().padding(32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "Kunne ikke hente værdata.",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "Sjekk at du har internettforbindelse og prøv igjen.",
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
             is UiState.Success -> {
