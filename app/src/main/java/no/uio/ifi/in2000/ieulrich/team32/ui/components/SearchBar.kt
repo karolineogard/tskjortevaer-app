@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -20,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -30,6 +32,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -63,44 +66,50 @@ fun SearchBar(
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
-        OutlinedTextField(
-            value = searchText,
-            onValueChange = { newText ->
-                searchText = newText
-                viewModel.onQueryChange(newText)
-            },
-            placeholder = { Text("Søk etter by...") },
-            singleLine = true,
-            shape = MaterialTheme.shapes.extraLarge,
-            modifier = Modifier
-                .fillMaxWidth()
-                .onFocusChanged { hasFocus = it.isFocused },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Søk") },
-            trailingIcon = {
-                if (searchText.isNotEmpty()){
-                    IconButton(onClick = {
-                        searchText = ""
-                        viewModel.onQueryChange("")
-                    }) {
-                        Icon(Icons.Default.Close, contentDescription = "Tøm")
-                    }
-                }
-            },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(
-                onSearch = {
-                    val first = suggestions.firstOrNull()
-                    if (first != null){
-                        selectPlace(first.first, first.second)
-                    } else {
-                        scope.launch {
-                            val location = viewModel.getCoordinatesForName(searchText)
-                            if (location != null) selectPlace(searchText, location)
+        Surface(
+            color = Color.White,
+            shape = RoundedCornerShape(28.dp),
+            shadowElevation = 4.dp
+        ) {
+            OutlinedTextField(
+                value = searchText,
+                onValueChange = { newText ->
+                    searchText = newText
+                    viewModel.onQueryChange(newText)
+                },
+                placeholder = { Text("Søk etter by...") },
+                singleLine = true,
+                shape = MaterialTheme.shapes.extraLarge,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { hasFocus = it.isFocused },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Søk") },
+                trailingIcon = {
+                    if (searchText.isNotEmpty()) {
+                        IconButton(onClick = {
+                            searchText = ""
+                            viewModel.onQueryChange("")
+                        }) {
+                            Icon(Icons.Default.Close, contentDescription = "Tøm")
                         }
                     }
-                }
+                },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(
+                    onSearch = {
+                        val first = suggestions.firstOrNull()
+                        if (first != null) {
+                            selectPlace(first.first, first.second)
+                        } else {
+                            scope.launch {
+                                val location = viewModel.getCoordinatesForName(searchText)
+                                if (location != null) selectPlace(searchText, location)
+                            }
+                        }
+                    }
+                )
             )
-        )
+        }
 
         if (showSuggestions) {
             SearchCard {
