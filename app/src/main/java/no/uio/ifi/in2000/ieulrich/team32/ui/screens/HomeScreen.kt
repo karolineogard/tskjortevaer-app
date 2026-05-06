@@ -2,21 +2,14 @@ package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
 import android.location.Location
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -28,15 +21,19 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
@@ -54,27 +51,14 @@ import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDeta
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.imageUrl
 import no.uio.ifi.in2000.ieulrich.team32.ui.Routes
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.*
+import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.AlertFeature
 import org.json.JSONArray
 import java.net.HttpURLConnection
 import java.net.URL
-import java.text.Normalizer
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.FocusState
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.focus.onFocusEvent
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.UiState
 
 
 data class SimpleLatLng(val lat: Double, val lon: Double)
@@ -105,91 +89,116 @@ suspend fun getCoordsFromService(sted: String): SimpleLatLng? {
     }
 }
 
+
+
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier,
     navController: NavController,
     viewmodel: LocationForecastViewmodel,
     clothesViewModel: ClothesViewModel,
     homeViewModel: HomeViewModel
 ) {
     val context = LocalContext.current
-    val uiState by homeViewModel.uiState.collectAsState()
+    val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+    val focusManager = LocalFocusManager.current
+    val padding = 16.dp
+
     LaunchedEffect(Unit) {
         viewmodel.loadForecastForDevice(context)
         homeViewModel.loadData(context)
     }
-    val currentLocation by viewmodel.currentLocation.collectAsState()
-    LaunchedEffect(currentLocation) {
-        Log.d("HomeScreen", "currentLocation: $currentLocation")
-        currentLocation?.let { (lat, lon) ->
-            clothesViewModel.updateLocation(lat, lon)
-        }
-    }
-    val padding = 16.dp
-    var isVisible by remember { mutableStateOf(true) }
 
 
-    val focusManager = LocalFocusManager.current
+    Box(modifier = Modifier.fillMaxSize()) {
 
-    var isSearchExpanded by remember { mutableStateOf(false) }
-
-    Box(modifier = Modifier.fillMaxSize()){
         when (val state = uiState) {
             is UiState.Loading -> {
-                // TODO: loading stuff
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
             }
             is UiState.Error -> {
-                // TODO: Error stuff
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Noe gikk galt ved henting av værdata.")
+                }
             }
             is UiState.Success -> {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
                         .clickable(
                             indication = null,
                             interactionSource = remember { MutableInteractionSource() }
-                        ) {
-                            focusManager.clearFocus()
-                        },
-
-
+                        ) { focusManager.clearFocus() },
                     verticalArrangement = Arrangement.spacedBy(padding),
-                    contentPadding = PaddingValues(
-                        start = padding,
-                        end = padding,
-                        top = padding,
-                        bottom = padding
-                    ),
+                    contentPadding = PaddingValues(padding)
                 ) {
-                    item {
-                        HomeSearchBar(
-                            navController = navController,
-                            viewmodel = viewmodel
-                        )
-                    }
+                    item { HomeSearchBar(navController = navController, viewmodel = viewmodel) }
 
                     item {
                         WeatherCard(
                             navController = navController,
                             forecastHourDetails = state.forecast,
-                            placeName = state.place, //TODO: forward api data
+                            placeName = state.place,
                             location = state.location
                         )
                     }
-                    item {
-                        AnimatedVisibility(
-                            visible = isVisible,
-                            enter = expandVertically() + fadeIn(),
-                            exit = shrinkVertically() + fadeOut()
-                        ) {
-                            MetalertCarousel(modifier = Modifier.height(80.dp))
+
+                    if (state.alerts.isNotEmpty()) {
+                        item {
+                            MetalertCarousel(alerts = state.alerts)
                         }
                     }
+
                     item {
                         ClothingCard(navController = navController, clothesViewModel = clothesViewModel)
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun MetalertCarousel(alerts: List<AlertFeature>, modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        Text(
+            text = "Farevarsler",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(alerts) { alert ->
+                Box(modifier = Modifier.width(280.dp)) {
+                    MetalertCard(alert = alert)
+                }
+            }
+        }
+    }
+}
+@Composable
+fun MetalertCard(alert: AlertFeature) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0))
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = alert.properties.eventAwarenessName,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+            Text(
+                text = alert.properties.area,
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.DarkGray
+            )
         }
     }
 }
@@ -243,8 +252,9 @@ fun HomeSearchBar(
                     forslag = emptyList()
                     visForslag = false
                 }
-            }
-    }
+            } }
+
+
 
     fun navigerTilBy(navn: String, coords: SimpleLatLng) {
         navController.navigate("forecast?lat=${coords.lat}&lon=${coords.lon}&city=${navn}")
@@ -273,10 +283,8 @@ fun HomeSearchBar(
                 .onFocusChanged { focusState ->
                     harFokus = focusState.isFocused
                     if (!focusState.isFocused) {
-                        // Når man mister fokus, skjul forslag
                         visForslag = false
                     } else {
-                        // Når man får fokus og har tekst, vis forslag igjen
                         if (søkeTekst.length >= 2) {
                             visForslag = forslag.isNotEmpty()
                         }
@@ -373,24 +381,6 @@ fun HomeSearchBar(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MetalertCarousel(modifier: Modifier = Modifier) {
-    val varselTekster = listOf("Sterk vind", "Flom", "Orkan")
-    Column(modifier = modifier) {
-        LazyRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(varselTekster.size) { index ->
-                Box(modifier = Modifier.width(280.dp)) {
-                    MetalertCard(tekst = varselTekster[index])
-                }
-            }
-        }
-    }
-}
-
 @Composable
 fun WeatherCard(
     navController: NavController,
@@ -474,26 +464,13 @@ fun WeatherCard(
                         text = Format.formatTemp(details.temperature),
                         fontSize = 40.sp)
                 }
-//                Row(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalArrangement = Arrangement.Center
-//                ) { Text(text = "H:14°  L: 5°") }
+
             }
         }
     }
 }
 
-@Composable
-fun MetalertCard(tekst: String) {
-    Card(
-        modifier = Modifier.fillMaxWidth().height(80.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-    ) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterStart) {
-            Text(text = tekst, modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        }
-    }
-}
+
 
 @Composable
 fun ClothingCard(
