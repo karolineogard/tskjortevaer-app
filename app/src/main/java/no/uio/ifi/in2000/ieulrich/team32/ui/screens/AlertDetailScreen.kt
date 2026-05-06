@@ -71,7 +71,6 @@ fun AlertDetailScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Use the extension property from the model layer
                     AsyncImage(
                         model = alert.iconUrl,
                         contentDescription = "Ikon for ${alert.event}",
@@ -96,6 +95,7 @@ fun AlertDetailScreen(
                                 else -> {}
                             }
                         }
+
                     )
 
                     alert.title?.let {
