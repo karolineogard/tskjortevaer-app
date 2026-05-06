@@ -58,6 +58,7 @@ fun SearchBar(
     fun selectPlace(name: String, location: Location) {
         viewModel.addRecentSearch(name)
         searchText = ""
+        viewModel.clearSearch()
         onPlaceSelected(name, location)
     }
 

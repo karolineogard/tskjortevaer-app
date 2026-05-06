@@ -53,6 +53,10 @@ class SearchViewModel(
             .take(5)
     }
 
+    fun clearSearch(){
+        _suggestions.value = emptyList()
+    }
+
     suspend fun getCoordinatesForName(name: String): Location? {
         return locationRepository.getCoordinatesFromName(name)
     }
