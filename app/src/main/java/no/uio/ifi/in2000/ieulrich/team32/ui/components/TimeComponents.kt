@@ -134,26 +134,24 @@ fun CheckboxSection(
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text("Skal du være utendørs")
-        Checkbox(checked = isOutdoors, onCheckedChange = onOutdoorsChange)
     }
-    if (isOutdoors) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Skal du være fysisk aktiv")
-            Checkbox(checked = isPhysical, onCheckedChange = onPhysicalChange)
-        }
-    }
-    if (isPhysical) {
-        Column {
-            Text("Nivå:")
-            ActivityLevel.entries.forEach { level ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    RadioButton(
-                        selected = activityLevel == level,
-                        onClick = { onActivityLevelChange(level) }
-                    )
-                    Text(level.displayValue)
-                }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Checkbox(checked = isOutdoors, onCheckedChange = {
+            onOutdoorsChange(it)
+            if (!it) {
+                onPhysicalChange(false)
+                onActivityLevelChange(null)
             }
-        }
+        })
+        Text("Ja")
+        Spacer(modifier = Modifier.width(16.dp))
+        Checkbox(checked = !isOutdoors, onCheckedChange = {
+            onOutdoorsChange(!it)
+            if (it) {
+                onPhysicalChange(false)
+                onActivityLevelChange(null)
+            }
+        })
+        Text("Nei")
     }
 }
