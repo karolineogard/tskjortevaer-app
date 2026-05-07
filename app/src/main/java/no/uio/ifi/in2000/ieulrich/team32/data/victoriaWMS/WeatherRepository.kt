@@ -36,7 +36,7 @@ class WeatherRepositoryImpl @Inject constructor(
     }
 
     override fun getAlertsUrl(): String {
-        return "https://api.met.no/weatherapi/metalerts/2.0/current.json"
+        return "https://in2000.api.met.no/weatherapi/metalerts/2.0/current.json"
     }
 
     override suspend fun getAlerts(): List<MetAlert> {
