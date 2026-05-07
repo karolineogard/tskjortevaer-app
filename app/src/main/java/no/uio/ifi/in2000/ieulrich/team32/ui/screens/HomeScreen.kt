@@ -36,7 +36,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -366,8 +365,8 @@ fun ClothingCard(
     modifier: Modifier = Modifier
 ) {
     var showInfo by rememberSaveable { mutableStateOf(false) }
-    val recommendation by clothesViewModel.recommendation.collectAsState()
-    val isLoading by clothesViewModel.isLoading.collectAsState()
+    val recommendation by clothesViewModel.recommendation.collectAsStateWithLifecycle()
+    val isLoading by clothesViewModel.isLoading.collectAsStateWithLifecycle()
 
     Box(modifier = modifier.fillMaxWidth()) {
         Card(

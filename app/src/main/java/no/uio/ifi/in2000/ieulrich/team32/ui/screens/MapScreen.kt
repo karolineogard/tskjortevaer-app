@@ -82,6 +82,7 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.components.SearchBar
 import org.maplibre.android.camera.CameraUpdateFactory
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,7 +94,7 @@ fun MapScreen(
 ){
     val viewModel: MapViewModel = hiltViewModel()
 
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var mapRef by remember { mutableStateOf<org.maplibre.android.maps.MapLibreMap?>(null) }
     val showAlertsActive by rememberUpdatedState(uiState.showAlerts)
     var isMenuExpanded by remember { mutableStateOf(false) }
@@ -249,7 +250,7 @@ fun MapScreen(
                     }
                 }
 
-                val zoomToLocation by viewModel.zoomToLocation.collectAsState()
+                val zoomToLocation by viewModel.zoomToLocation.collectAsStateWithLifecycle()
                 LaunchedEffect(zoomToLocation) {
                     zoomToLocation?.let { location ->
                         mapRef?.animateCamera(

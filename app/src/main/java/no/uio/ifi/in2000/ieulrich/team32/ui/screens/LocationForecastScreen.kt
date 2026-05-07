@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
@@ -29,7 +28,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -44,16 +42,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
-import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.dto.TimeSeries
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ForecastHour
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
-import kotlin.collections.emptyList
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,8 +69,8 @@ fun LocationForecastScreen(
         }
     }
 
-    val forecast by viewmodel.forecast.collectAsState()
-    val groupedByDay = viewmodel.forecastByDay.collectAsState()
+    val forecast by viewmodel.forecast.collectAsStateWithLifecycle()
+    val groupedByDay = viewmodel.forecastByDay.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
