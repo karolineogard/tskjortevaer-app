@@ -2,6 +2,8 @@ package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
 import android.location.Location
 import android.util.Log
+import androidx.compose.animation.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -20,6 +22,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
@@ -65,6 +70,16 @@ import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.imageUrl
 import no.uio.ifi.in2000.ieulrich.team32.ui.Routes
+import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.*
+import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.AlertFeature
+import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
+import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.iconUrl
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
+import org.json.JSONArray
+import java.net.HttpURLConnection
+import java.net.URL
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.SearchBar
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
@@ -91,9 +106,14 @@ fun HomeScreen(
         viewmodel.loadForecastForDevice(context)
         homeViewModel.loadData(context)
     }
+    var selectedAlert by remember { mutableStateOf<MetAlert?>(null) }
 
-
-    Box(modifier = Modifier.fillMaxSize()) {
+    selectedAlert?.let { alert ->
+        AlertDetailScreen(
+            alert = alert,
+            onBack = { selectedAlert = null }
+        )
+    } ?: Box(modifier = Modifier.fillMaxSize()) {
 
         when (val state = uiState) {
             is UiState.Loading -> {
@@ -177,7 +197,10 @@ fun HomeScreen(
 
                     if (state.alerts.isNotEmpty()) {
                         item {
-                            MetalertCarousel(alerts = state.alerts)
+                            MetalertCarousel(
+                                alerts = state.alerts,
+                                onAlertClick = { selectedAlert = it }
+                            )
                         }
                     }
 
@@ -191,45 +214,77 @@ fun HomeScreen(
 }
 
 @Composable
-fun MetalertCarousel(alerts: List<AlertFeature>, modifier: Modifier = Modifier) {
+fun MetalertCarousel(
+    alerts: List<AlertFeature>,
+    onAlertClick: (MetAlert) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(modifier = modifier) {
-        Text(
-            text = "Farevarsler",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(alerts) { alert ->
-                Box(modifier = Modifier.width(280.dp)) {
-                    MetalertCard(alert = alert)
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    MetalertCard(alert = alert, onClick = onAlertClick)
                 }
             }
         }
     }
 }
 @Composable
-fun MetalertCard(alert: AlertFeature) {
+fun MetalertCard(
+    alert: AlertFeature,
+    onClick: (MetAlert) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val metAlert = MetAlert(
+        event = alert.properties.event,
+        severity = alert.properties.severity,
+        description = alert.properties.description,
+        area = alert.properties.area,
+        instruction = alert.properties.instruction,
+        consequence = alert.properties.consequences,
+        awarnessResponse = alert.properties.awarenessResponse,
+        title = alert.properties.eventAwarenessName
+    )
+
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0))
+            .height(80.dp)
+            .clickable { onClick(metAlert) },
+        colors = CardDefaults.cardColors(
+            containerColor = SeverityColor(alert.properties.severity).copy(alpha = 0.2f)
+        ),
+        shape = RoundedCornerShape(16.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = alert.properties.eventAwarenessName,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            AsyncImage(
+                model = metAlert.iconUrl,
+                contentDescription = "Ikon for ${alert.properties.event}",
+                modifier = Modifier.size(52.dp),
+                contentScale = ContentScale.Fit
             )
-            Text(
-                text = alert.properties.area,
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.DarkGray
-            )
+            Column {
+                Text(
+                    text = alert.properties.eventAwarenessName,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+                Text(
+                    text = alert.properties.area,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.DarkGray
+                )
+            }
         }
     }
 }

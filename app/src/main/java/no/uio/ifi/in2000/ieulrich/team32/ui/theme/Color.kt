@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.Color
 
 //custom theme
 
-val Grey = Color(0xff56595C)
+val Grey = Color(0xff000000)
 
 val MediumBlue = Color(0xff99C4D3)
 

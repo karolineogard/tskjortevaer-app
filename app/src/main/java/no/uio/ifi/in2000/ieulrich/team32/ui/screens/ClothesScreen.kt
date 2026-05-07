@@ -57,6 +57,7 @@ import androidx.compose.ui.zIndex
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.R
@@ -296,12 +297,19 @@ fun ClothesScreen(
                         showBanner = true
                         scope.launch { sheetState.bottomSheetState.partialExpand() }
                     },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.wrapContentWidth(
+                        align = Alignment.CenterHorizontally
+                    ).align(Alignment.CenterHorizontally),
                     colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 ) {
                     Text("Gi ny klesanbefaling")
+                    Icon(
+                        painter = painterResource(id = R.drawable.arrow_forward_icon),
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
 
                 Spacer(modifier = Modifier.size(24.dp))
