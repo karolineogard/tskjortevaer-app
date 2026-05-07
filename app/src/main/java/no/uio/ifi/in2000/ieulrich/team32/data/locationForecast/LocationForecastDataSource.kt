@@ -9,8 +9,9 @@ import io.ktor.client.request.parameter
 import io.ktor.http.HttpStatusCode
 import no.uio.ifi.in2000.ieulrich.team32.data.client.HttpClientProvider
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.dto.LocationForecastResponse
+import javax.inject.Inject
 
-class LocationForecastDataSource(private val client: HttpClient = HttpClientProvider.client) {
+class LocationForecastDataSource @Inject constructor(private val client: HttpClient) {
     private var cachedResponse: LocationForecastResponse? = null
     private var lastUpdatedAt: String? = null
 
