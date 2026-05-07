@@ -7,15 +7,24 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.http.HttpStatusCode
-import no.uio.ifi.in2000.ieulrich.team32.data.client.HttpClientProvider
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.dto.LocationForecastResponse
 import javax.inject.Inject
+import kotlin.math.abs
 
-class LocationForecastDataSource @Inject constructor(private val client: HttpClient) {
+class LocationForecastDataSource @Inject constructor(
+    private val client: HttpClient
+) {
     private var cachedResponse: LocationForecastResponse? = null
-    private var lastUpdatedAt: String? = null
+    private var lastModified: String? = null
+    private var cachedLat: Double? = null
+    private var cachedLon: Double? = null
 
     suspend fun getForecast(lat: Double, lon: Double): LocationForecastResponse? {
+        val locationChanged = !isSameLocation(lat, lon)
+        if (locationChanged) {
+            lastModified = null
+            cachedResponse = null
+        }
         Log.d("LocationForecast", "Api kall for $lat, $lon")
         return try {
             val response = client.get(
@@ -24,7 +33,7 @@ class LocationForecastDataSource @Inject constructor(private val client: HttpCli
                 parameter("lat", lat)
                 parameter("lon", lon)
                 header("User-Agent", "IN2000 Team 32")
-                lastUpdatedAt?.let { header("If-Modified-Since", it) }
+                lastModified?.let { header("If-Modified-Since", it) }
             }
             when (response.status) {
                 HttpStatusCode.NotModified -> {
@@ -33,14 +42,23 @@ class LocationForecastDataSource @Inject constructor(private val client: HttpCli
                 }
                 else -> {
                     val body = response.body<LocationForecastResponse>()
-                    lastUpdatedAt = body.properties.meta.updatedAt
+                    lastModified = response.headers["Last-Modified"]
                     cachedResponse = body
+                    cachedLat = lat
+                    cachedLon = lon
                     body
                 }
             }
         } catch (e: Throwable) {
-            Log.e("LocationForecast", "Nettverksfeil: ${e.message}")
+            Log.e("LocationForecast", "Nettverksfeil", e)
             cachedResponse
         }
+    }
+
+    private fun isSameLocation(lat: Double, lon: Double): Boolean {
+        val cachedLat = cachedLat ?: return false
+        val cachedLon = cachedLon ?: return false
+        // passer på å ikke forkaste cache hvis koordinater bare har endret seg litt
+        return abs(lat - cachedLat) < 0.01 && abs(lon - cachedLon) < 0.01
     }
 }
