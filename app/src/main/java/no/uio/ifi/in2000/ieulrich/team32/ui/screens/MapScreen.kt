@@ -694,7 +694,7 @@ fun TimeSliderCard(
     LaunchedEffect(isPlaying, selectionKey) {
         if (isPlaying) {
             while (isPlaying) {
-                delay(2500L) // Wait 1 second per step
+                delay(1500L)
                 if (sliderPosition < 8f) {
                     sliderPosition += 1f
                     val currentSelectedTimeUTC = baseTime.plusHours((sliderPosition.toInt() * 3).toLong())

@@ -65,8 +65,6 @@ import coil3.compose.AsyncImage
 import coil3.svg.SvgDecoder
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
-import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.AlertFeature
-import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.imageUrl
 import no.uio.ifi.in2000.ieulrich.team32.ui.Routes
