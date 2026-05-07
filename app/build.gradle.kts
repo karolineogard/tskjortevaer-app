@@ -93,4 +93,9 @@ dependencies {
     implementation(libs.play.services.location)
     // persistent storage
     implementation(libs.androidx.datastore.preferences)
+
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("io.mockk:mockk:1.13.8")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
 }
