@@ -2,20 +2,18 @@ package no.uio.ifi.in2000.ieulrich.team32
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.svg.SvgDecoder
 import com.google.android.gms.location.LocationServices
+import dagger.hilt.android.AndroidEntryPoint
 import no.uio.ifi.in2000.ieulrich.team32.ui.MapApp
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.Team32Theme
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
@@ -23,9 +21,8 @@ import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
 import org.maplibre.android.MapLibre
 import org.maplibre.android.WellKnownTileServer
-import java.util.jar.Manifest
 
-// ingrid var her
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val viewModel: LocationForecastViewmodel by viewModels {
         object : ViewModelProvider.Factory{
