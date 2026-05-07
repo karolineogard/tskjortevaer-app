@@ -7,11 +7,9 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
-import io.ktor.client.statement.bodyAsText
 import no.uio.ifi.in2000.ieulrich.team32.data.client.HttpClientProvider
 import no.uio.ifi.in2000.ieulrich.team32.data.geocoding.dto.NominatimResponse
 import no.uio.ifi.in2000.ieulrich.team32.data.geocoding.dto.NominatimSearchResult
-import java.nio.DoubleBuffer
 
 class LocationDatasource(private val client: HttpClient = HttpClientProvider.client)  {
 
@@ -23,6 +21,23 @@ class LocationDatasource(private val client: HttpClient = HttpClientProvider.cli
             header("User-Agent", "IN2000 Team 32")
         }
         return response.body<NominatimResponse>()
+    }
+
+    suspend fun searchPlaces(query: String): List<Pair<String, Location>>{
+        val response = client.get("https://nominatim.openstreetmap.org/search") {
+            parameter("q", query)
+            parameter("format", "json")
+            parameter("limit", 5)
+            parameter("featuretype", "city")
+            header("User-Agent", "IN2000 Team 32")
+        }
+        return response.body<List<NominatimSearchResult>>().map { result ->
+            val location = Location("nominatim").apply {
+                latitude = result.lat.toDouble()
+                longitude = result.lon.toDouble()
+            }
+            Pair(result.displayName.split(",").take(2).joinToString(", "), location)
+        }
     }
 
     suspend fun getCoordinatesFromName(name: String): Location?{
