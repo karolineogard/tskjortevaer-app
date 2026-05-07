@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import no.uio.ifi.in2000.ieulrich.team32.data.location.DeviceLocationDataSource
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.LocationForecastRepository
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.dto.LocationForecastResponse
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.mapper.toForecastByDay
@@ -18,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LocationForecastViewmodel @Inject constructor(
-    private val locationClient: FusedLocationProviderClient,
+    private val deviceLocationDataSource: DeviceLocationDataSource,
     private val repository: LocationForecastRepository
 ): ViewModel() {
     private val _forecast = MutableStateFlow<LocationForecastResponse?>(null)
@@ -33,21 +34,14 @@ class LocationForecastViewmodel @Inject constructor(
         Log.d("LocationForecastViewModel", "ViewModel initialized")
     }
 
-    fun loadForecastForDevice(context: Context) {
-        val appContext = context.applicationContext
+    fun loadForecastForDevice() {
         viewModelScope.launch {
-            val location = locationClient.getDeviceLocation(appContext)
+            val location = deviceLocationDataSource.getCurrentLocation()
 
-            val lat: Double
-            val lon: Double
+            val lat = location?.latitude ?: 59.9432
+            val lon = location?.longitude ?: 10.7173
 
-            if (location != null) {
-                lat = location.latitude
-                lon = location.longitude
-                Log.d("LocationDebug", "Using device location: $lat, $lon")
-            } else {
-                lat = 59.91
-                lon = 10.75
+            if (location == null) {
                 Log.w("LocationDebug", "Location failed, using default (Oslo)")
             }
 

@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import no.uio.ifi.in2000.ieulrich.team32.data.geocoding.LocationRepository
+import no.uio.ifi.in2000.ieulrich.team32.data.location.DeviceLocationDataSource
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.LocationForecastRepository
 import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.AlertFeature
 import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.AlertsRepository
@@ -40,7 +41,7 @@ sealed class UiState {
 
 @HiltViewModel
 class HomeViewModel @Inject constructor (
-    private val locationClient: FusedLocationProviderClient,
+    private val deviceLocationDataSource: DeviceLocationDataSource,
     private val locationForecastRepository: LocationForecastRepository,
     private val alertsRepository: AlertsRepository,
     private val locationRepository: LocationRepository
@@ -52,18 +53,13 @@ class HomeViewModel @Inject constructor (
         Log.d("HomeViewModel", "ViewModel initialized")
     }
 
-    fun loadData(context: Context){
-        val appContext = context.applicationContext
+    fun loadData(){
         viewModelScope.launch {
-            Log.d("HomeVIewModel", "Prøver å loade data")
-            val location = locationClient.getDeviceLocation(appContext)
-
             try {
-                if (location == null) {
-                    Log.d("HomeViewModel", "could not find location, using default")
-                }
-                val lat = location?.latitude ?: 59.91
-                val lon = location?.longitude ?: 10.73
+                Log.d("HomeViewModel", "Prøver å laste data")
+                val location = deviceLocationDataSource.getCurrentLocation()
+                val lat = location?.latitude ?: 59.9432
+                val lon = location?.longitude ?: 10.7173
 
                 coroutineScope {
                     val forecastDeferred = async { locationForecastRepository.getForecastNow(lat, lon) }
@@ -84,6 +80,7 @@ class HomeViewModel @Inject constructor (
                             alerts = alerts
                         )
                     } else {
+                        Log.e("HomeViewModel", "Error loading data")
                         _uiState.value = UiState.Error
                     }
                 }
@@ -96,35 +93,5 @@ class HomeViewModel @Inject constructor (
         }
     }
 
-}
-
-suspend fun FusedLocationProviderClient.getDeviceLocation(context: Context): Location?{
-    val hasPermission = ActivityCompat.checkSelfPermission(
-        context, android.Manifest.permission.ACCESS_COARSE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
-
-    if (!hasPermission) return null
-
-
-    return suspendCancellableCoroutine { continuation ->
-        val cts = CancellationTokenSource()
-        getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, cts.token)
-            .addOnSuccessListener { location ->
-                if (location != null) {
-                    continuation.resume(location)
-                } else {
-                    lastLocation.addOnSuccessListener { lastLoc ->
-                        continuation.resume(lastLoc)
-                    }.addOnFailureListener {
-                        continuation.resume(null)
-                    }
-                }
-            }.addOnFailureListener {
-                continuation.resume(null)
-            }
-        continuation.invokeOnCancellation {
-            cts.cancel()
-        }
-    }
 }
 
