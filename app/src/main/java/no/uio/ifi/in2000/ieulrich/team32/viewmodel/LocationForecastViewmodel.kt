@@ -38,6 +38,7 @@ class LocationForecastViewmodel @Inject constructor(
         viewModelScope.launch {
             val location = deviceLocationDataSource.getCurrentLocation()
 
+            // fallback to default location if location permission is denied
             val lat = location?.latitude ?: 59.9432
             val lon = location?.longitude ?: 10.7173
 
