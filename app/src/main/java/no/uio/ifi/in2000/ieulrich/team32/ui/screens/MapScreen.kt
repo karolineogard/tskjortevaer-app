@@ -81,17 +81,18 @@ import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.SearchBar
 import org.maplibre.android.camera.CameraUpdateFactory
 import androidx.compose.ui.zIndex
-
+import androidx.hilt.navigation.compose.hiltViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
-    viewModel: MapViewModel = viewModel(),
     navController: NavController,
     isOnline: Boolean
 ){
+    val viewModel: MapViewModel = hiltViewModel()
+
     val uiState by viewModel.uiState.collectAsState()
     var mapRef by remember { mutableStateOf<org.maplibre.android.maps.MapLibreMap?>(null) }
     val showAlertsActive by rememberUpdatedState(uiState.showAlerts)

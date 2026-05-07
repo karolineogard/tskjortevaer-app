@@ -6,47 +6,22 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.svg.SvgDecoder
-import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.AndroidEntryPoint
 import no.uio.ifi.in2000.ieulrich.team32.ui.MapApp
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.Team32Theme
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
 import org.maplibre.android.MapLibre
 import org.maplibre.android.WellKnownTileServer
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val viewModel: LocationForecastViewmodel by viewModels {
-        object : ViewModelProvider.Factory{
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val locationClient = LocationServices.getFusedLocationProviderClient(this@MainActivity)
-                @Suppress("UNCHECKED_CAST")
-                return LocationForecastViewmodel(locationClient) as T
-            }
-        }
-    }
-    private val homeViewModel: HomeViewModel by viewModels {
-        object : ViewModelProvider.Factory{
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val locationClient = LocationServices.getFusedLocationProviderClient(this@MainActivity)
-                @Suppress("UNCHECKED_CAST")
-                return HomeViewModel(locationClient) as T
-            }
-        }
-    }
-
-    private val settingsViewModel: SettingsViewModel by viewModels {
-        SettingsViewModel.Factory(applicationContext)
-    }
-
+    private val viewModel: LocationForecastViewmodel by viewModels()
+    private val homeViewModel: HomeViewModel by viewModels()
 
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission())
@@ -77,11 +52,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Team32Theme {
-                MapApp(
-                    locationForecastViewmodel = viewModel,
-                    homeViewModel = homeViewModel,
-                    settingsViewModel = settingsViewModel
-                )
+                MapApp()
             }
         }
     }

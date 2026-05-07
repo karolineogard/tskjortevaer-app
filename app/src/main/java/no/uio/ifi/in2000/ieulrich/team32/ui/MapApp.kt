@@ -34,7 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -47,7 +47,6 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.screens.HomeScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.LocationForecastScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.MapScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.SettingsScreen
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.Grey
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
@@ -59,11 +58,11 @@ import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
 fun MapApp(
     navController: NavHostController = rememberNavController(),
     modifier: Modifier = Modifier,
-    clothesViewModel: ClothesViewModel = viewModel(),
-    locationForecastViewmodel: LocationForecastViewmodel,
-    homeViewModel: HomeViewModel,
-    settingsViewModel: SettingsViewModel = viewModel()
 ) {
+    val locationForecastViewmodel: LocationForecastViewmodel = hiltViewModel()
+    val homeViewModel: HomeViewModel = hiltViewModel()
+    val settingsViewModel: SettingsViewModel = hiltViewModel()
+    val clothesViewModel: ClothesViewModel = hiltViewModel()
     val context = LocalContext.current
 
     // Nettverksovervåking
