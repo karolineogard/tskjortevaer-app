@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,9 +21,8 @@ import no.uio.ifi.in2000.ieulrich.team32.data.geocoding.LocationRepository
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.LocationForecastRepository
 import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.AlertFeature
 import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.AlertsRepository
-import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.NetworkAlertsRepository
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
-import no.uio.ifi.in2000.ieulrich.team32.ui.screens.LocationForecastScreen
+import javax.inject.Inject
 import kotlin.coroutines.resume
 
 sealed class UiState {
@@ -38,12 +38,13 @@ sealed class UiState {
     object Error : UiState()
 }
 
-class HomeViewModel(
+@HiltViewModel
+class HomeViewModel @Inject constructor (
     private val locationClient: FusedLocationProviderClient,
+    private val locationForecastRepository: LocationForecastRepository,
+    private val alertsRepository: AlertsRepository,
+    private val locationRepository: LocationRepository
 ): ViewModel() {
-    private val locationForecastRepository: LocationForecastRepository = LocationForecastRepository()
-    private val alertsRepository: AlertsRepository = NetworkAlertsRepository()
-    private val locationRepository: LocationRepository = LocationRepository()
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState = _uiState.asStateFlow()
 

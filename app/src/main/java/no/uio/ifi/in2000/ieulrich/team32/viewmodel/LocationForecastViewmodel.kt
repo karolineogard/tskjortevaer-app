@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.FusedLocationProviderClient
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,11 +14,13 @@ import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.LocationForecastR
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.dto.LocationForecastResponse
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.mapper.toForecastByDay
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
+import javax.inject.Inject
 
-class LocationForecastViewmodel(
-    private val locationClient: FusedLocationProviderClient
+@HiltViewModel
+class LocationForecastViewmodel @Inject constructor(
+    private val locationClient: FusedLocationProviderClient,
+    private val repository: LocationForecastRepository
 ): ViewModel() {
-    private val repository: LocationForecastRepository = LocationForecastRepository()
     private val _forecast = MutableStateFlow<LocationForecastResponse?>(null)
     val forecast: StateFlow<LocationForecastResponse?> = _forecast.asStateFlow()
     private val _forecastByDay = MutableStateFlow<Map<String, List<ForecastHourDetails>>?>(null)

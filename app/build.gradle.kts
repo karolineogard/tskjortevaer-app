@@ -3,9 +3,9 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    kotlin("plugin.serialization") version "2.0.0"
+    kotlin("android")
+    kotlin("plugin.serialization") version "2.2.0"
 }
-
 android {
     namespace = "no.uio.ifi.in2000.ieulrich.team32"
     compileSdk = 36
@@ -35,6 +35,11 @@ android {
 
         isCoreLibraryDesugaringEnabled = true
     }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
     buildFeatures {
         compose = true
     }

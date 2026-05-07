@@ -4,15 +4,18 @@ import android.location.Location
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.data.geocoding.LocationRepository
+import javax.inject.Inject
 
-class SearchViewModel(
-    private val locationRepository: LocationRepository = LocationRepository(),
+@HiltViewModel
+class SearchViewModel @Inject constructor(
+    private val locationRepository: LocationRepository
 ) : ViewModel() {
     private val _suggestions = MutableStateFlow<List<Pair<String, Location>>>(emptyList())
     val suggestions = _suggestions.asStateFlow()

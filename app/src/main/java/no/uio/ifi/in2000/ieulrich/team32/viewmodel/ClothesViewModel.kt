@@ -3,6 +3,7 @@ package no.uio.ifi.in2000.ieulrich.team32.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,10 +15,12 @@ import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendationEngi
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.UserSettings
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
+import javax.inject.Inject
 
-class ClothesViewModel : ViewModel() {
-
-    private val repository = LocationForecastRepository()
+@HiltViewModel
+class ClothesViewModel @Inject constructor(
+    private val repository: LocationForecastRepository
+) : ViewModel() {
 
     var currentLat: Double = 59.9139
         private set
