@@ -10,33 +10,36 @@ import io.ktor.http.HttpStatusCode
 import no.uio.ifi.in2000.ieulrich.team32.data.client.HttpClientProvider
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.dto.LocationForecastResponse
 
-class LocationForecastDataSource (private val client: HttpClient = HttpClientProvider.client) {
+class LocationForecastDataSource(private val client: HttpClient = HttpClientProvider.client) {
     private var cachedResponse: LocationForecastResponse? = null
     private var lastUpdatedAt: String? = null
 
-    suspend fun getForecast(lat: Double, lon: Double) : LocationForecastResponse {
+    suspend fun getForecast(lat: Double, lon: Double): LocationForecastResponse? {
         Log.d("LocationForecast", "Api kall for $lat, $lon")
-        val response = client.get (
-            "https://in2000.api.met.no/weatherapi/locationforecast/2.0/compact"
-        ){
-            parameter("lat", lat)
-            parameter("lon", lon)
-            header("User-Agent", "IN2000 Team 32")
-            // TODO: check coordinates against cached data
-            lastUpdatedAt?.let { header("If-Modified-Since", it) }
-        }
-        return when (response.status) {
-            HttpStatusCode.NotModified -> {
-                Log.d("LocationForecast", "Ingen endringer, bruker cache")
-                cachedResponse ?: error("No forecast cached")
+        return try {
+            val response = client.get(
+                "https://in2000.api.met.no/weatherapi/locationforecast/2.0/compact"
+            ) {
+                parameter("lat", lat)
+                parameter("lon", lon)
+                header("User-Agent", "IN2000 Team 32")
+                lastUpdatedAt?.let { header("If-Modified-Since", it) }
             }
-            else -> {
-                val body = response.body<LocationForecastResponse>()
-                lastUpdatedAt = body.properties.meta.updatedAt
-                cachedResponse = body
-                body
+            when (response.status) {
+                HttpStatusCode.NotModified -> {
+                    Log.d("LocationForecast", "Ingen endringer, bruker cache")
+                    cachedResponse
+                }
+                else -> {
+                    val body = response.body<LocationForecastResponse>()
+                    lastUpdatedAt = body.properties.meta.updatedAt
+                    cachedResponse = body
+                    body
+                }
             }
+        } catch (e: Throwable) {
+            Log.e("LocationForecast", "Nettverksfeil: ${e.message}")
+            cachedResponse
         }
-
     }
 }

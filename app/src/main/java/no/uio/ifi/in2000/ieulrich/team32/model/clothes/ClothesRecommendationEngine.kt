@@ -38,8 +38,8 @@ object ClothesRecommendationEngine {
         forecasts: List<ForecastHourDetails>,
         settings: UserSettings,
         temperatureOffset: Float = 0f
-    ): ClothesRecommendation {
-        if (forecasts.isEmpty()) return defaultRecommendation()
+    ): ClothesRecommendation? {
+        if (forecasts.isEmpty()) return null
 
         val temperatures = forecasts.map { it.rawTemperature() }
         val baseTemp = if (settings.isOutdoors) {
@@ -137,13 +137,5 @@ object ClothesRecommendationEngine {
         else       -> 5
     }
 
-    private fun defaultRecommendation() = ClothesRecommendation(
-        effectiveTemp = 10.0,
-        wearTshirt = false, wearSweater = false, wearLightJacket = true,
-        wearHeavyJacket = false, wearThermalUnderwear = false,
-        wearShorts = false, wearPants = true,
-        wearHatGloves = false, wearScarf = false,
-        wearSunglasses = false, bringUmbrella = false, wearRainGear = false,
-        wearWaterproofShoes = false, wearWinterBoots = false, wearSneakers = true
-    )
+
 }

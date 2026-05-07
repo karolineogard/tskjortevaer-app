@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui.victoriaWMS
 
+import android.location.Location
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,6 +36,9 @@ class MapViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MapUiState(alertsUrl = repository.getAlertsUrl()))
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
+
+    private val _zoomToLocation = MutableStateFlow<Location?>(null)
+    val zoomToLocation = _zoomToLocation.asStateFlow()
 
     init {
         updateLayer(WeatherLayer.TEMPERATURE)
@@ -114,6 +118,10 @@ class MapViewModel(
             mapCenter = latLng,
             mapZoom = zoom
         ) }
+    }
+
+    fun onPlaceSelected(location: Location){
+        _zoomToLocation.value = location
     }
 
 

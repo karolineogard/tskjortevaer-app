@@ -78,7 +78,10 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import no.uio.ifi.in2000.ieulrich.team32.ui.components.SearchBar
 import org.maplibre.android.camera.CameraUpdateFactory
+import androidx.compose.ui.zIndex
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,8 +89,9 @@ import org.maplibre.android.camera.CameraUpdateFactory
 fun MapScreen(
     modifier: Modifier = Modifier,
     viewModel: MapViewModel = viewModel(),
-    navController: NavController
-) {
+    navController: NavController,
+    isOnline: Boolean
+){
     val uiState by viewModel.uiState.collectAsState()
     var mapRef by remember { mutableStateOf<org.maplibre.android.maps.MapLibreMap?>(null) }
     val showAlertsActive by rememberUpdatedState(uiState.showAlerts)
@@ -148,6 +152,31 @@ fun MapScreen(
             sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
         ) { innerPadding ->
             Box(modifier = modifier.fillMaxSize()) {
+                if (!isOnline) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background)
+                            .padding(32.dp)
+                            .zIndex(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(
+                                text = "Ingen internettforbindelse",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "Kartet krever internett for å laste inn.",
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
                 AndroidView(
                     factory = { context ->
                         MapView(context).apply {
@@ -219,14 +248,49 @@ fun MapScreen(
                     }
                 }
 
+                val zoomToLocation by viewModel.zoomToLocation.collectAsState()
+                LaunchedEffect(zoomToLocation) {
+                    zoomToLocation?.let { location ->
+                        mapRef?.animateCamera(
+                            CameraUpdateFactory.newLatLngZoom(
+                                LatLng(location.latitude, location.longitude),
+                                12.0
+                            )
+                        )
+                    }
+                }
+
                 // Top Search Bar
-                SearchBar(
+                Box(
                     modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(top = 48.dp, start = 16.dp, end = 16.dp),
-                    isExpanded = isSearchExpanded,
-                    onToggleExpand = { isSearchExpanded = it }
-                )
+                        .align(Alignment.TopEnd)
+                        .padding(top = 48.dp, start = 16.dp, end = 16.dp)
+                ) {
+                    if (isSearchExpanded) {
+                        SearchBar(
+                            modifier = Modifier.fillMaxWidth(),
+                            onPlaceSelected = { _, location ->
+                                viewModel.onPlaceSelected(location)
+                                isSearchExpanded = false
+                            }
+                        )
+                    } else {
+                        Surface(
+                            onClick = { isSearchExpanded = true},
+                            shape = CircleShape,
+                            color = Color.White,
+                            shadowElevation = 4.dp,
+                            modifier = Modifier.size(56.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Search,
+                                contentDescription = "Åpne søk",
+                                tint = Color.Black,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+                }
 
                 if (uiState.showAlerts) {
                     AlertsLegendCard(
@@ -589,62 +653,6 @@ fun AlertsLegendCard(modifier: Modifier = Modifier) {
     }
 
 
-}
-
-
-@Composable
-fun SearchBar(
-    modifier: Modifier = Modifier,
-    isExpanded: Boolean,
-    onToggleExpand: (Boolean) -> Unit
-) {
-    var searchText by remember { mutableStateOf("") }
-
-    Box(modifier = modifier.fillMaxWidth()) {
-        Surface(
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .animateContentSize()
-                .height(56.dp)
-                .then(if (isExpanded) Modifier.fillMaxWidth() else Modifier.width(56.dp)),
-            shape = RoundedCornerShape(28.dp),
-            color = Color.White,
-            shadowElevation = 4.dp
-        ) {
-            if (isExpanded) {
-                Row(
-                    modifier = Modifier.padding(start = 16.dp, end = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    BasicTextField(
-                        value = searchText,
-                        onValueChange = { searchText = it },
-                        modifier = Modifier.weight(1f),
-                        singleLine = true,
-                        decorationBox = { innerTextField ->
-                            if (searchText.isEmpty()) {
-                                Text("Søk her...", color = Color.Gray)
-                            }
-                            innerTextField()
-                        }
-                    )
-                    IconButton(onClick = { 
-                        // TODO: Legg til søke-logikk her
-                        onToggleExpand(false) 
-                    }) {
-                        Icon(Icons.Default.Search, contentDescription = "Søk", tint = Color.Black)
-                    }
-                }
-            } else {
-                IconButton(
-                    onClick = { onToggleExpand(true) },
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Icon(Icons.Default.Search, contentDescription = "Åpne søk", tint = Color.Black)
-                }
-            }
-        }
-    }
 }
 
 @Composable
