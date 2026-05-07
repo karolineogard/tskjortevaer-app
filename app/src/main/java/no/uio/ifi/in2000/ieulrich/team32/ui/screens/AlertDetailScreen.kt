@@ -185,7 +185,7 @@ fun FormatSeverity(severity: String?): String = when (severity?.lowercase()) {
 fun SeverityLegend(modifier: Modifier = Modifier) {
     val levels = listOf(
         Triple("minor",    Color(0xFFFFFF00), "Gult: Moderat fare"),
-        Triple("moderate", Color(0xFFFFA500), "Oransj: Stor fare"),
+        Triple("moderate", Color(0xFFFFA500), "Oransje: Stor fare"),
         Triple("severe",   Color(0xFFFF0000), "Rødt: Ekstrem fare og ekstremvær"),
     )
 
