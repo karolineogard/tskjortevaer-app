@@ -1,6 +1,15 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,6 +25,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,7 +48,6 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -54,10 +63,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.compose.animation.*
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.R
@@ -65,7 +71,6 @@ import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
-import androidx.compose.ui.text.style.TextAlign
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
 
@@ -78,8 +83,8 @@ fun ClothesScreen(
     settingsViewModel: SettingsViewModel,
     isOnline: Boolean
 ) {
-    val defaultDepHour by settingsViewModel.defaultDepartureHour.collectAsState()
-    val defaultRetHour by settingsViewModel.defaultReturnHour.collectAsState()
+    val defaultDepHour by settingsViewModel.defaultDepartureHour.collectAsStateWithLifecycle()
+    val defaultRetHour by settingsViewModel.defaultReturnHour.collectAsStateWithLifecycle()
 
     var showBanner by remember { mutableStateOf(false) }
     var bannerMessage by remember { mutableStateOf("") }
@@ -90,9 +95,9 @@ fun ClothesScreen(
             .replaceFirstChar { it.uppercase() }
     }
 
-    val recommendation by clothesViewModel.recommendation.collectAsState()
-    val settings by clothesViewModel.settings.collectAsState()
-    val isLoading by clothesViewModel.isLoading.collectAsState()
+    val recommendation by clothesViewModel.recommendation.collectAsStateWithLifecycle()
+    val settings by clothesViewModel.settings.collectAsStateWithLifecycle()
+    val isLoading by clothesViewModel.isLoading.collectAsStateWithLifecycle()
 
     val sheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberStandardBottomSheetState(

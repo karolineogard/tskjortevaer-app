@@ -1,24 +1,24 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui.victoriaWMS
 
 import android.location.Location
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.data.victoriaWMS.WeatherRepository
-import no.uio.ifi.in2000.ieulrich.team32.data.victoriaWMS.WeatherRepositoryImpl
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
 import no.uio.ifi.in2000.ieulrich.team32.model.victoriaWMS.WeatherLayer
+import org.maplibre.android.geometry.LatLng
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import android.util.Log
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.launch
-import org.maplibre.android.geometry.LatLng
+import javax.inject.Inject
 
 data class MapUiState(
     val currentLayer: WeatherLayer? = WeatherLayer.TEMPERATURE,
@@ -31,8 +31,9 @@ data class MapUiState(
     val mapZoom: Double = 5.0
 )
 
-class MapViewModel(
-    private val repository: WeatherRepository = WeatherRepositoryImpl()
+@HiltViewModel
+class MapViewModel @Inject constructor(
+    private val repository: WeatherRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MapUiState(alertsUrl = repository.getAlertsUrl()))
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()

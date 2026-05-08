@@ -2,8 +2,6 @@ package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
 import android.location.Location
 import android.util.Log
-import androidx.compose.animation.*
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -23,8 +21,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
@@ -40,8 +36,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,23 +59,16 @@ import coil3.compose.AsyncImage
 import coil3.svg.SvgDecoder
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
+import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.AlertFeature
+import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.imageUrl
-import no.uio.ifi.in2000.ieulrich.team32.ui.Routes
-import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.*
-import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.AlertFeature
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.iconUrl
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
-import org.json.JSONArray
-import java.net.HttpURLConnection
-import java.net.URL
+import no.uio.ifi.in2000.ieulrich.team32.ui.Routes
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.SearchBar
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.UiState
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -90,20 +77,13 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewmodel: LocationForecastViewmodel,
     clothesViewModel: ClothesViewModel,
     homeViewModel: HomeViewModel,
     isOnline: Boolean
 ){
-    val context = LocalContext.current
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
     val padding = 16.dp
-
-    LaunchedEffect(Unit) {
-        viewmodel.loadForecastForDevice(context)
-        homeViewModel.loadData(context)
-    }
     var selectedAlert by remember { mutableStateOf<MetAlert?>(null) }
 
     selectedAlert?.let { alert ->
@@ -385,8 +365,8 @@ fun ClothingCard(
     modifier: Modifier = Modifier
 ) {
     var showInfo by rememberSaveable { mutableStateOf(false) }
-    val recommendation by clothesViewModel.recommendation.collectAsState()
-    val isLoading by clothesViewModel.isLoading.collectAsState()
+    val recommendation by clothesViewModel.recommendation.collectAsStateWithLifecycle()
+    val isLoading by clothesViewModel.isLoading.collectAsStateWithLifecycle()
 
     Box(modifier = modifier.fillMaxWidth()) {
         Card(

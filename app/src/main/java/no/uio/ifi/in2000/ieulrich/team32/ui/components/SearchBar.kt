@@ -36,7 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SearchViewModel
@@ -45,9 +45,9 @@ import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SearchViewModel
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
-    viewModel: SearchViewModel = viewModel(),
     onPlaceSelected: (name: String, location: Location) -> Unit
 ) {
+    val viewModel: SearchViewModel = hiltViewModel()
     val scope = rememberCoroutineScope()
     var searchText by remember { mutableStateOf("") }
     var hasFocus by remember { mutableStateOf(false) }

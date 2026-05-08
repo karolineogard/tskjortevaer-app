@@ -33,7 +33,6 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -46,13 +45,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,11 +61,11 @@ fun SettingsScreen(
     navController: NavController,
     settingsViewModel: SettingsViewModel
 ) {
-    val savedDepHour   by settingsViewModel.defaultDepartureHour.collectAsState()
-    val savedDepMinute by settingsViewModel.defaultDepartureMinute.collectAsState()
-    val savedRetHour   by settingsViewModel.defaultReturnHour.collectAsState()
-    val savedRetMinute by settingsViewModel.defaultReturnMinute.collectAsState()
-    val savedOffset    by settingsViewModel.temperatureOffset.collectAsState()
+    val savedDepHour   by settingsViewModel.defaultDepartureHour.collectAsStateWithLifecycle()
+    val savedDepMinute by settingsViewModel.defaultDepartureMinute.collectAsStateWithLifecycle()
+    val savedRetHour   by settingsViewModel.defaultReturnHour.collectAsStateWithLifecycle()
+    val savedRetMinute by settingsViewModel.defaultReturnMinute.collectAsStateWithLifecycle()
+    val savedOffset    by settingsViewModel.temperatureOffset.collectAsStateWithLifecycle()
 
     var startHour   by remember(savedDepHour)   { mutableIntStateOf(savedDepHour) }
     var startMinute by remember(savedDepMinute) { mutableIntStateOf(savedDepMinute) }

@@ -8,13 +8,14 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 val Context.settingsDataStore: DataStore<Preferences> by preferencesDataStore(name = "user_settings")
 
@@ -26,7 +27,10 @@ private object SettingsKeys {
     val TEMPERATURE_OFFSET = floatPreferencesKey("temperature_offset")
 }
 
-class SettingsViewModel(private val dataStore: DataStore<Preferences>) : ViewModel() {
+@HiltViewModel
+class SettingsViewModel @Inject constructor(
+    private val dataStore: DataStore<Preferences>
+) : ViewModel() {
 
     val defaultDepartureHour: StateFlow<Int> = dataStore.data
         .map { it[SettingsKeys.DEPARTURE_HOUR] ?: 8 }
@@ -90,11 +94,5 @@ class SettingsViewModel(private val dataStore: DataStore<Preferences>) : ViewMod
                 prefs[SettingsKeys.RETURN_MINUTE]    = returnMinute
             }
         }
-    }
-
-    class Factory(private val context: Context) : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T =
-            SettingsViewModel(context.settingsDataStore) as T
     }
 }

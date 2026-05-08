@@ -23,7 +23,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -34,7 +33,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -47,7 +47,6 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.screens.HomeScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.LocationForecastScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.MapScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.SettingsScreen
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.Grey
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
@@ -57,13 +56,13 @@ import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
 
 @Composable
 fun MapApp(
-    navController: NavHostController = rememberNavController(),
     modifier: Modifier = Modifier,
-    clothesViewModel: ClothesViewModel = viewModel(),
-    locationForecastViewmodel: LocationForecastViewmodel,
-    homeViewModel: HomeViewModel,
-    settingsViewModel: SettingsViewModel = viewModel()
+    navController: NavHostController = rememberNavController()
 ) {
+    val locationForecastViewmodel: LocationForecastViewmodel = hiltViewModel()
+    val homeViewModel: HomeViewModel = hiltViewModel()
+    val settingsViewModel: SettingsViewModel = hiltViewModel()
+    val clothesViewModel: ClothesViewModel = hiltViewModel()
     val context = LocalContext.current
 
     // Nettverksovervåking
@@ -71,10 +70,10 @@ fun MapApp(
     DisposableEffect(Unit) {
         onDispose { networkMonitor.unregister() }
     }
-    val isOnline by networkMonitor.isOnline.collectAsState()
+    val isOnline by networkMonitor.isOnline.collectAsStateWithLifecycle()
 
     // Sync temperatureOffset fra innstillinger til klesanbefalingen
-    val temperatureOffset by settingsViewModel.temperatureOffset.collectAsState()
+    val temperatureOffset by settingsViewModel.temperatureOffset.collectAsStateWithLifecycle()
     LaunchedEffect(temperatureOffset) {
         clothesViewModel.updateTemperatureOffset(temperatureOffset)
     }
@@ -149,7 +148,6 @@ fun MapApp(
                 composable(route = Routes.HOME) {
                     HomeScreen(
                         navController = navController,
-                        viewmodel = locationForecastViewmodel,
                         clothesViewModel = clothesViewModel,
                         homeViewModel = homeViewModel,
                         isOnline = isOnline

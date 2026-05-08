@@ -1,9 +1,11 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    kotlin("plugin.serialization") version "2.0.0"
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
+    kotlin("android")
+    kotlin("plugin.serialization") version "2.2.0"
 }
-
 android {
     namespace = "no.uio.ifi.in2000.ieulrich.team32"
     compileSdk = 36
@@ -11,7 +13,7 @@ android {
     defaultConfig {
         applicationId = "no.uio.ifi.in2000.ieulrich.team32"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -33,6 +35,11 @@ android {
 
         isCoreLibraryDesugaringEnabled = true
     }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
     buildFeatures {
         compose = true
     }
@@ -105,5 +112,10 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     testImplementation("io.mockk:mockk:1.13.8")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+    // hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.navigation.compose)
 
 }
