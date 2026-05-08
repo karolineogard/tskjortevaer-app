@@ -54,6 +54,7 @@ import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.UiState
 
 @Composable
 fun MapApp(
@@ -71,7 +72,16 @@ fun MapApp(
     DisposableEffect(Unit) {
         onDispose { networkMonitor.unregister() }
     }
+
     val isOnline by networkMonitor.isOnline.collectAsStateWithLifecycle()
+    val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+
+// Prøv å laste data på nytt når nett kommer tilbake og vi ikke har data
+    LaunchedEffect(isOnline) {
+        if (isOnline && homeUiState !is UiState.Success) {
+            homeViewModel.loadData()
+        }
+    }
 
     // Sync temperatureOffset fra innstillinger til klesanbefalingen
     val temperatureOffset by settingsViewModel.temperatureOffset.collectAsStateWithLifecycle()
