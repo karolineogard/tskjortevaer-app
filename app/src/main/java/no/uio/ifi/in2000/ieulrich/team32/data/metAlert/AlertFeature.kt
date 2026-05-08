@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AlertFeature(
-    @SerialName("when") val timeInterval: TimeInterval,
     val properties: AlertProperties
 ) {
 }
