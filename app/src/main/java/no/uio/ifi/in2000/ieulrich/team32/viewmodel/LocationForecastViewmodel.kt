@@ -39,8 +39,8 @@ class LocationForecastViewmodel @Inject constructor(
             val location = deviceLocationDataSource.getCurrentLocation()
 
             // fallback to default location if location permission is denied
-            val lat = location?.latitude ?: 59.9432
-            val lon = location?.longitude ?: 10.7173
+            val lat = location?.lat ?: 59.9432
+            val lon = location?.lon ?: 10.7173
 
             if (location == null) {
                 Log.w("LocationDebug", "Location failed, using default (Oslo)")
