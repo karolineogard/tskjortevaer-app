@@ -11,6 +11,7 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.suspendCancellableCoroutine
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.AppLocation
 import javax.inject.Inject
 import kotlin.coroutines.resume
 
@@ -18,7 +19,7 @@ class DeviceLocationDataSource @Inject constructor(
     @ApplicationContext private val context: Context,
     private val locationClient: FusedLocationProviderClient
 ) {
-    suspend fun getCurrentLocation(): Location? {
+    suspend fun getCurrentLocation(): AppLocation? {
         val hasPermission = ActivityCompat.checkSelfPermission(
             context, Manifest.permission.ACCESS_COARSE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
@@ -31,10 +32,13 @@ class DeviceLocationDataSource @Inject constructor(
                 .getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, cts.token)
                 .addOnSuccessListener { location ->
                     if (location != null) {
-                        continuation.resume(location)
+                        continuation.resume(AppLocation(lat = location.latitude, lon = location.longitude))
                     } else {
                         locationClient.lastLocation
-                            .addOnSuccessListener { continuation.resume(it) }
+                            .addOnSuccessListener { lastLocation ->
+                                continuation.resume(
+                                    lastLocation?.let { AppLocation(lat = it.latitude, lon = it.longitude) }
+                                ) }
                             .addOnFailureListener { continuation.resume(null) }
                     }
                 }

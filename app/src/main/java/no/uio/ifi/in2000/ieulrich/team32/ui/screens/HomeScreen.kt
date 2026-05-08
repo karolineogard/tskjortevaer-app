@@ -67,6 +67,7 @@ import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.iconUrl
 import no.uio.ifi.in2000.ieulrich.team32.ui.Routes
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.SearchBar
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.AppLocation
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.UiState
@@ -272,7 +273,7 @@ fun WeatherCard(
     navController: NavController,
     forecastHourDetails: ForecastHourDetails?,
     modifier: Modifier = Modifier,
-    location: Location,
+    location: AppLocation?,
     placeName: String
 ) {
     val svgLoader = rememberSvgImageLoader()
@@ -280,8 +281,8 @@ fun WeatherCard(
         modifier = modifier.height(280.dp).fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         onClick = {
-            val lat = location.latitude
-            val lon = location.longitude
+            val lat = location?.lat
+            val lon = location?.lon
                 navController.navigate("forecast?lat=$lat&lon=$lon&city=Min posisjon")
 
         }

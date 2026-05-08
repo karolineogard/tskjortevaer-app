@@ -25,12 +25,15 @@ import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.AlertsRepository
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import javax.inject.Inject
 import kotlin.coroutines.resume
-
+data class AppLocation(
+    val lat: Double,
+    val lon: Double
+)
 sealed class UiState {
     object Loading : UiState()
 
     data class Success(
-        val location: Location,
+        val location: AppLocation?,
         val forecast: ForecastHourDetails?,
         val place: String,
         val alerts: List<AlertFeature>
@@ -58,8 +61,11 @@ class HomeViewModel @Inject constructor (
             try {
                 Log.d("HomeViewModel", "Prøver å laste data")
                 val location = deviceLocationDataSource.getCurrentLocation()
-                val lat = location?.latitude ?: 59.9432
-                val lon = location?.longitude ?: 10.7173
+                val appLocation = AppLocation(
+                    location?.lat ?: 59.9432,
+                    location?.lon ?: 10.7173)
+                val lat = appLocation.lat
+                val lon = appLocation.lon
 
                 coroutineScope {
                     val forecastDeferred = async { locationForecastRepository.getForecastNow(lat, lon) }
@@ -72,9 +78,7 @@ class HomeViewModel @Inject constructor (
 
                     if (forecast != null){
                         _uiState.value = UiState.Success(
-                            location = location ?: Location("appDefault").apply {
-                                latitude = lat
-                                longitude = lon },
+                            location = appLocation,
                             forecast = forecast,
                             place = place,
                             alerts = alerts
