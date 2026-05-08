@@ -90,7 +90,6 @@ fun LocationForecastScreen(
                     titleContentColor = MaterialTheme.colorScheme.onPrimary,
                     navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
                 ),
-                expandedHeight = 32.dp
             )
         }
     ) { innerPadding: PaddingValues ->

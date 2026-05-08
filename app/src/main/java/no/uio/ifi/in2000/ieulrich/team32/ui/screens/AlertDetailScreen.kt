@@ -42,7 +42,6 @@ fun AlertDetailScreen(
                         )
                     }
                 },
-                expandedHeight = 32.dp,
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
                 )
