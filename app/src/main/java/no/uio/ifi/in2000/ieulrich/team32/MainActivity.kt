@@ -64,6 +64,9 @@ class MainActivity : ComponentActivity() {
                 // TODO: rationale for location permission
                 locationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
             }
+            else -> {
+                locationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+            }
         }
     }
     private val locationPermissionLauncher = registerForActivityResult(
