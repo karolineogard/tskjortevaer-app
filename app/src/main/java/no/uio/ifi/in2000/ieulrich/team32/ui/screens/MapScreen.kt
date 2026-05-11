@@ -65,6 +65,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.ui.layout.HorizontalAlignmentLine
+import androidx.compose.ui.res.painterResource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.SearchBar
@@ -78,6 +79,7 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRød
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGulGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOranjeGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRødGjennomsiktig
+import no.uio.ifi.in2000.ieulrich.team32.R
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -789,7 +791,7 @@ fun AlertsSheetContent(
                     .padding(horizontal = 12.dp, vertical = 4.dp)
             )
             Icon(
-                painter = painterResource(id = R.drawable.arrow_up_icon),
+                painter = painterResource(R.drawable.arrow_up_icon),
                 contentDescription = null,
                 modifier = Modifier.size(20.dp)
             )

@@ -455,8 +455,8 @@ private fun ClothingCard(rec: ClothesRecommendation) {
     Box {
         Card(
             modifier = Modifier
-              .fillMaxWidth()
-              .padding(horizontal = 16.dp, vertical = 4.dp),
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
@@ -478,72 +478,130 @@ private fun ClothingCard(rec: ClothesRecommendation) {
                         modifier = Modifier.weight(1f)
                     )
                     IconButton(onClick = { showInfo = true }, modifier = Modifier.size(24.dp)) {
-                        Icon(Icons.Default.Info, contentDescription = "Info", modifier = Modifier.size(20.dp))
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = "Info",
+                            modifier = Modifier.size(20.dp)
+                        )
                     }
                 }
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-            if (rec.wearSunglasses) ClothingRow(R.drawable.solbriller, stringResource(R.string.clothes_sunglasses))
-            if (rec.wearHatGloves) ClothingRow(R.drawable.caps, stringResource(R.string.clothes_hat_gloves))
-            if (rec.wearScarf) ClothingRow(R.drawable.skjerf, stringResource(R.string.clothes_scarf))
-            if (rec.wearHeavyJacket) ClothingRow(R.drawable.tykk_jakke, stringResource(R.string.clothes_thick_jacket))
-            if (rec.wearLightJacket) ClothingRow(R.drawable.lett_jakke, stringResource(R.string.clothes_thin_jacket))
-            if (rec.wearSweater) ClothingRow(R.drawable.genser, stringResource(R.string.clothes_sweatshirt ))
-            if (rec.wearTshirt) ClothingRow(R.drawable.t_skjorte, stringResource(R.string.clothes_tshirt))
-            if (rec.wearShorts) ClothingRow(R.drawable.shorts, stringResource(R.string.clothes_shorts))
-            if (rec.wearPants) ClothingRow(R.drawable.jeans, stringResource(R.string.clothes_pants))
-            if (rec.wearThermalUnderwear) ClothingRow(R.drawable.jeggings, stringResource(R.string.clothes_thermal_underwear))
+                if (rec.wearSunglasses) ClothingRow(
+                    R.drawable.solbriller,
+                    stringResource(R.string.clothes_sunglasses)
+                )
+                if (rec.wearHatGloves) ClothingRow(
+                    R.drawable.caps,
+                    stringResource(R.string.clothes_hat_gloves)
+                )
+                if (rec.wearScarf) ClothingRow(
+                    R.drawable.skjerf,
+                    stringResource(R.string.clothes_scarf)
+                )
+                if (rec.wearHeavyJacket) ClothingRow(
+                    R.drawable.tykk_jakke,
+                    stringResource(R.string.clothes_thick_jacket)
+                )
+                if (rec.wearLightJacket) ClothingRow(
+                    R.drawable.lett_jakke,
+                    stringResource(R.string.clothes_thin_jacket)
+                )
+                if (rec.wearSweater) ClothingRow(
+                    R.drawable.genser,
+                    stringResource(R.string.clothes_sweatshirt)
+                )
+                if (rec.wearTshirt) ClothingRow(
+                    R.drawable.t_skjorte,
+                    stringResource(R.string.clothes_tshirt)
+                )
+                if (rec.wearShorts) ClothingRow(
+                    R.drawable.shorts,
+                    stringResource(R.string.clothes_shorts)
+                )
+                if (rec.wearPants) ClothingRow(
+                    R.drawable.jeans,
+                    stringResource(R.string.clothes_pants)
+                )
+                if (rec.wearThermalUnderwear) ClothingRow(
+                    R.drawable.jeggings,
+                    stringResource(R.string.clothes_thermal_underwear)
+                )
 
-            if (rec.wearWinterBoots) {
-                ClothingRow(R.drawable.st_vler, stringResource(R.string.clothes_winter_boots))
-            } else if (rec.wearWaterproofShoes) {
-                ClothingRow(R.drawable.st_vler, stringResource(R.string.clothes_waterproof_shoes))
-            } else {
-                ClothingRow(R.drawable.sneaker, stringResource(R.string.clothes_shoes))
+                if (rec.wearWinterBoots) {
+                    ClothingRow(R.drawable.st_vler, stringResource(R.string.clothes_winter_boots))
+                } else if (rec.wearWaterproofShoes) {
+                    ClothingRow(
+                        R.drawable.st_vler,
+                        stringResource(R.string.clothes_waterproof_shoes)
+                    )
+                } else {
+                    ClothingRow(R.drawable.sneaker, stringResource(R.string.clothes_shoes))
+                }
             }
-        }
 
-        if (showInfo) {
-            Card(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-            ) {
-                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
-                    Text("Info kommer", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-                    IconButton(onClick = { showInfo = false }, modifier = Modifier.size(20.dp)) {
-                        Icon(Icons.Default.Close, contentDescription = "Lukk", modifier = Modifier.size(16.dp))
+            if (showInfo) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                ) {
+                    Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
+                        Text(
+                            "Info kommer",
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.weight(1f)
+                        )
+                        IconButton(
+                            onClick = { showInfo = false },
+                            modifier = Modifier.size(20.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Lukk",
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
                     }
                 }
             }
         }
     }
 }
-
 @Composable
-private fun RainCard(rec: ClothesRecommendation) {
+fun RainCard(rec: ClothesRecommendation) {
     Card(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             if (rec.bringUmbrella) {
-                ClothingRow(R.drawable.paraply_ikon, stringResource(R.string.clothes_bring_umbrella))
+                ClothingRow(
+                    R.drawable.paraply_ikon,
+                    stringResource(R.string.clothes_bring_umbrella)
+                )
             }
             if (rec.wearRainGear) {
-                ClothingRow(R.drawable.paraply_ikon, stringResource(R.string.clothes_wear_rain_gear))
+                ClothingRow(
+                    R.drawable.paraply_ikon,
+                    stringResource(R.string.clothes_wear_rain_gear)
+                )
             }
         }
     }
 }
 
 @Composable
-private fun ClothingRow(iconRes: Int, text: String) {
+fun ClothingRow(iconRes: Int, text: String) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(painter = painterResource(id = iconRes), contentDescription = null, modifier = Modifier.size(48.dp))
+        Image(
+            painter = painterResource(id = iconRes),
+            contentDescription = null,
+            modifier = Modifier.size(48.dp)
+        )
         Spacer(modifier = Modifier.width(16.dp))
         Text(text = text, modifier = Modifier.weight(1f))
     }

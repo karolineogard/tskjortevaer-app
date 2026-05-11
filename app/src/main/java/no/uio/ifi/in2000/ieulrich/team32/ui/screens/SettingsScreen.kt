@@ -187,7 +187,7 @@ fun SettingsScreen(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(
                               painter = painterResource(id = R.drawable.ispinne_ikon), 
-                              contentDescription = stringResource(R.string.settings_cold_description
+                              contentDescription = stringResource(R.string.settings_cold_description)
                             )
                             Text(
                               stringResource(R.string.settings_cold),
@@ -200,8 +200,8 @@ fun SettingsScreen(
                           onValueChange = { sliderValue = it })
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(
-                              painter = painterResource(id = R.drawable.viking_ikon), 
-                              contentDescription = contentDescription = stringResource(R.string.settings_warm_description)
+                                painter = painterResource(id = R.drawable.viking_ikon),
+                                contentDescription = stringResource(R.string.settings_warm_description)
                             )
                             Text(
                               stringResource(R.string.settings_warm), 
