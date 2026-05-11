@@ -49,7 +49,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -245,7 +244,7 @@ fun MetalertCard(
             .height(80.dp)
             .clickable { onClick(metAlert) },
         colors = CardDefaults.cardColors(
-            containerColor = when (alert.properties.severity.lowercase()) {
+            containerColor = when (alert.properties.severity?.lowercase()) {
                 "moderate" -> FarevarselGulGjennomsiktig
                 "severe"   -> FarevarselOranjeGjennomsiktig
                 "extreme"  -> FarevarselRødGjennomsiktig
@@ -401,7 +400,7 @@ fun ClothingCard(
                 ) {
                     Spacer(modifier = Modifier.width(60.dp))
                     Text(
-                        text = stringResource(R.string.home_outfit),
+                        text = "Bekledning",
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.weight(2f),
                         textAlign = TextAlign.Center
@@ -439,19 +438,14 @@ fun ClothingCard(
                 HorizontalDivider()
 
                 if (isLoading) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
+                    Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(modifier = Modifier.size(32.dp))
                     }
                 } else if (recommendation != null) {
                     ClothingCardRecommendationRows(rec = recommendation!!)
                 } else {
                     Text(
-                        text = stringResource(R.string.home_no_recommendation),
+                        text = "Ingen værdata tilgjengelig ennå.",
                         modifier = Modifier.padding(8.dp),
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -480,21 +474,18 @@ fun ClothingCard(
                         ) {
                             Spacer(modifier = Modifier.size(48.dp))
                             Text(
-                                text = stringResource(R.string.home_recommendation_title),
+                                text = "Anbefaling",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.weight(2f),
                                 textAlign = TextAlign.Center
                             )
                             IconButton(onClick = { showInfo = false }) {
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = stringResource(R.string.close_button)
-                                )
+                                Icon(Icons.Default.Close, contentDescription = "Lukk")
                             }
                         }
                         Text(
-                            text = stringResource(R.string.home_info_text),
+                            text = "Anbefalingen tar utgangspunkt i fremkomst til og fra skole eller jobb. Vi antar at reisetidspunktet skjer mellom 8–10 på morgenen og 16–18 på kvelden.",
                             style = MaterialTheme.typography.bodyMedium
                         )
                         OutlinedButton(
@@ -507,7 +498,7 @@ fun ClothingCard(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
-                                text = stringResource(R.string.home_preferences),
+                                text = "Jeg har andre behov",
                                 color = Color.Black
                             )
                             Icon(
