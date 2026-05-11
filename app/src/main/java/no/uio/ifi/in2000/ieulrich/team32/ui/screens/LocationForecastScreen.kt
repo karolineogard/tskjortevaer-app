@@ -58,6 +58,7 @@ fun LocationForecastScreen(
     viewmodel: LocationForecastViewmodel,
     lat: Double?,
     lon: Double?,
+    city: String = "Værvarsel",
     navController: NavController
 ) {
     if (lat == null || lon == null) {
@@ -68,17 +69,13 @@ fun LocationForecastScreen(
         }
     }
 
+    val forecast by viewmodel.forecast.collectAsStateWithLifecycle()
     val groupedByDay = viewmodel.forecastByDay.collectAsStateWithLifecycle()
-    val place = viewmodel.placeName.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = place.value,
-                        fontWeight = FontWeight.Bold
-                    ) },
+                title = { Text(city, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -142,7 +139,7 @@ fun DayForecastCard(
         Column {
             Text(
                 text = date,
-                fontSize = 20.sp,
+                style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(16.dp)
             )
@@ -160,29 +157,28 @@ fun DayForecastCard(
                 ) {
                     Spacer(modifier = Modifier.weight(1.3f))
                     Text(
-                        text = "Tid",
-                        fontSize = 13.sp,
-                        modifier = Modifier.weight(1f)
+                      text = "Tid", 
+                      style = MaterialTheme.typography.bodySmall, 
+                      modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.weight(0.5f))
                     Text(
-                        text = "Temp",
-                        fontSize = 13.sp,
-                        modifier = Modifier.weight(1f)
+                      text = "Temp", 
+                      style = MaterialTheme.typography.bodySmall, 
+                      modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.weight(0.5f))
                     Text(
-                        text = "Regn",
-                        fontSize = 13.sp,
-                        modifier = Modifier.weight(1f)
+                      text = "Regn", 
+                      style = MaterialTheme.typography.bodySmall, 
+                      modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.weight(0.5f))
                     Text(
-                        text = "Vind",
-                        fontSize = 13.sp,
-                        modifier = Modifier.weight(1f)
+                      text = "Vind", 
+                      style = MaterialTheme.typography.bodySmall, 
+                      modifier = Modifier.weight(1f)
                     )
-                    Spacer(modifier = Modifier.weight(0.5f))
                 }
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                 forecastForDay.forEachIndexed { index, details ->
@@ -194,7 +190,8 @@ fun DayForecastCard(
                         windDirection = details.windDirection,
                         precipitationAmount = Format.formatPrecipitation(details.precipitationAmount),
                         symbolCode = details.symbolCode,
-                        compact = true
+                        compact = true,
+                        tempColor = if (details.temperature <= 0.0) Color(0xFF1565C0) else Color(0xFFB71C1C)
                     )
 
                 }
@@ -224,20 +221,21 @@ fun DayForecastCard(
                                 .weight(0.8f),
                             contentScale = ContentScale.Fit
                         )
-                        Text(text = interval, fontSize = 13.sp, modifier = Modifier.weight(1.5f))
+                        Text(text = interval, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1.5f))
                         Text(
                             text = Format.formatTemp(maxTemp),
-                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (maxTemp <= 0.0) Color(0xFF1565C0) else Color(0xFFB71C1C),
                             modifier = Modifier.weight(1f)
                         )
                         Text(
                             text = Format.formatPrecipitation(totalPrecipitation),
-                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.weight(1f)
                         )
                         Text(
                             text = Format.formatWind(avgWind),
-                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.weight(1f)
                         )
                     }

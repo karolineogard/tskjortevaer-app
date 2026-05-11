@@ -15,8 +15,8 @@ class MetAlertsDatasource @Inject constructor(private val client: HttpClient) {
             val response = client.get(
                 "https://in2000.api.met.no/weatherapi/metalerts/2.0/current.json"
             ) {
-                parameter("lat", lat)
-                parameter("lon", lon)
+                parameter("lat", "%.4f".format(lat))
+                parameter("lon", "%.4f".format(lon))
                 header("User-Agent", "IN2000 Team 32")
             }
             response.body<MetAlertsResponse>()

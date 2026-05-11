@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,6 +51,7 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
 import kotlin.math.roundToInt
@@ -157,7 +159,7 @@ fun SettingsScreen(
                             painter = painterResource(id = R.drawable.ispinne_ikon),
                             contentDescription = "Ispinne – fryser lett"
                         )
-                        Text("Ispinne", fontSize = 12.sp)
+                        Text("Ispinne", style = MaterialTheme.typography.bodySmall)
                     }
                     AdjustmentSlider(
                         modifier = Modifier.weight(1f),
@@ -169,7 +171,7 @@ fun SettingsScreen(
                             painter = painterResource(id = R.drawable.viking_ikon),
                             contentDescription = "Viking – varm av seg"
                         )
-                        Text("Viking", fontSize = 12.sp)
+                        Text("Viking", style = MaterialTheme.typography.bodySmall)
                     }
                 }
             }
@@ -185,12 +187,12 @@ fun SettingsScreen(
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         "Reiser du fast til andre tidspunkter?",
-                        fontSize = 16.sp,
+                        style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
-                    Text("Dra", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+                    Text("Dra", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
                     Spacer(modifier = Modifier.height(8.dp))
                     TimeInputField(
                         initialHour = startHour,
@@ -203,7 +205,7 @@ fun SettingsScreen(
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
-                    Text("Tilbake", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+                    Text("Tilbake", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
                     Spacer(modifier = Modifier.height(8.dp))
                     TimeInputField(
                         initialHour = endHour,
@@ -221,6 +223,7 @@ fun SettingsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 OutlinedButton(
+                    border = BorderStroke(2.dp, MediumBlue),
                     onClick = {
                         val offsetDegrees = (sliderValue - 50f) / 50f * 5f
                         settingsViewModel.saveSettings(

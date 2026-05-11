@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -55,6 +56,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
@@ -67,10 +69,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.R
-import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
@@ -153,7 +155,7 @@ fun ClothesScreen(
             ) {
                 Text(
                     text = "Tilpass klesanbefaling",
-                    fontSize = 20.sp,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
                 )
@@ -185,8 +187,8 @@ fun ClothesScreen(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Når reiser du?", fontSize = 32.sp, fontWeight = FontWeight.Bold)
-                        Text("Dra", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+                        Text("Når reiser du?", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                        Text("Dra", fontWeight = FontWeight.SemiBold,style = MaterialTheme.typography.bodySmall)
                         TimeInputField(
                             initialHour = localDepHour,
                             initialMinute = localDepMinute,
@@ -196,7 +198,7 @@ fun ClothesScreen(
                             }
                         )
                         HorizontalDivider()
-                        Text("Tilbake", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+                        Text("Tilbake", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodySmall)
                         TimeInputField(
                             initialHour = localRetHour,
                             initialMinute = localRetMinute,
@@ -289,6 +291,7 @@ fun ClothesScreen(
                 }
 
                 OutlinedButton(
+                    border = BorderStroke(2.dp, MediumBlue),
                     onClick = {
                         clothesViewModel.updateSettings(
                             departureHour = localDepHour,
@@ -340,16 +343,17 @@ fun ClothesScreen(
                     contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
                     item {
-                        Text(text = "Klær", fontSize = 48.sp)
+                        Text(text = "Klær", style = MaterialTheme.typography.titleLarge)
                         Spacer(modifier = Modifier.size(4.dp))
                         Text(
                             text = "Anbefalingen tar utgangspunkt i fremkomst til og fra skole eller jobb.\n" +
-                                    "Swipe opp for å tilpasse klesanbefalingen!"
+                                    "Swipe opp for å tilpasse klesanbefalingen!",
+                            style = MaterialTheme.typography.bodyMedium
                         )
                         Spacer(modifier = Modifier.size(4.dp))
                         Text(
                             text = today,
-                            fontSize = 14.sp,
+                            style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.padding(top = 4.dp)
                         )
@@ -358,7 +362,7 @@ fun ClothesScreen(
                                 settings.departureHour, settings.departureMinute,
                                 settings.returnHour, settings.returnMinute
                             ),
-                            fontSize = 14.sp,
+                            style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.padding(top = 4.dp)
                         )
@@ -405,15 +409,16 @@ private fun EffectiveTempCard(rec: ClothesRecommendation) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("Effektiv temperatur", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+            Text("Effektiv temperatur", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
             Text(
-                text = Format.formatTemp(rec.effectiveTemp),
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold
+                text = "%.1f°C".format(rec.effectiveTemp),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                color = if (rec.effectiveTemp <= 0.0) Color(0xFF1565C0) else Color(0xFFB71C1C)
             )
             Text(
                 text = "Justert for vind, skydekke og aktivitet",
-                fontSize = 12.sp,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
         }
@@ -442,7 +447,7 @@ private fun ClothingCard(rec: ClothesRecommendation) {
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
                     text = "Klesanbefaling",
-                    fontSize = 18.sp,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f)
                 )
@@ -532,7 +537,7 @@ fun TopBanner(message: String, onDismiss: () -> Unit) {
             Text(
                 text = message,
                 color = MaterialTheme.colorScheme.surfaceVariant,
-                fontSize = 13.sp,
+                style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.weight(1f)
             )
         }
