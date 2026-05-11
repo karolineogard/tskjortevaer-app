@@ -12,20 +12,20 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun WindDirectionArrow(
-    degrees: Float,
+    degrees: Double,
     modifier: Modifier = Modifier
 ){
         Icon(
             imageVector = Icons.Filled.North,
             contentDescription = "Vindretning",
             modifier = modifier
-                .size(48.dp)
-                .rotate(degrees)
+                .size(16.dp)
+                .rotate(degrees.toFloat())
         )
 }
 
 @Preview
 @Composable
 fun PreviewWindDirectionArrow(){
-    WindDirectionArrow(degrees = 11f)
+    WindDirectionArrow(degrees = 11.0)
 }
