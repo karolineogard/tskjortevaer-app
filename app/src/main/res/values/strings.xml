@@ -4,6 +4,8 @@
     <string name="degree_sign">°</string>
     <string name="info_button">Info</string>
     <string name="close_button">Lukk</string>
+    <string name="error_no_internet">Ingen internettforbindelse</string>
+    <string name="error_no_internet_text">Koble til internett for å se værdata og klesanbefalinger.</string>
 
     <!-- Navbar -->
     <string name="navbar_back_description">Tilbake</string>
@@ -24,6 +26,19 @@
     <string name="home_recommendation_title">Anbefaling</string>
     <string name="home_info_text">Anbefalingen tar utgangspunkt i fremkomst til og fra skole eller jobb. Vi antar at reisetidspunktet skjer mellom 8–10 på morgenen og 16–18 på kvelden.</string>
     <string name="home_preferences">Jeg har andre behov</string>
+    <string name="home_heavy_jacket">Tykk jakke</string>
+    <string name="home_light_jacket">Lett jakke</string>
+    <string name="home_sweatshirt">Genser</string>
+    <string name="home_tshirt">T-skjorte</string>
+    <string name="home_upper_default">Lett bekledning</string>
+    <string name="home_shorts">shorts</string>
+    <string name="home_pants">lange bukser</string>
+    <string name="home_rain">Det kan være lurt å ha med paraply eller regnjakke</string>
+    <string name="home_no_rain">Det er ikke nødvendig å ta med paraply eller regnjakke</string>
+    <string name="home_outfit_summary">%1$s og %2$s</string>
+    <string name="home_clothing_explanation_title">For deg som pendler</string>
+    <string name="home_clothing_explanation_text">Basert på værmeldingen kl 08-10 og 16-18</string>
+
 
     <!-- Clothes screen -->
     <string name="clothes_outdoors">Skal du være utendørs?</string>
@@ -41,6 +56,8 @@
     <string name="clothes_no_data">Ingen værdata tilgjengelig. Prøv å søk opp et sted på hjemskjermen først.</string>
     <string name="clothes_effective_temp_text">Justert for vind, skydekke og aktivitet</string>
     <string name="clothes_recommendation">Klesanbefaling</string>
+    <string name="clothes_effective_temp_info_text">Info kommer</string>
+    <string name="clothes_clothing_info_text">Info kommer</string>
 
     <!-- text for each clothing item -->
     <string name="clothes_sunglasses">Solbriller anbefales — det er sol</string>
