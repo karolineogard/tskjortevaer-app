@@ -121,7 +121,7 @@ fun HomeScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator( color = Color.Blue)
                     }
                 }
             }
@@ -375,22 +375,45 @@ fun ClothingCard(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
             onClick = { navController.navigate(Routes.CLOTHES) }
         ) {
-            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 // Tittelrad
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Spacer(modifier = Modifier.size(48.dp))
+                    Spacer(modifier = Modifier.width(60.dp))
                     Text(
-                        text = "Bekledning",
-                        fontSize = 30.sp,
-                        modifier = Modifier.weight(2f),
-                        textAlign = TextAlign.Center
+                        text = "Klesanbefaling",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.weight(1f)
                     )
                     IconButton(onClick = { showInfo = !showInfo }) {
-                        Icon(Icons.Default.Info, contentDescription = "Info")
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Info",
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
+                }
+
+                // Undertekster med mindre mellomrom og riktig innrykk
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Spacer(modifier = Modifier.width(60.dp))
+                        Text(
+                            text = "For deg som pendler:",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Spacer(modifier = Modifier.width(60.dp))
+                        Text(
+                            text = "Basert på værmeldingen kl 08-10 og 16-18",
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
                 }
 
@@ -454,11 +477,15 @@ fun ClothingCard(
                             ),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(text = "Jeg har andre behov")
+                            Text(
+                                text = "Jeg har andre behov",
+                                color = Color.Black
+                            )
                             Icon(
                                 painter = painterResource(id = R.drawable.arrow_forward_icon),
                                 contentDescription = null,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(20.dp),
+                                tint = Color.Black
                             )
                         }
                     }
@@ -477,65 +504,59 @@ fun rememberSvgImageLoader(): ImageLoader{
             .build()
     }
 }
+
 @Composable
 private fun ClothingCardRecommendationRows(rec: ClothesRecommendation) {
-    // Hodeplagg (kun hvis relevant)
-    if (rec.wearSunglasses) {
-        ClothingCardRow(iconRes = R.drawable.solbriller, text = "Solbriller anbefales — det er sol.")
-    }
-    if (rec.wearHatGloves) {
-        ClothingCardRow(iconRes = R.drawable.caps, text = "Lue og hansker anbefales.")
-    }
-    if (rec.wearScarf) {
-        ClothingCardRow(iconRes = R.drawable.skjerf, text = "Ta på skjerf.")
-    }
+    Column(
+        modifier = Modifier.padding(bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
 
-    // Overkropp
-    when {
-        rec.wearTshirt      -> ClothingCardRow(iconRes = R.drawable.t_skjorte, text = "T-skjorte holder fint.")
-        rec.wearSweater     -> ClothingCardRow(iconRes = R.drawable.genser,     text = "Genser passer bra.")
-        rec.wearLightJacket -> ClothingCardRow(iconRes = R.drawable.lett_jakke,     text = "Ta på en lett jakke.")
-        rec.wearHeavyJacket -> ClothingCardRow(iconRes = R.drawable.tykk_jakke,     text = "Tykk jakke anbefales.")
-    }
-    if (rec.wearThermalUnderwear) {
-        ClothingCardRow(iconRes = R.drawable.tskjorte_ikon, text = "Ullundertøy er lurt.")
-    }
+    ) {
+        // Hovedbekledning (Overdel og underdel)
+        val upper = when {
+            rec.wearHeavyJacket -> "Tykk jakke"
+            rec.wearLightJacket -> "Lett jakke"
+            rec.wearSweater -> "Genser"
+            rec.wearTshirt -> "T-skjorte"
+            else -> "Lett bekledning"
+        }
+        val lower = if (rec.wearShorts) "shorts" else "lange bukser"
+        val clothingSummary = "$upper og $lower"
+        
+        val rainsuggestion = if (rec.bringUmbrella || rec.wearRainGear) {
+            "Det kan være lurt å ha med paraply eller regnjakke"
+        } else {
+            "Det er ikke nødvendig å ta med paraply eller regnjakke"
+        }
 
-    // Underkropp
-    if (rec.wearShorts) {
-        ClothingCardRow(iconRes = R.drawable.shorts, text = "Shorts passer fint.")
-    } else {
-        ClothingCardRow(iconRes = R.drawable.jeans, text = "Bukse passer til temperaturen.")
-    }
+        ClothingCardRow(
+            iconRes = R.drawable.henger,
+            text = clothingSummary
+        )
 
-    // Sko
-    when {
-        rec.wearWinterBoots     -> ClothingCardRow(iconRes = R.drawable.st_vler, text = "Vintersko/støvler anbefales.")
-        rec.wearWaterproofShoes -> ClothingCardRow(iconRes = R.drawable.st_vler, text = "Vanntette sko anbefales.")
-        else                    -> ClothingCardRow(iconRes = R.drawable.sneaker, text = "Hverdagssko passer fint.")
-    }
-
-    // Regn
-    if (rec.bringUmbrella) {
-        ClothingCardRow(iconRes = R.drawable.paraply_ikon, text = "Husk paraply.")
-    }
-    if (rec.wearRainGear) {
-        ClothingCardRow(iconRes = R.drawable.paraply_ikon, text = "Ta på regntøy.")
+        ClothingCardRow(
+            iconRes = R.drawable.paraply,
+            text = rainsuggestion
+        )
     }
 }
 
 @Composable
 private fun ClothingCardRow(iconRes: Int, text: String) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
             painter = painterResource(id = iconRes),
             contentDescription = null,
-            modifier = Modifier.size(36.dp)
+            modifier = Modifier.size(40.dp)
         )
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(text = text, fontSize = 14.sp, modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.width(20.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyLarge,
+            lineHeight = 28.sp,
+        )
     }
 }
