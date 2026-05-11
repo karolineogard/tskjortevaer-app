@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import no.uio.ifi.in2000.ieulrich.team32.R
@@ -35,6 +36,7 @@ fun ForecastHour(
     precipitationAmount: String,
     symbolCode: String,
     compact: Boolean = false,
+    tempColor: Color = Color.Unspecified,
     forecastHourDetails: ForecastHourDetails?=null
 )
 
@@ -87,6 +89,7 @@ fun ForecastHour(
         Text(
             temp,
             fontSize = size,
+            color = tempColor,
             modifier = Modifier
                 .weight(1f),
             textAlign = TextAlign.Left

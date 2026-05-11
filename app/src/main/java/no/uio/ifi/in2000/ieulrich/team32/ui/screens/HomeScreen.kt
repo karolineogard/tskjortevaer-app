@@ -69,6 +69,9 @@ import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.iconUrl
 import no.uio.ifi.in2000.ieulrich.team32.ui.Routes
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.SearchBar
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGulGjennomsiktig
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOranjeGjennomsiktig
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRødGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.AppLocation
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
@@ -239,7 +242,12 @@ fun MetalertCard(
             .height(80.dp)
             .clickable { onClick(metAlert) },
         colors = CardDefaults.cardColors(
-            containerColor = SeverityColor(alert.properties.severity).copy(alpha = 0.2f)
+            containerColor = when (alert.properties.severity?.lowercase()) {
+                "moderate" -> FarevarselGulGjennomsiktig
+                "severe"   -> FarevarselOranjeGjennomsiktig
+                "extreme"  -> FarevarselRødGjennomsiktig
+                else       -> Color.LightGray
+            }
         ),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -352,9 +360,11 @@ fun WeatherCard(
                         }
                     )
                     Spacer(modifier = Modifier.width(5.dp))
+                    val tempColor = if (details.temperature <= 0.0) Color(0xFF1565C0) else Color(0xFFB71C1C)
                     Text(
                         text = Format.formatTemp(details.temperature),
-                        style = MaterialTheme.typography.titleLarge)
+                        style = MaterialTheme.typography.titleLarge,
+                        color = tempColor)
                 }
 
             }
