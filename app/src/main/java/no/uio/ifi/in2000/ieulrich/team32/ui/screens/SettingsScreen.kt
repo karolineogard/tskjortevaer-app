@@ -47,6 +47,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -103,10 +104,17 @@ fun SettingsScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Innstillinger", fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        stringResource(R.string.settings_title),
+                        fontWeight = FontWeight.Bold
+                    ) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Tilbake")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.navbar_back_description)
+                        )
                     }
                 },
                 expandedHeight = 32.dp,
@@ -126,12 +134,17 @@ fun SettingsScreen(
                     bottom = innerPadding.calculateBottomPadding()
                 )
         ) {
-            Text("Preferanser", fontWeight = FontWeight.Bold)
+            Text(
+                stringResource(R.string.settings_preferences),
+                fontWeight = FontWeight.Bold
+            )
 
             // Kort 1 — Temperaturjustering
             Box {
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    modifier = Modifier
+                      .fillMaxWidth()
+                      .padding(vertical = 8.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
                     val degrees = ((sliderValue - 50f) / 50f * 5).roundToInt()
@@ -145,7 +158,9 @@ fun SettingsScreen(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("Hvor varm er du?", fontWeight = FontWeight.Bold)
+                            Text(
+                              stringResource(R.string.settings_heat_level),
+                              fontWeight = FontWeight.Bold)
                             IconButton(onClick = { showSliderInfo = true }) {
                                 Icon(Icons.Default.Info, contentDescription = "Info", modifier = Modifier.size(20.dp))
                             }
@@ -159,7 +174,7 @@ fun SettingsScreen(
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = tempColor
-                        )
+                        ) //TODO: stringResource?
 
                         Spacer(modifier = Modifier.height(8.dp))
                     }
@@ -170,13 +185,28 @@ fun SettingsScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(painter = painterResource(id = R.drawable.ispinne_ikon), contentDescription = "Ispinne – fryser lett")
-                            Text("Ispinne", style = MaterialTheme.typography.bodySmall)
+                            Icon(
+                              painter = painterResource(id = R.drawable.ispinne_ikon), 
+                              contentDescription = stringResource(R.string.settings_cold_description)
+                            )
+                            Text(
+                              stringResource(R.string.settings_cold),
+                              style = MaterialTheme.typography.bodySmall
+                            )
                         }
-                        AdjustmentSlider(modifier = Modifier.weight(1f), value = sliderValue, onValueChange = { sliderValue = it })
+                        AdjustmentSlider(
+                          modifier = Modifier.weight(1f), 
+                          value = sliderValue, 
+                          onValueChange = { sliderValue = it })
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(painter = painterResource(id = R.drawable.viking_ikon), contentDescription = "Viking – varm av seg")
-                            Text("Viking", style = MaterialTheme.typography.bodySmall)
+                            Icon(
+                                painter = painterResource(id = R.drawable.viking_ikon),
+                                contentDescription = stringResource(R.string.settings_warm_description)
+                            )
+                            Text(
+                              stringResource(R.string.settings_warm), 
+                              style = MaterialTheme.typography.bodySmall
+                            )
                         }
                     }
 
@@ -185,14 +215,26 @@ fun SettingsScreen(
 
                 if (showSliderInfo) {
                     Card(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                        modifier = Modifier
+                          .fillMaxWidth()
+                          .padding(vertical = 8.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
                     ) {
                         Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
-                            Text("Info kommer", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-                            IconButton(onClick = { showSliderInfo = false }, modifier = Modifier.size(20.dp)) {
-                                Icon(Icons.Default.Close, contentDescription = "Lukk", modifier = Modifier.size(16.dp))
+                            Text(
+                              "Info kommer", 
+                              style = MaterialTheme.typography.bodySmall, 
+                              modifier = Modifier.weight(1f)
+                            )
+                            IconButton(
+                              onClick = { showSliderInfo = false }, 
+                              modifier = Modifier.size(20.dp)
+                            ) {
+                                Icon(
+                                  Icons.Default.Close, 
+                                  contentDescription = "Lukk", 
+                                  modifier = Modifier.size(16.dp))
                             }
                         }
                     }
@@ -202,7 +244,9 @@ fun SettingsScreen(
             // Kort 2 — Reisetider
             Box {
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    modifier = Modifier
+                      .fillMaxWidth()
+                      .padding(vertical = 8.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -212,24 +256,43 @@ fun SettingsScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                "Reiser du fast til andre tidspunkter?",
+                                stringResource(R.string.settings_traveltimes),
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.weight(1f)
                             )
                             IconButton(onClick = { showTimeInfo = true }) {
-                                Icon(Icons.Default.Info, contentDescription = "Info", modifier = Modifier.size(20.dp))
+                                Icon(
+                                  Icons.Default.Info, 
+                                  contentDescription = "Info", 
+                                  modifier = Modifier.size(20.dp))
                             }
                         }
 
                         Spacer(modifier = Modifier.height(12.dp))
-                        Text("Dra", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
+                        Text(
+                          stringResource(R.string.settings_leave),
+                          style = MaterialTheme.typography.bodyLarge, 
+                          fontWeight = FontWeight.SemiBold
+                        )
                         Spacer(modifier = Modifier.height(8.dp))
-                        TimeInputField(initialHour = startHour, initialMinute = startMinute, onTimeChanged = { h, m -> startHour = h; startMinute = m })
+                        TimeInputField(
+                          initialHour = startHour, 
+                          initialMinute = startMinute, 
+                          onTimeChanged = { h, m -> startHour = h; startMinute = m }
+                        )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
-                        Text("Tilbake", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
+                        Text(
+                          stringResource(R.string.settings_return),
+                          style = MaterialTheme.typography.bodyLarge, 
+                          fontWeight = FontWeight.SemiBold
+                        )
                         Spacer(modifier = Modifier.height(8.dp))
-                        TimeInputField(initialHour = endHour, initialMinute = endMinute, onTimeChanged = { h, m -> endHour = h; endMinute = m })
+                        TimeInputField(
+                          initialHour = endHour, 
+                          initialMinute = endMinute, 
+                          onTimeChanged = { h, m -> endHour = h; endMinute = m }
+                        )
                     }
                 }
 
@@ -277,7 +340,7 @@ fun SettingsScreen(
                         contentColor = MaterialTheme.colorScheme.onSurface
                     )
                 ) {
-                    Text("Lagre")
+                    Text(stringResource(R.string.settings_save))
                 }
             }
         }
