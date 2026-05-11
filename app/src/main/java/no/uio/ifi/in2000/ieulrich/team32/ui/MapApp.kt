@@ -163,12 +163,10 @@ fun MapApp(
                 composable(route = "forecast?lat={lat}&lon={lon}&city={city}") { backStackEntry ->
                     val lat = backStackEntry.arguments?.getString("lat")?.toDoubleOrNull()
                     val lon = backStackEntry.arguments?.getString("lon")?.toDoubleOrNull()
-                    val city = backStackEntry.arguments?.getString("city") ?: "Værvarsel"
                     LocationForecastScreen(
                         viewmodel = locationForecastViewmodel,
                         lat = lat,
                         lon = lon,
-                        city = city,
                         navController = navController
                     )
                 }
