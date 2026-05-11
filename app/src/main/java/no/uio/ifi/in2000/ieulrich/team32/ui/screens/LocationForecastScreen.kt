@@ -49,6 +49,8 @@ import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ForecastHour
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.PlussTekst
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 
 
@@ -58,6 +60,7 @@ fun LocationForecastScreen(
     viewmodel: LocationForecastViewmodel,
     lat: Double?,
     lon: Double?,
+    city: String = "Værvarsel",
     navController: NavController
 ) {
     if (lat == null || lon == null) {
@@ -68,17 +71,13 @@ fun LocationForecastScreen(
         }
     }
 
+    val forecast by viewmodel.forecast.collectAsStateWithLifecycle()
     val groupedByDay = viewmodel.forecastByDay.collectAsStateWithLifecycle()
-    val place = viewmodel.placeName.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = place.value,
-                        fontWeight = FontWeight.Bold
-                    ) },
+                title = { Text(city, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -97,7 +96,7 @@ fun LocationForecastScreen(
         }
     ) { innerPadding: PaddingValues ->
         LazyColumn(
-            modifier = Modifier .padding(
+            modifier = Modifier.padding(
                 top = innerPadding.calculateTopPadding(),
                 start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
                 end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
@@ -106,7 +105,10 @@ fun LocationForecastScreen(
         ) {
             groupedByDay.value?.forEach { (date, forecastForDay) ->
                 item {
-                    DayForecastCard(date = date, forecastForDay = forecastForDay)
+                    DayForecastCard(
+                        date = date,
+                        forecastForDay = forecastForDay
+                    )
                 }
             }
         }
@@ -115,7 +117,10 @@ fun LocationForecastScreen(
 
 
 @Composable
-fun DayForecastCard(date: String, forecastForDay: List<ForecastHourDetails>) {
+fun DayForecastCard(
+    date: String,
+    forecastForDay: List<ForecastHourDetails>
+) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
     val groupedByInterval = forecastForDay.groupBy {
@@ -125,7 +130,10 @@ fun DayForecastCard(date: String, forecastForDay: List<ForecastHourDetails>) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp),
+            .padding(
+                horizontal = 16.dp,
+                vertical = 4.dp
+            ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
@@ -133,7 +141,7 @@ fun DayForecastCard(date: String, forecastForDay: List<ForecastHourDetails>) {
         Column {
             Text(
                 text = date,
-                fontSize = 20.sp,
+                style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(16.dp)
             )
@@ -142,18 +150,37 @@ fun DayForecastCard(date: String, forecastForDay: List<ForecastHourDetails>) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                        .padding(
+                            horizontal = 16.dp,
+                            vertical = 4.dp
+                        ),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Spacer(modifier = Modifier.weight(1.3f))
-                    Text("Tid", fontSize = 13.sp, modifier = Modifier.weight(1f))
+                    Text(
+                      text = "Tid", 
+                      style = MaterialTheme.typography.bodySmall, 
+                      modifier = Modifier.weight(1f)
+                    )
                     Spacer(modifier = Modifier.weight(0.5f))
-                    Text("Temp", fontSize = 13.sp, modifier = Modifier.weight(1f))
+                    Text(
+                      text = "Temp", 
+                      style = MaterialTheme.typography.bodySmall, 
+                      modifier = Modifier.weight(1f)
+                    )
                     Spacer(modifier = Modifier.weight(0.5f))
-                    Text("Regn", fontSize = 13.sp, modifier = Modifier.weight(1f))
+                    Text(
+                      text = "Regn", 
+                      style = MaterialTheme.typography.bodySmall, 
+                      modifier = Modifier.weight(1f)
+                    )
                     Spacer(modifier = Modifier.weight(0.5f))
-                    Text("Vind", fontSize = 13.sp, modifier = Modifier.weight(1f))
+                    Text(
+                      text = "Vind", 
+                      style = MaterialTheme.typography.bodySmall, 
+                      modifier = Modifier.weight(1f)
+                    )
                 }
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                 forecastForDay.forEachIndexed { index, details ->
@@ -162,9 +189,11 @@ fun DayForecastCard(date: String, forecastForDay: List<ForecastHourDetails>) {
                         time = Format.extractHour(details.timestamp),
                         temp = Format.formatTemp(details.temperature),
                         windSpeed = Format.formatWind(details.windSpeed),
+                        windDirection = details.windDirection,
                         precipitationAmount = Format.formatPrecipitation(details.precipitationAmount),
                         symbolCode = details.symbolCode,
-                        compact = true
+                        compact = true,
+                        tempColor = if (details.temperature <= 0.0) MinusTekst else PlussTekst
                     )
 
                 }
@@ -194,20 +223,21 @@ fun DayForecastCard(date: String, forecastForDay: List<ForecastHourDetails>) {
                                 .weight(0.8f),
                             contentScale = ContentScale.Fit
                         )
-                        Text(text = interval, fontSize = 13.sp, modifier = Modifier.weight(1.5f))
+                        Text(text = interval, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1.5f))
                         Text(
                             text = Format.formatTemp(maxTemp),
-                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (maxTemp <= 0.0) MinusTekst else PlussTekst,
                             modifier = Modifier.weight(1f)
                         )
                         Text(
                             text = Format.formatPrecipitation(totalPrecipitation),
-                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.weight(1f)
                         )
                         Text(
                             text = Format.formatWind(avgWind),
-                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.weight(1f)
                         )
                     }

@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import no.uio.ifi.in2000.ieulrich.team32.R
@@ -32,27 +33,30 @@ fun ForecastHour(
     time: String,
     temp: String,
     windSpeed: String,
+    windDirection: Double,
     precipitationAmount: String,
     symbolCode: String,
     compact: Boolean = false,
-    forecastHourDetails: ForecastHourDetails?=null
+    tempColor: Color = Color.Unspecified
 )
 
 {
-    // TODO: må finne ut hvordan jeg kan bruke symbolCode til å hente riktig bilde, prøvde med et eksempel først
-    val size = if (compact) 14.sp else 14.sp
-    val imageSize = if (compact) 36.dp else 64.dp
+    val size = 14.sp
+    val imageSize = 36.dp
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp),
+            .padding(
+                start = 16.dp,
+                end = 16.dp
+            ),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
 
         AsyncImage(
             model = "https://raw.githubusercontent.com/metno/weathericons/refs/heads/main/weather/svg/$symbolCode.svg",
-            contentDescription = "Ikon for ${forecastHourDetails?.symbolCode}",
+            contentDescription = "Ikon for $symbolCode",
             modifier = Modifier
                 .size(imageSize),
             contentScale = ContentScale.Fit,
@@ -60,14 +64,14 @@ fun ForecastHour(
                 when (state) {
                     is coil3.compose.AsyncImagePainter.State.Error -> {
                         Log.e(
-                            "MetAlertIcon",
+                            "ForecastHourIcon",
                             "Feil ved lasting av ikon: ${state.result.throwable.message}"
                         )
-                        Log.e("MetAlertIcon", "Prøvde å hente: ${forecastHourDetails?.imageUrl}")
+                        Log.e("ForecastHourIcon", "Prøvde å hente: $symbolCode")
                     }
 
                     is coil3.compose.AsyncImagePainter.State.Success -> {
-                        Log.d("MetAlertIcon", "Vellykket lasting av: ${forecastHourDetails?.imageUrl}")
+                        Log.d("ForecastHourIcon", "Vellykket lasting av: $symbolCode")
                     }
 
                     else -> {}
@@ -87,6 +91,7 @@ fun ForecastHour(
         Text(
             temp,
             fontSize = size,
+            color = tempColor,
             modifier = Modifier
                 .weight(1f),
             textAlign = TextAlign.Left
@@ -107,13 +112,22 @@ fun ForecastHour(
                 .weight(1f),
             textAlign = TextAlign.Left
         )
-
-
+        WindDirectionArrow(
+            degrees = windDirection,
+            modifier = Modifier
+                .weight(0.5f)
+        )
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewForecastHour(){
-//    ForecastHour("16:00", "17°", "5 m/s", precipitationAmount = "3 mm", symbolCode = "clearsky_day")
-//}
+@Preview(showBackground = true)
+@Composable
+fun PreviewForecastHour(){
+    ForecastHour(
+        time = "16:00",
+        temp = "17°",
+        windSpeed = "5 m/s",
+        precipitationAmount = "3",
+        windDirection = 10.0,
+        symbolCode = "clearsky_day")
+}

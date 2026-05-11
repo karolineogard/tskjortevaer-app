@@ -42,12 +42,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import no.uio.ifi.in2000.ieulrich.team32.data.client.NetworkMonitor
-import no.uio.ifi.in2000.ieulrich.team32.ui.screens.AdjustmentScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.ClothesScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.HomeScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.LocationForecastScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.MapScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.SettingsScreen
+//import no.uio.ifi.in2000.ieulrich.team32.ui.screens.SplashScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.Grey
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
@@ -110,31 +110,33 @@ fun MapApp(
     Scaffold(
         modifier = modifier,
         bottomBar = {
-            NavigationBar {
-                Destination.entries.forEachIndexed { index, destination ->
-                    NavigationBarItem(
-                        selected = currentRoute == destination.route,
-                        onClick = {
-                            navController.navigate(destination.route) {
-                                launchSingleTop = true
-                            }
-                        },
-                        icon = {
-                            Icon(
-                                painter = painterResource(id = destination.icon),
-                                contentDescription = destination.contentDescription
+
+                NavigationBar {
+                    Destination.entries.forEachIndexed { index, destination ->
+                        NavigationBarItem(
+                            selected = currentRoute == destination.route,
+                            onClick = {
+                                navController.navigate(destination.route) {
+                                    launchSingleTop = true
+                                }
+                            },
+                            icon = {
+                                Icon(
+                                    painter = painterResource(id = destination.icon),
+                                    contentDescription = destination.contentDescription
+                                )
+                            },
+                            label = { Text(destination.label, fontWeight = FontWeight.SemiBold) },
+                            colors = NavigationBarItemDefaults.colors(
+                                indicatorColor = MediumBlue,
+                                selectedIconColor = Grey,
+                                selectedTextColor = Grey,
+                                unselectedIconColor = Grey,
+                                unselectedTextColor = Grey
                             )
-                        },
-                        label = { Text(destination.label) },
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = MediumBlue,
-                            selectedIconColor = Grey,
-                            selectedTextColor = Grey,
-                            unselectedIconColor = Grey,
-                            unselectedTextColor = Grey
                         )
-                    )
-                }
+                    }
+
             }
         }
     ) { innerPadding ->
@@ -150,6 +152,8 @@ fun MapApp(
                 popEnterTransition = { fadeIn(animationSpec = tween(400)) },
                 popExitTransition = { fadeOut(animationSpec = tween(400)) }
             ) {
+
+
                 composable(
                     route = Routes.MAP,
                     enterTransition = { EnterTransition.None },
@@ -193,9 +197,6 @@ fun MapApp(
                     )
                 }
 
-                composable(route = Routes.ADJUSTMENT) {
-                    AdjustmentScreen(navController = navController)
-                }
             }
 
             // Ingen-nett-banner — vises øverst på alle skjermer

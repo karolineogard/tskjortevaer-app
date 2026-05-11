@@ -22,6 +22,12 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGul
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGulGjennomsiktig
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOransje
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOranjeGjennomsiktig
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRød
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRødGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.RobotoMono
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -151,9 +157,9 @@ fun InfoSection(label: String, value: String, color: Color = MaterialTheme.color
 
 
 fun SeverityColor(severity: String?): Color = when (severity?.lowercase()){
-    "moderate" -> Color(0xFFFFFF00)
-    "severe"   -> Color(0xFFFFA500)
-    "extreme"  -> Color(0xFFFF0000)
+    "moderate" -> FarevarselGul
+    "severe"   -> FarevarselOransje
+    "extreme"  -> FarevarselRød
     else -> Color.LightGray
 }
 
@@ -183,9 +189,9 @@ fun FormatSeverity(severity: String?): String = when (severity?.lowercase()) {
 @Composable
 fun SeverityLegend(modifier: Modifier = Modifier) {
     val levels = listOf(
-        Triple("minor",    Color(0xFFFFFF00), "Gult: Moderat fare"),
-        Triple("moderate", Color(0xFFFFA500), "Oransje: Stor fare"),
-        Triple("severe",   Color(0xFFFF0000), "Rødt: Ekstrem fare og ekstremvær"),
+        Triple("minor",    FarevarselGul, "Gult: Moderat fare"),
+        Triple("moderate", FarevarselOransje, "Oransje: Stor fare"),
+        Triple("severe",   FarevarselRød, "Rødt: Ekstrem fare og ekstremvær"),
     )
 
     Column(

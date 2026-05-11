@@ -10,7 +10,7 @@ object Routes {
     const val SETTINGS = "settings"
     const val CLOTHES = "clothes"
 
-    const val ADJUSTMENT = "adjustment"
+    const val SPLASH = "splash"
 
 }
 

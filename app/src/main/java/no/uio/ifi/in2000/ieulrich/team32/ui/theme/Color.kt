@@ -19,3 +19,14 @@ val SuperLightBlue = Color(0xffEFFBFF)
 val LightBlue = Color(0xffDBF9FF)
 
 val Unknown = Color(0xffDBF9FF)
+
+val FarevarselGul = Color(0xffFFE600)
+val FarevarselOransje = Color(0xffFF9D00)
+val FarevarselRød = Color(0xffC60000)
+val FarevarselGulGjennomsiktig = Color(0xffFCF8CB)
+val FarevarselOranjeGjennomsiktig = Color(0xffFCF4DF)
+val FarevarselRødGjennomsiktig = Color(0xffF7E3E3)
+
+val PlussTekst = Color(0xffBF1D1D)
+val MinusTekst = Color(0xff0358C7)
+
