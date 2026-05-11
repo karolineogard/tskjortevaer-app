@@ -58,6 +58,7 @@ fun LocationForecastScreen(
     viewmodel: LocationForecastViewmodel,
     lat: Double?,
     lon: Double?,
+    city: String = "Værvarsel",
     navController: NavController
 ) {
     if (lat == null || lon == null) {
@@ -68,17 +69,13 @@ fun LocationForecastScreen(
         }
     }
 
+    val forecast by viewmodel.forecast.collectAsStateWithLifecycle()
     val groupedByDay = viewmodel.forecastByDay.collectAsStateWithLifecycle()
-    val place = viewmodel.placeName.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = place.value,
-                        fontWeight = FontWeight.Bold
-                    ) },
+                title = { Text(city, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -164,7 +161,8 @@ fun DayForecastCard(date: String, forecastForDay: List<ForecastHourDetails>) {
                         windSpeed = Format.formatWind(details.windSpeed),
                         precipitationAmount = Format.formatPrecipitation(details.precipitationAmount),
                         symbolCode = details.symbolCode,
-                        compact = true
+                        compact = true,
+                        tempColor = if (details.temperature <= 0.0) Color(0xFF1565C0) else Color(0xFFB71C1C)
                     )
 
                 }
@@ -198,6 +196,7 @@ fun DayForecastCard(date: String, forecastForDay: List<ForecastHourDetails>) {
                         Text(
                             text = Format.formatTemp(maxTemp),
                             style = MaterialTheme.typography.bodySmall,
+                            color = if (maxTemp <= 0.0) Color(0xFF1565C0) else Color(0xFFB71C1C),
                             modifier = Modifier.weight(1f)
                         )
                         Text(
