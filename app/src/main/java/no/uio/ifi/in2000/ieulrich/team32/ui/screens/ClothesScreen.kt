@@ -414,7 +414,10 @@ private fun EffectiveTempCard(rec: ClothesRecommendation) {
                       fontWeight = FontWeight.SemiBold
                     )
                     IconButton(onClick = { showInfo = true }, modifier = Modifier.size(24.dp)) {
-                        Icon(Icons.Default.Info, contentDescription = "Info", modifier = Modifier.size(20.dp))
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = stringResource(R.string.info_button),
+                            modifier = Modifier.size(20.dp))
                     }
                 }
                 Text(
@@ -433,14 +436,26 @@ private fun EffectiveTempCard(rec: ClothesRecommendation) {
 
         if (showInfo) {
             Card(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
                 Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
-                    Text("Info kommer", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-                    IconButton(onClick = { showInfo = false }, modifier = Modifier.size(20.dp)) {
-                        Icon(Icons.Default.Close, contentDescription = "Lukk", modifier = Modifier.size(16.dp))
+                    Text(
+                        stringResource(R.string.clothes_effective_temp_info_text),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(
+                        onClick = { showInfo = false },
+                        modifier = Modifier.size(20.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = stringResource(R.string.close_button),
+                            modifier = Modifier.size(16.dp))
                     }
                 }
             }
@@ -480,7 +495,7 @@ private fun ClothingCard(rec: ClothesRecommendation) {
                     IconButton(onClick = { showInfo = true }, modifier = Modifier.size(24.dp)) {
                         Icon(
                             Icons.Default.Info,
-                            contentDescription = "Info",
+                            contentDescription = stringResource(R.string.info_button),
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -548,7 +563,7 @@ private fun ClothingCard(rec: ClothesRecommendation) {
                 ) {
                     Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
                         Text(
-                            "Info kommer",
+                            text = stringResource(R.string.clothes_clothing_info_text),
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.weight(1f)
                         )
@@ -558,7 +573,7 @@ private fun ClothingCard(rec: ClothesRecommendation) {
                         ) {
                             Icon(
                                 Icons.Default.Close,
-                                contentDescription = "Lukk",
+                                contentDescription = stringResource(R.string.close_button),
                                 modifier = Modifier.size(16.dp)
                             )
                         }

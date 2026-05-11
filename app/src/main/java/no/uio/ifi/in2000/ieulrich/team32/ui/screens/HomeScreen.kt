@@ -115,12 +115,12 @@ fun HomeScreen(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             Text(
-                                text = "Ingen internettforbindelse",
+                                text = stringResource(R.string.error_no_internet),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "Koble til internett for å se værdata og klesanbefalinger.",
+                                text = stringResource(R.string.error_no_internet_text),
                                 textAlign = TextAlign.Center
                             )
                         }
@@ -147,12 +147,12 @@ fun HomeScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
-                            text = "Kunne ikke hente værdata.",
+                            text = "Kunne ikke hente værdata.", // TODO: Stringres
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Sjekk at du har internettforbindelse og prøv igjen.",
+                            text = "Sjekk at du har internettforbindelse og prøv igjen.", // TODO: stringres
                             textAlign = TextAlign.Center
                         )
                     }
@@ -423,14 +423,14 @@ fun ClothingCard(
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Spacer(modifier = Modifier.width(60.dp))
                         Text(
-                            text = "For deg som pendler:",
+                            text = stringResource(R.string.home_clothing_explanation_title),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Spacer(modifier = Modifier.width(60.dp))
                         Text(
-                            text = "Basert på værmeldingen kl 08-10 og 16-18",
+                            text = stringResource(R.string.home_clothing_explanation_text),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -543,19 +543,20 @@ private fun ClothingCardRecommendationRows(rec: ClothesRecommendation) {
     ) {
         // Hovedbekledning (Overdel og underdel)
         val upper = when {
-            rec.wearHeavyJacket -> "Tykk jakke"
-            rec.wearLightJacket -> "Lett jakke"
-            rec.wearSweater -> "Genser"
-            rec.wearTshirt -> "T-skjorte"
-            else -> "Lett bekledning"
+            rec.wearHeavyJacket -> stringResource(R.string.home_heavy_jacket)
+            rec.wearLightJacket -> stringResource(R.string.home_light_jacket)
+            rec.wearSweater -> stringResource(R.string.home_sweatshirt)
+            rec.wearTshirt -> stringResource(R.string.home_tshirt)
+            else -> stringResource(R.string.home_upper_default)
         }
-        val lower = if (rec.wearShorts) "shorts" else "lange bukser"
-        val clothingSummary = "$upper og $lower"
+        val lower = if (rec.wearShorts) stringResource(R.string.home_shorts)
+         else stringResource(R.string.home_pants)
+        val clothingSummary = stringResource(R.string.home_outfit_summary, upper, lower)
         
         val rainsuggestion = if (rec.bringUmbrella || rec.wearRainGear) {
-            "Det kan være lurt å ha med paraply eller regnjakke"
+            stringResource(R.string.home_rain)
         } else {
-            "Det er ikke nødvendig å ta med paraply eller regnjakke"
+            stringResource(R.string.home_no_rain)
         }
 
         ClothingCardRow(
