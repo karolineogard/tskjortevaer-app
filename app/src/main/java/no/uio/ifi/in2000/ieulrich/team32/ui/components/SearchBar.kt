@@ -34,13 +34,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
-import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SearchViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
@@ -79,29 +77,20 @@ fun SearchBar(
                     searchText = newText
                     viewModel.onQueryChange(newText)
                 },
-                placeholder = {
-                    Text(
-                        text = stringResource(R.string.search_placeholder)
-                    ) },
+                placeholder = { Text("Søk etter by...") },
                 singleLine = true,
                 shape = MaterialTheme.shapes.extraLarge,
                 modifier = Modifier
                     .fillMaxWidth()
                     .onFocusChanged { hasFocus = it.isFocused },
-                leadingIcon = {
-                    Icon(imageVector = Icons.Default.Search,
-                        contentDescription = stringResource(R.string.search_description)
-                    ) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Søk") },
                 trailingIcon = {
                     if (searchText.isNotEmpty()) {
                         IconButton(onClick = {
                             searchText = ""
                             viewModel.onQueryChange("")
                         }) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = stringResource(R.string.search_clear)
-                            )
+                            Icon(Icons.Default.Close, contentDescription = "Tøm")
                         }
                     }
                 },
@@ -137,7 +126,7 @@ fun SearchBar(
         if (showRecent) {
             SearchCard {
                 Text(
-                    text = stringResource(R.string.search_recent),
+                    text = "Sist søkt",
                     style = MaterialTheme.typography.labelMedium,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
@@ -145,10 +134,7 @@ fun SearchBar(
                     ListItem(
                         headlineContent = { Text(name) },
                         leadingContent = {
-                            Icon(
-                                painter = painterResource(android.R.drawable.ic_menu_recent_history),
-                                contentDescription = stringResource(R.string.search_recent)
-                            )
+                            Icon(painterResource(android.R.drawable.ic_menu_recent_history), "Nylige søk")
                         },
                         modifier = Modifier.clickable {
                             scope.launch {

@@ -15,7 +15,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -23,7 +22,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import no.uio.ifi.in2000.ieulrich.team32.R
 
 enum class ActivityLevel(val displayValue: String) {
     LOW("Lav"),
@@ -135,7 +133,7 @@ fun CheckboxSection(
     onActivityLevelChange: (ActivityLevel?) -> Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(stringResource(R.string.clothes_outdoors))
+        Text("Skal du være utendørs")
     }
     Row(verticalAlignment = Alignment.CenterVertically) {
         Checkbox(checked = isOutdoors, onCheckedChange = {
@@ -145,7 +143,7 @@ fun CheckboxSection(
                 onActivityLevelChange(null)
             }
         })
-        Text(stringResource(R.string.check_yes))
+        Text("Ja")
         Spacer(modifier = Modifier.width(16.dp))
         Checkbox(checked = !isOutdoors, onCheckedChange = {
             onOutdoorsChange(!it)
@@ -154,6 +152,6 @@ fun CheckboxSection(
                 onActivityLevelChange(null)
             }
         })
-        Text(stringResource(R.string.check_no))
+        Text("Nei")
     }
 }
