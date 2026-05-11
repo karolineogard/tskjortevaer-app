@@ -89,6 +89,21 @@ fun MapApp(
         clothesViewModel.updateTemperatureOffset(temperatureOffset)
     }
 
+
+    val savedDepHour   by settingsViewModel.defaultDepartureHour.collectAsStateWithLifecycle()
+    val savedDepMinute by settingsViewModel.defaultDepartureMinute.collectAsStateWithLifecycle()
+    val savedRetHour   by settingsViewModel.defaultReturnHour.collectAsStateWithLifecycle()
+    val savedRetMinute by settingsViewModel.defaultReturnMinute.collectAsStateWithLifecycle()
+
+    LaunchedEffect(savedDepHour, savedDepMinute, savedRetHour, savedRetMinute) {
+        clothesViewModel.applyDefaultTimes(
+            departureHour   = savedDepHour,
+            departureMinute = savedDepMinute,
+            returnHour      = savedRetHour,
+            returnMinute    = savedRetMinute
+        )
+    }
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
