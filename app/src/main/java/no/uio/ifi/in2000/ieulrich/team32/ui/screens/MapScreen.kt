@@ -64,6 +64,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.ui.layout.HorizontalAlignmentLine
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.SearchBar
@@ -261,6 +262,7 @@ fun MapScreen(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(top = 48.dp, start = 16.dp, end = 16.dp)
+                        .zIndex(10f)
                 ) {
                     if (isSearchExpanded) {
                         SearchBar(
@@ -776,13 +778,22 @@ fun AlertsSheetContent(
             ) { onHeaderClick() }
             .padding(bottom = 32.dp)
     ) {
-        Text(
-            text = "Gjeldende farevarsler",
-            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-            modifier = Modifier
-                .padding(horizontal = 12.dp, vertical = 4.dp)
-                .align(Alignment.CenterHorizontally)
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Gjeldende farevarsler",
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                modifier = Modifier
+                    .padding(horizontal = 12.dp, vertical = 4.dp)
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.arrow_up_icon),
+                contentDescription = null,
+                modifier = Modifier.size(20.dp)
+            )
+        }
 
         if (alerts.isEmpty()) {
             Text(

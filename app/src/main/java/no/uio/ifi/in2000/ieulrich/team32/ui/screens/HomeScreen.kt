@@ -74,6 +74,8 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGulGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOranjeGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRødGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.PlussTekst
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.AppLocation
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
@@ -361,7 +363,7 @@ fun WeatherCard(
                         }
                     )
                     Spacer(modifier = Modifier.width(5.dp))
-                    val tempColor = if (details.temperature <= 0.0) Color(0xFF1565C0) else Color(0xFFB71C1C)
+                    val tempColor = if (details.temperature <= 0.0) MinusTekst else PlussTekst
                     Text(
                         text = Format.formatTemp(details.temperature),
                         style = MaterialTheme.typography.titleLarge,
@@ -391,14 +393,13 @@ fun ClothingCard(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
             onClick = { navController.navigate(Routes.CLOTHES) }
         ) {
-            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 // Tittelrad
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Spacer(modifier = Modifier.size(48.dp))
+                    Spacer(modifier = Modifier.width(60.dp))
                     Text(
                         text = stringResource(R.string.home_outfit),
                         style = MaterialTheme.typography.titleMedium,
@@ -407,8 +408,30 @@ fun ClothingCard(
                     )
                     IconButton(onClick = { showInfo = !showInfo }) {
                         Icon(
-                            imageVector =Icons.Default.Info,
-                            contentDescription = stringResource(R.string.info_button)
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Info",
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
+                }
+
+                // Undertekster med mindre mellomrom og riktig innrykk
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Spacer(modifier = Modifier.width(60.dp))
+                        Text(
+                            text = "For deg som pendler:",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Spacer(modifier = Modifier.width(60.dp))
+                        Text(
+                            text = "Basert på værmeldingen kl 08-10 og 16-18",
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }
@@ -478,15 +501,20 @@ fun ClothingCard(
                             onClick = { navController.navigate(Routes.CLOTHES) },
                             border = BorderStroke(2.dp, MediumBlue),
                             colors = ButtonDefaults.outlinedButtonColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                contentColor = MaterialTheme.colorScheme.onSurface
                             ),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(text = stringResource(R.string.home_preferences))
+                            Text(
+                                text = stringResource(R.string.home_preferences),
+                                color = Color.Black
+                            )
                             Icon(
                                 painter = painterResource(id = R.drawable.arrow_forward_icon),
                                 contentDescription = null,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(20.dp),
+                                tint = Color.Black
                             )
                         }
                     }
@@ -505,101 +533,39 @@ fun rememberSvgImageLoader(): ImageLoader{
             .build()
     }
 }
+
 @Composable
 private fun ClothingCardRecommendationRows(rec: ClothesRecommendation) {
-    // Hodeplagg (kun hvis relevant)
-    if (rec.wearSunglasses) {
-        ClothingCardRow(
-            iconRes = R.drawable.solbriller,
-            text = stringResource(R.string.clothes_sunglasses)
-        )
-    }
-    if (rec.wearHatGloves) {
-        ClothingCardRow(
-            iconRes = R.drawable.caps,
-            text = stringResource(R.string.clothes_hat_gloves)
-        )
-    }
-    if (rec.wearScarf) {
-        ClothingCardRow(
-            iconRes = R.drawable.skjerf,
-            text = stringResource(R.string.clothes_scarf)
-        )
-    }
+    Column(
+        modifier = Modifier.padding(bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
 
-    // Overkropp
-    when {
-        rec.wearTshirt ->
-            ClothingCardRow(
-                iconRes = R.drawable.t_skjorte,
-                text = stringResource(R.string.clothes_tshirt)
-            )
-        rec.wearSweater ->
-            ClothingCardRow(
-                iconRes = R.drawable.genser,
-                text = stringResource(R.string.clothes_sweatshirt)
-            )
-        rec.wearLightJacket ->
-            ClothingCardRow(
-                iconRes = R.drawable.lett_jakke,
-                text = stringResource(R.string.clothes_thin_jacket)
-            )
-        rec.wearHeavyJacket ->
-            ClothingCardRow(
-                iconRes = R.drawable.tykk_jakke,
-                text = stringResource(R.string.clothes_thick_jacket)
-            )
-    }
-    if (rec.wearThermalUnderwear) {
-        ClothingCardRow(
-            iconRes = R.drawable.tskjorte_ikon,
-            text = stringResource(R.string.clothes_thermal_underwear)
-        )
-    }
+    ) {
+        // Hovedbekledning (Overdel og underdel)
+        val upper = when {
+            rec.wearHeavyJacket -> "Tykk jakke"
+            rec.wearLightJacket -> "Lett jakke"
+            rec.wearSweater -> "Genser"
+            rec.wearTshirt -> "T-skjorte"
+            else -> "Lett bekledning"
+        }
+        val lower = if (rec.wearShorts) "shorts" else "lange bukser"
+        val clothingSummary = "$upper og $lower"
+        
+        val rainsuggestion = if (rec.bringUmbrella || rec.wearRainGear) {
+            "Det kan være lurt å ha med paraply eller regnjakke"
+        } else {
+            "Det er ikke nødvendig å ta med paraply eller regnjakke"
+        }
 
-    // Underkropp
-    if (rec.wearShorts) {
         ClothingCardRow(
-            iconRes = R.drawable.shorts,
-            text = stringResource(R.string.clothes_shorts)
+            iconRes = R.drawable.henger,
+            text = clothingSummary
         )
-    } else {
-        ClothingCardRow(
-            iconRes = R.drawable.jeans,
-            text = stringResource(R.string.clothes_pants)
-        )
-    }
 
-    // Sko
-    when {
-        rec.wearWinterBoots
-            -> ClothingCardRow(
-            iconRes = R.drawable.st_vler,
-            text = stringResource(R.string.clothes_winter_boots)
-            )
-        rec.wearWaterproofShoes ->
-            ClothingCardRow(
-                iconRes = R.drawable.st_vler,
-                text = stringResource(R.string.clothes_waterproof_shoes)
-            )
-        else ->
-            ClothingCardRow(
-                iconRes = R.drawable.sneaker,
-                text = stringResource(R.string.clothes_shoes)
-            )
-    }
-
-    // Regn
-    if (rec.bringUmbrella) {
         ClothingCardRow(
-            iconRes = R.drawable.paraply_ikon,
-            text = stringResource(R.string.clothes_bring_umbrella)
-        )
-    }
-    if (rec.wearRainGear) {
-        ClothingCardRow(
-            iconRes = R.drawable.paraply_ikon,
-            text = stringResource(R.string.clothes_wear_rain_gear)
+            iconRes = R.drawable.paraply,
+            text = rainsuggestion
         )
     }
 }
@@ -607,19 +573,19 @@ private fun ClothingCardRecommendationRows(rec: ClothesRecommendation) {
 @Composable
 private fun ClothingCardRow(iconRes: Int, text: String) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
             painter = painterResource(id = iconRes),
             contentDescription = null,
-            modifier = Modifier.size(36.dp)
+            modifier = Modifier.size(40.dp)
         )
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(20.dp))
         Text(
             text = text,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.weight(1f)
+            style = MaterialTheme.typography.bodyLarge,
+            lineHeight = 28.sp,
         )
     }
 }

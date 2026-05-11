@@ -31,6 +31,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -40,6 +43,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
@@ -56,7 +60,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
@@ -72,8 +75,10 @@ import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.PlussTekst
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
 
@@ -119,12 +124,8 @@ fun ClothesScreen(
         scope.launch { sheetState.bottomSheetState.partialExpand() }
     }
 
-    LaunchedEffect(Unit) {
-        clothesViewModel.loadRecommendation()
-    }
-    LaunchedEffect(Unit) {
-        clothesViewModel.clearRecommendationIfOffline(isOnline)
-    }
+    LaunchedEffect(Unit) { clothesViewModel.loadRecommendation() }
+    LaunchedEffect(Unit) { clothesViewModel.clearRecommendationIfOffline(isOnline) }
 
     BottomSheetScaffold(
         scaffoldState = sheetState,
@@ -143,11 +144,10 @@ fun ClothesScreen(
                         interactionSource = remember { MutableInteractionSource() }
                     ) {
                         scope.launch {
-                            if (sheetState.bottomSheetState.currentValue == SheetValue.Expanded) {
+                            if (sheetState.bottomSheetState.currentValue == SheetValue.Expanded)
                                 sheetState.bottomSheetState.partialExpand()
-                            } else {
+                            else
                                 sheetState.bottomSheetState.expand()
-                            }
                         }
                     },
                 horizontalArrangement = Arrangement.Center,
@@ -169,19 +169,15 @@ fun ClothesScreen(
             var localIsOutdoors by remember { mutableStateOf<Boolean?>(if (settings.isOutdoors) true else null) }
             var localIsPhysical by remember { mutableStateOf<Boolean?>(if (settings.isPhysicallyActive) true else null) }
             var localActivityLevel by remember { mutableStateOf(settings.activityLevel) }
-
             var localDepHour by remember(settings) { mutableIntStateOf(settings.departureHour) }
             var localDepMinute by remember(settings) { mutableIntStateOf(settings.departureMinute) }
             var localRetHour by remember(settings) { mutableIntStateOf(settings.returnHour) }
             var localRetMinute by remember(settings) { mutableIntStateOf(settings.returnMinute) }
 
             Column(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .verticalScroll(rememberScrollState()),
+                modifier = Modifier.padding(horizontal = 16.dp).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Reisekort
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -200,10 +196,7 @@ fun ClothesScreen(
                         TimeInputField(
                             initialHour = localDepHour,
                             initialMinute = localDepMinute,
-                            onTimeChanged = { hour, minute ->
-                                localDepHour = hour
-                                localDepMinute = minute
-                            }
+                            onTimeChanged = { hour, minute -> localDepHour = hour; localDepMinute = minute }
                         )
                         HorizontalDivider()
                         Text(
@@ -214,15 +207,11 @@ fun ClothesScreen(
                         TimeInputField(
                             initialHour = localRetHour,
                             initialMinute = localRetMinute,
-                            onTimeChanged = { hour, minute ->
-                                localRetHour = hour
-                                localRetMinute = minute
-                            }
+                            onTimeChanged = { hour, minute -> localRetHour = hour; localRetMinute = minute }
                         )
                     }
                 }
 
-                // Kort 1 — Utendørs
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -251,7 +240,6 @@ fun ClothesScreen(
                     }
                 }
 
-                // Kort 2 — Fysisk aktiv, glir inn når ute = true
                 AnimatedVisibility(
                     visible = localIsOutdoors == true,
                     enter = expandVertically() + fadeIn(),
@@ -282,8 +270,6 @@ fun ClothesScreen(
                                 )
                                 Text(stringResource(R.string.check_no))
                             }
-
-                            // Radioknapper, glir inn når fysisk = true
                             AnimatedVisibility(visible = localIsPhysical == true) {
                                 Column {
                                     Text(stringResource(R.string.clothes_activity_level))
@@ -318,13 +304,11 @@ fun ClothesScreen(
                         showBanner = true
                         scope.launch { sheetState.bottomSheetState.partialExpand() }
                     },
-                    modifier = Modifier.wrapContentWidth(
-                        align = Alignment.CenterHorizontally
-                    ).align(Alignment.CenterHorizontally),
+                    modifier = Modifier.wrapContentWidth(align = Alignment.CenterHorizontally).align(Alignment.CenterHorizontally),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
-                ) {
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    )                ) {
                     Text(stringResource(R.string.clothes_new_recommendation))
                     Icon(
                         painter = painterResource(id = R.drawable.arrow_forward_icon),
@@ -332,7 +316,6 @@ fun ClothesScreen(
                         modifier = Modifier.size(20.dp)
                     )
                 }
-
                 Spacer(modifier = Modifier.size(24.dp))
             }
         }
@@ -347,9 +330,7 @@ fun ClothesScreen(
                 }
             } else {
                 LazyColumn(
-                    modifier = Modifier
-                        .padding(12.dp)
-                        .background(MaterialTheme.colorScheme.background),
+                    modifier = Modifier.padding(12.dp).background(MaterialTheme.colorScheme.background),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     contentPadding = PaddingValues(bottom = 80.dp)
@@ -403,10 +384,7 @@ fun ClothesScreen(
                     exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
                     modifier = Modifier.align(Alignment.TopCenter).zIndex(1f)
                 ) {
-                    TopBanner(
-                        message = bannerMessage,
-                        onDismiss = { showBanner = false }
-                    )
+                    TopBanner(message = bannerMessage, onDismiss = { showBanner = false })
                 }
             }
         }
@@ -415,61 +393,95 @@ fun ClothesScreen(
 
 @Composable
 private fun EffectiveTempCard(rec: ClothesRecommendation) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                stringResource(R.string.clothes_effective_temp),
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold
-            )
-            Text(
-                text = "%.1f°C".format(rec.effectiveTemp),
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold,
-                color = if (rec.effectiveTemp <= 0.0) Color(0xFF1565C0) else Color(0xFFB71C1C)
-            )
-            Text(
-                text = stringResource(R.string.clothes_effective_temp_text),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-            )
+    var showInfo by remember { mutableStateOf(false) }
+
+    Box {
+        Card(
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(horizontal = 16.dp, vertical = 4.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                      stringResource(R.string.clothes_effective_temp),
+                      style = MaterialTheme.typography.titleSmall, 
+                      fontWeight = FontWeight.SemiBold
+                    )
+                    IconButton(onClick = { showInfo = true }, modifier = Modifier.size(24.dp)) {
+                        Icon(Icons.Default.Info, contentDescription = "Info", modifier = Modifier.size(20.dp))
+                    }
+                }
+                Text(
+                    text = "%.1f°C".format(rec.effectiveTemp),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = if (rec.effectiveTemp <= 0.0) MinusTekst else PlussTekst
+                )
+                Text(
+                    text = stringResource(R.string.clothes_effective_temp_text),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+            }
+        }
+
+        if (showInfo) {
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            ) {
+                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
+                    Text("Info kommer", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                    IconButton(onClick = { showInfo = false }, modifier = Modifier.size(20.dp)) {
+                        Icon(Icons.Default.Close, contentDescription = "Lukk", modifier = Modifier.size(16.dp))
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
 private fun ClothingCard(rec: ClothesRecommendation) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.padding(horizontal = 8.dp).fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.kl_r_ikon),
-                    contentDescription = null,
-                    modifier = Modifier.size(36.dp)
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(
-                    text = stringResource(R.string.clothes_recommendation),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+    var showInfo by remember { mutableStateOf(false) }
+
+    Box {
+        Card(
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(horizontal = 16.dp, vertical = 4.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 8.dp).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.kl_r_ikon),
+                        contentDescription = null,
+                        modifier = Modifier.size(36.dp)
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = stringResource(R.string.clothes_recommendation),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(onClick = { showInfo = true }, modifier = Modifier.size(24.dp)) {
+                        Icon(Icons.Default.Info, contentDescription = "Info", modifier = Modifier.size(20.dp))
+                    }
+                }
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
             if (rec.wearSunglasses) ClothingRow(R.drawable.solbriller, stringResource(R.string.clothes_sunglasses))
             if (rec.wearHatGloves) ClothingRow(R.drawable.caps, stringResource(R.string.clothes_hat_gloves))
@@ -490,15 +502,28 @@ private fun ClothingCard(rec: ClothesRecommendation) {
                 ClothingRow(R.drawable.sneaker, stringResource(R.string.clothes_shoes))
             }
         }
+
+        if (showInfo) {
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            ) {
+                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
+                    Text("Info kommer", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                    IconButton(onClick = { showInfo = false }, modifier = Modifier.size(20.dp)) {
+                        Icon(Icons.Default.Close, contentDescription = "Lukk", modifier = Modifier.size(16.dp))
+                    }
+                }
+            }
+        }
     }
 }
 
 @Composable
 private fun RainCard(rec: ClothesRecommendation) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -518,11 +543,7 @@ private fun ClothingRow(iconRes: Int, text: String) {
         modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = iconRes),
-            contentDescription = null,
-            modifier = Modifier.size(48.dp)
-        )
+        Image(painter = painterResource(id = iconRes), contentDescription = null, modifier = Modifier.size(48.dp))
         Spacer(modifier = Modifier.width(16.dp))
         Text(text = text, modifier = Modifier.weight(1f))
     }

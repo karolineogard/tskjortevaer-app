@@ -9,10 +9,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -37,6 +40,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -46,14 +50,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.PlussTekst
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
 import kotlin.math.roundToInt
 
@@ -75,10 +80,12 @@ fun SettingsScreen(
     var endHour     by remember(savedRetHour)   { mutableIntStateOf(savedRetHour) }
     var endMinute   by remember(savedRetMinute) { mutableIntStateOf(savedRetMinute) }
 
-    // Slider internt 0..100, der 50 = nøytral (0°), 0 = ispinne (-5°), 100 = viking (+5°)
     var sliderValue by remember(savedOffset) {
         mutableFloatStateOf(savedOffset / 5f * 50f + 50f)
     }
+
+    var showSliderInfo by remember { mutableStateOf(false) }
+    var showTimeInfo by remember { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -132,124 +139,180 @@ fun SettingsScreen(
                 fontWeight = FontWeight.Bold
             )
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            ) {
-                val degrees = ((sliderValue - 50f) / 50f * 5).roundToInt()
-                val sign = if (degrees >= 0) "+" else "" // TODO: stringResource?
-
-                Row(
+            // Kort 1 — Temperaturjustering
+            Box {
+                Card(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp)
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                      .fillMaxWidth()
+                      .padding(vertical = 8.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
-                    Text(
-                        stringResource(R.string.settings_heat_level),
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        "${sign}${degrees}° C",
-                        fontWeight = FontWeight.Bold
-                    ) //TODO: stringResource?
+                    val degrees = ((sliderValue - 50f) / 50f * 5).roundToInt()
+                    val sign = if (degrees >= 0) "+" else ""
+                    val tempColor = if (degrees <= 0) MinusTekst else PlussTekst
+
+                    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+                        // Øverste rad: tittel + infoknapp
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                              stringResource(R.string.settings_heat_level),
+                              fontWeight = FontWeight.Bold)
+                            IconButton(onClick = { showSliderInfo = true }) {
+                                Icon(Icons.Default.Info, contentDescription = "Info", modifier = Modifier.size(20.dp))
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        // Gradstal på egen linje
+                        Text(
+                            text = "${sign}${degrees}° C",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = tempColor
+                        ) //TODO: stringResource?
+
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                              painter = painterResource(id = R.drawable.ispinne_ikon), 
+                              contentDescription = stringResource(R.string.settings_cold_description
+                            )
+                            Text(
+                              stringResource(R.string.settings_cold),
+                              style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                        AdjustmentSlider(
+                          modifier = Modifier.weight(1f), 
+                          value = sliderValue, 
+                          onValueChange = { sliderValue = it })
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                              painter = painterResource(id = R.drawable.viking_ikon), 
+                              contentDescription = contentDescription = stringResource(R.string.settings_warm_description)
+                            )
+                            Text(
+                              stringResource(R.string.settings_warm), 
+                              style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ispinne_ikon),
-                            contentDescription = stringResource(R.string.settings_cold_description)
-                        )
-                        Text(
-                            stringResource(R.string.settings_cold),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                    AdjustmentSlider(
-                        modifier = Modifier.weight(1f),
-                        value = sliderValue,
-                        onValueChange = { sliderValue = it }
-                    )
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.viking_ikon),
-                            contentDescription = stringResource(R.string.settings_warm_description)
-                        )
-                        Text(
-                            stringResource(R.string.settings_warm),
-                            style = MaterialTheme.typography.bodySmall
-                        )
+                if (showSliderInfo) {
+                    Card(
+                        modifier = Modifier
+                          .fillMaxWidth()
+                          .padding(vertical = 8.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                    ) {
+                        Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
+                            Text(
+                              "Info kommer", 
+                              style = MaterialTheme.typography.bodySmall, 
+                              modifier = Modifier.weight(1f)
+                            )
+                            IconButton(
+                              onClick = { showSliderInfo = false }, 
+                              modifier = Modifier.size(20.dp)
+                            ) {
+                                Icon(
+                                  Icons.Default.Close, 
+                                  contentDescription = "Lukk", 
+                                  modifier = Modifier.size(16.dp))
+                            }
+                        }
                     }
                 }
             }
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        stringResource(R.string.settings_traveltimes),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        stringResource(R.string.settings_leave),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    TimeInputField(
-                        initialHour = startHour,
-                        initialMinute = startMinute,
-                        onTimeChanged = { h, m ->
-                            startHour = h
-                            startMinute = m
+            // Kort 2 — Reisetider
+            Box {
+                Card(
+                    modifier = Modifier
+                      .fillMaxWidth()
+                      .padding(vertical = 8.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                stringResource(R.string.settings_traveltimes),
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.weight(1f)
+                            )
+                            IconButton(onClick = { showTimeInfo = true }) {
+                                Icon(
+                                  Icons.Default.Info, 
+                                  contentDescription = "Info", 
+                                  modifier = Modifier.size(20.dp))
+                            }
                         }
-                    )
 
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                          stringResource(R.string.settings_leave),
+                          style = MaterialTheme.typography.bodyLarge, 
+                          fontWeight = FontWeight.SemiBold
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        TimeInputField(
+                          initialHour = startHour, 
+                          initialMinute = startMinute, 
+                          onTimeChanged = { h, m -> startHour = h; startMinute = m }
+                        )
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+                        Text(
+                          stringResource(R.string.settings_return),
+                          style = MaterialTheme.typography.bodyLarge, 
+                          fontWeight = FontWeight.SemiBold
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        TimeInputField(
+                          initialHour = endHour, 
+                          initialMinute = endMinute, 
+                          onTimeChanged = { h, m -> endHour = h; endMinute = m }
+                        )
+                    }
+                }
 
-                    Text(
-                        stringResource(R.string.settings_return),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    TimeInputField(
-                        initialHour = endHour,
-                        initialMinute = endMinute,
-                        onTimeChanged = { h, m ->
-                            endHour = h
-                            endMinute = m
+                if (showTimeInfo) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                    ) {
+                        Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
+                            Text("Info kommer", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                            IconButton(onClick = { showTimeInfo = false }, modifier = Modifier.size(20.dp)) {
+                                Icon(Icons.Default.Close, contentDescription = "Lukk", modifier = Modifier.size(16.dp))
+                            }
                         }
-                    )
+                    }
                 }
             }
 
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 OutlinedButton(
                     border = BorderStroke(2.dp, MediumBlue),
                     onClick = {
@@ -273,7 +336,8 @@ fun SettingsScreen(
                         }
                     },
                     colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurface
                     )
                 ) {
                     Text(stringResource(R.string.settings_save))
