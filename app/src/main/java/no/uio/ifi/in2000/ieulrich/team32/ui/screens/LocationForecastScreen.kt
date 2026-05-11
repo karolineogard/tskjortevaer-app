@@ -130,7 +130,7 @@ fun DayForecastCard(date: String, forecastForDay: List<ForecastHourDetails>) {
         Column {
             Text(
                 text = date,
-                fontSize = 20.sp,
+                style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(16.dp)
             )
@@ -144,13 +144,13 @@ fun DayForecastCard(date: String, forecastForDay: List<ForecastHourDetails>) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Spacer(modifier = Modifier.weight(1.3f))
-                    Text("Tid", fontSize = 13.sp, modifier = Modifier.weight(1f))
+                    Text("Tid", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
                     Spacer(modifier = Modifier.weight(0.5f))
-                    Text("Temp", fontSize = 13.sp, modifier = Modifier.weight(1f))
+                    Text("Temp", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
                     Spacer(modifier = Modifier.weight(0.5f))
-                    Text("Regn", fontSize = 13.sp, modifier = Modifier.weight(1f))
+                    Text("Regn", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
                     Spacer(modifier = Modifier.weight(0.5f))
-                    Text("Vind", fontSize = 13.sp, modifier = Modifier.weight(1f))
+                    Text("Vind", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
                 }
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                 forecastForDay.forEachIndexed { index, details ->
@@ -191,20 +191,20 @@ fun DayForecastCard(date: String, forecastForDay: List<ForecastHourDetails>) {
                                 .weight(0.8f),
                             contentScale = ContentScale.Fit
                         )
-                        Text(text = interval, fontSize = 13.sp, modifier = Modifier.weight(1.5f))
+                        Text(text = interval, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1.5f))
                         Text(
                             text = Format.formatTemp(maxTemp),
-                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.weight(1f)
                         )
                         Text(
                             text = Format.formatPrecipitation(totalPrecipitation),
-                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.weight(1f)
                         )
                         Text(
                             text = Format.formatWind(avgWind),
-                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.weight(1f)
                         )
                     }

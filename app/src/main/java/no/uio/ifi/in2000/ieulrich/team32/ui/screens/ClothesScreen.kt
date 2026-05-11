@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -70,6 +71,7 @@ import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
@@ -288,6 +290,7 @@ fun ClothesScreen(
                 }
 
                 OutlinedButton(
+                    border = BorderStroke(2.dp, MediumBlue),
                     onClick = {
                         clothesViewModel.updateSettings(
                             departureHour = localDepHour,

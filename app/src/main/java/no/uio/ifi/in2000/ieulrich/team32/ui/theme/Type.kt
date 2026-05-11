@@ -59,17 +59,17 @@ val Typography = Typography(
     ),
     labelLarge = TextStyle(
         fontFamily = RobotoMono,
-        fontWeight = FontWeight.Light,
+        fontWeight = FontWeight.Normal,
         fontSize = 14.sp
     ),
     labelMedium = TextStyle(
         fontFamily = RobotoMono,
-        fontWeight = FontWeight.Light,
+        fontWeight = FontWeight.Normal,
         fontSize = 12.sp
     ),
     labelSmall = TextStyle(
         fontFamily = RobotoMono,
-        fontWeight = FontWeight.Light,
+        fontWeight = FontWeight.Normal,
         fontSize = 11.sp
     )
 
