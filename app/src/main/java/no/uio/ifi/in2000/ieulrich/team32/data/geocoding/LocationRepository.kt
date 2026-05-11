@@ -12,9 +12,9 @@ class LocationRepository @Inject constructor (
     suspend fun getPlaceName(lat: Double, lon: Double): String {
         return try {
             val response = api.getPlaceName(lat, lon)
-            response.address.bestName()
-        } catch (e: IOException){
-            "Unknown"
+            response?.address?.bestName() ?: "Ukjent lokasjon"
+        } catch (e: Throwable) {
+            "Ukjent lokasjon"
         }
     }
 
