@@ -417,8 +417,8 @@ fun MapScreen(
                                 Text(
                                     currentLabel,
                                     style = MaterialTheme.typography.labelLarge,
-                                    fontSize = 16.sp
-                                )
+
+                                    )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Icon(
                                     Icons.Default.KeyboardArrowDown,
@@ -455,8 +455,8 @@ fun TemperatureLegendCard(modifier: Modifier = Modifier) {
         "-5", "-10", "-15", "<-20"
     )
     val colors = listOf(
-        "#FF2000", "#FF6000", "#FF9F00", "#FFDF00", "#FFFF2A", 
-        "#FFFF7E", "#FFFFD2", "#F5F5FF", "#C4C4FF", "#9393FF", 
+        "#FF2000", "#FF6000", "#FF9F00", "#FFDF00", "#FFFF2A",
+        "#FFFF7E", "#FFFFD2", "#F5F5FF", "#C4C4FF", "#9393FF",
         "#6262FF", "#3131FF", "#0000FF", "#0000E7"
     )
 
@@ -486,7 +486,7 @@ fun TemperatureLegendCard(modifier: Modifier = Modifier) {
                                 .background(Color(android.graphics.Color.parseColor(colors[index])))
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(range, fontSize = 10.sp, color = Color.Black)
+                        Text(range, style = MaterialTheme.typography.labelSmall, color = Color.Black)
                     }
                 }
             }
@@ -534,7 +534,7 @@ fun PrecipitationLegendCard(modifier: Modifier = Modifier) {
                                 .background(Color(android.graphics.Color.parseColor(colors[index])))
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(range, fontSize = 10.sp, color = Color.Black)
+                        Text(range, style = MaterialTheme.typography.labelSmall, color = Color.Black)
                     }
                 }
             }
@@ -581,7 +581,7 @@ fun WindLegendCard(modifier: Modifier = Modifier) {
                                 .background(Color(android.graphics.Color.parseColor(colors[index])))
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(range, fontSize = 10.sp, color = Color.Black)
+                        Text(range, style = MaterialTheme.typography.labelSmall, color = Color.Black)
                     }
                 }
             }
@@ -645,7 +645,7 @@ fun AlertsLegendCard(modifier: Modifier = Modifier) {
 
                         Text(
                             level,
-                            fontSize = 11.sp,
+                            style = MaterialTheme.typography.labelSmall,
                             color = Color.Black
                         )
                     }
@@ -709,7 +709,7 @@ fun TimeSliderCard(
         }
     }
 
-    
+
 
     val selectedTimeUTC = baseTime.plusHours((sliderPosition.toInt() * 3).toLong())
 
