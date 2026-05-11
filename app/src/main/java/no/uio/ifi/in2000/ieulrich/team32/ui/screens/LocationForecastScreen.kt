@@ -58,7 +58,6 @@ fun LocationForecastScreen(
     viewmodel: LocationForecastViewmodel,
     lat: Double?,
     lon: Double?,
-    city: String = "Værvarsel",
     navController: NavController
 ) {
     if (lat == null || lon == null) {
@@ -70,13 +69,14 @@ fun LocationForecastScreen(
     }
 
     val groupedByDay = viewmodel.forecastByDay.collectAsStateWithLifecycle()
+    val place = viewmodel.placeName.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = city,
+                        text = place.value,
                         fontWeight = FontWeight.Bold
                     ) },
                 navigationIcon = {
