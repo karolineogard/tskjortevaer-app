@@ -19,6 +19,7 @@ class LocationDatasource @Inject constructor(private val client: HttpClient)  {
             parameter("lat", lat)
             parameter("lon", lon)
             parameter("format", "json")
+            header("Accept-Language", "no,en")
             header("User-Agent", "IN2000 Team 32")
         }
         return response.body<NominatimResponse>()
@@ -30,6 +31,7 @@ class LocationDatasource @Inject constructor(private val client: HttpClient)  {
             parameter("format", "json")
             parameter("limit", 5)
             parameter("featuretype", "city")
+            header("Accept-Language", "no,en")
             header("User-Agent", "IN2000 Team 32")
         }
         return response.body<List<NominatimSearchResult>>().map { result ->

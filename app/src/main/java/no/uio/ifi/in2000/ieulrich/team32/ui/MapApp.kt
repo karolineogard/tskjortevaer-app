@@ -89,6 +89,21 @@ fun MapApp(
         clothesViewModel.updateTemperatureOffset(temperatureOffset)
     }
 
+
+    val savedDepHour   by settingsViewModel.defaultDepartureHour.collectAsStateWithLifecycle()
+    val savedDepMinute by settingsViewModel.defaultDepartureMinute.collectAsStateWithLifecycle()
+    val savedRetHour   by settingsViewModel.defaultReturnHour.collectAsStateWithLifecycle()
+    val savedRetMinute by settingsViewModel.defaultReturnMinute.collectAsStateWithLifecycle()
+
+    LaunchedEffect(savedDepHour, savedDepMinute, savedRetHour, savedRetMinute) {
+        clothesViewModel.applyDefaultTimes(
+            departureHour   = savedDepHour,
+            departureMinute = savedDepMinute,
+            returnHour      = savedRetHour,
+            returnMinute    = savedRetMinute
+        )
+    }
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -152,12 +167,10 @@ fun MapApp(
                 composable(route = "forecast?lat={lat}&lon={lon}&city={city}") { backStackEntry ->
                     val lat = backStackEntry.arguments?.getString("lat")?.toDoubleOrNull()
                     val lon = backStackEntry.arguments?.getString("lon")?.toDoubleOrNull()
-                    val city = backStackEntry.arguments?.getString("city") ?: "Værvarsel"
                     LocationForecastScreen(
                         viewmodel = locationForecastViewmodel,
                         lat = lat,
                         lon = lon,
-                        city = city,
                         navController = navController
                     )
                 }

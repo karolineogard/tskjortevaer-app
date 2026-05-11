@@ -68,6 +68,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.R
+import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
@@ -410,8 +411,9 @@ private fun EffectiveTempCard(rec: ClothesRecommendation) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text("Effektiv temperatur", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
             Text(
-                text = "%.1f°C".format(rec.effectiveTemp),
+            
                 style = MaterialTheme.typography.bodyLarge,
+                text = Format.formatTemp(rec.effectiveTemp),
                 fontWeight = FontWeight.Bold
             )
             Text(
