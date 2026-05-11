@@ -83,6 +83,12 @@ import org.maplibre.android.camera.CameraUpdateFactory
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGul
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOransje
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRød
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGulGjennomsiktig
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOranjeGjennomsiktig
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRødGjennomsiktig
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -418,8 +424,8 @@ fun MapScreen(
                                 Text(
                                     currentLabel,
                                     style = MaterialTheme.typography.labelLarge,
-                                    fontSize = 16.sp
-                                )
+
+                                    )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Icon(
                                     Icons.Default.KeyboardArrowDown,
@@ -456,8 +462,8 @@ fun TemperatureLegendCard(modifier: Modifier = Modifier) {
         "-5", "-10", "-15", "<-20"
     )
     val colors = listOf(
-        "#FF2000", "#FF6000", "#FF9F00", "#FFDF00", "#FFFF2A", 
-        "#FFFF7E", "#FFFFD2", "#F5F5FF", "#C4C4FF", "#9393FF", 
+        "#FF2000", "#FF6000", "#FF9F00", "#FFDF00", "#FFFF2A",
+        "#FFFF7E", "#FFFFD2", "#F5F5FF", "#C4C4FF", "#9393FF",
         "#6262FF", "#3131FF", "#0000FF", "#0000E7"
     )
 
@@ -487,7 +493,7 @@ fun TemperatureLegendCard(modifier: Modifier = Modifier) {
                                 .background(Color(android.graphics.Color.parseColor(colors[index])))
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(range, fontSize = 10.sp, color = Color.Black)
+                        Text(range, style = MaterialTheme.typography.labelSmall, color = Color.Black)
                     }
                 }
             }
@@ -535,7 +541,7 @@ fun PrecipitationLegendCard(modifier: Modifier = Modifier) {
                                 .background(Color(android.graphics.Color.parseColor(colors[index])))
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(range, fontSize = 10.sp, color = Color.Black)
+                        Text(range, style = MaterialTheme.typography.labelSmall, color = Color.Black)
                     }
                 }
             }
@@ -582,7 +588,7 @@ fun WindLegendCard(modifier: Modifier = Modifier) {
                                 .background(Color(android.graphics.Color.parseColor(colors[index])))
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(range, fontSize = 10.sp, color = Color.Black)
+                        Text(range, style = MaterialTheme.typography.labelSmall, color = Color.Black)
                     }
                 }
             }
@@ -599,9 +605,9 @@ fun AlertsLegendCard(modifier: Modifier = Modifier) {
     )
 
     val colors = listOf(
-        "#FFFF00",
-        "#FFA500",
-        "#FF0000"
+        FarevarselGul,
+        FarevarselOransje,
+        FarevarselRød
     )
 
     Surface(
@@ -637,16 +643,14 @@ fun AlertsLegendCard(modifier: Modifier = Modifier) {
                             modifier = Modifier
                                 .size(12.dp)
                                 .clip(RoundedCornerShape(2.dp))
-                                .background(
-                                    Color(android.graphics.Color.parseColor(colors[index]))
-                                )
+                                .background(colors[index])
                         )
 
                         Spacer(modifier = Modifier.width(8.dp))
 
                         Text(
                             level,
-                            fontSize = 11.sp,
+                            style = MaterialTheme.typography.labelSmall,
                             color = Color.Black
                         )
                     }
@@ -710,7 +714,7 @@ fun TimeSliderCard(
         }
     }
 
-    
+
 
     val selectedTimeUTC = baseTime.plusHours((sliderPosition.toInt() * 3).toLong())
 
@@ -821,10 +825,10 @@ fun AlertListItem(
     onClick: () -> Unit
 ) {
     val backgroundColor = when (alert.severity?.lowercase()) {
-        "moderate" -> Color(0xFFFF00)
-        "severe" -> Color(0xFFA500)
-        "extreme" -> Color(0xFF0000)
-        else -> Color(0xFFFF00)
+        "moderate" -> FarevarselGulGjennomsiktig
+        "severe" -> FarevarselOranjeGjennomsiktig
+        "extreme" -> FarevarselRødGjennomsiktig
+        else -> FarevarselGulGjennomsiktig
     }
 
     Card(

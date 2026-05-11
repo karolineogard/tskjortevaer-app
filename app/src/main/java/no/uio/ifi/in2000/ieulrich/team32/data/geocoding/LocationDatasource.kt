@@ -7,7 +7,6 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
-import no.uio.ifi.in2000.ieulrich.team32.data.client.HttpClientProvider
 import no.uio.ifi.in2000.ieulrich.team32.data.geocoding.dto.NominatimResponse
 import no.uio.ifi.in2000.ieulrich.team32.data.geocoding.dto.NominatimSearchResult
 import javax.inject.Inject
@@ -16,9 +15,10 @@ class LocationDatasource @Inject constructor(private val client: HttpClient)  {
 
     suspend fun getPlaceName(lat: Double, lon: Double): NominatimResponse {
         val response = client.get("https://nominatim.openstreetmap.org/reverse"){
-            parameter("lat", lat)
-            parameter("lon", lon)
+            parameter("lat", "%.4f".format(lat))
+            parameter("lon", "%.4f".format(lon))
             parameter("format", "json")
+            header("Accept-Language", "no,en")
             header("User-Agent", "IN2000 Team 32")
         }
         return response.body<NominatimResponse>()
@@ -30,6 +30,7 @@ class LocationDatasource @Inject constructor(private val client: HttpClient)  {
             parameter("format", "json")
             parameter("limit", 5)
             parameter("featuretype", "city")
+            header("Accept-Language", "no,en")
             header("User-Agent", "IN2000 Team 32")
         }
         return response.body<List<NominatimSearchResult>>().map { result ->

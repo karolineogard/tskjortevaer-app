@@ -3,6 +3,7 @@ package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 import android.location.Location
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -67,6 +68,13 @@ import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.iconUrl
 import no.uio.ifi.in2000.ieulrich.team32.ui.Routes
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.SearchBar
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGulGjennomsiktig
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOranjeGjennomsiktig
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRødGjennomsiktig
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.PlussTekst
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.AppLocation
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
@@ -121,7 +129,9 @@ fun HomeScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator(
+                            color = DarkBlue
+                        )
                     }
                 }
             }
@@ -234,7 +244,12 @@ fun MetalertCard(
             .height(80.dp)
             .clickable { onClick(metAlert) },
         colors = CardDefaults.cardColors(
-            containerColor = SeverityColor(alert.properties.severity).copy(alpha = 0.2f)
+            containerColor = when (alert.properties.severity?.lowercase()) {
+                "moderate" -> FarevarselGulGjennomsiktig
+                "severe"   -> FarevarselOranjeGjennomsiktig
+                "extreme"  -> FarevarselRødGjennomsiktig
+                else       -> Color.LightGray
+            }
         ),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -283,7 +298,7 @@ fun WeatherCard(
         onClick = {
             val lat = location?.lat
             val lon = location?.lon
-                navController.navigate("forecast?lat=$lat&lon=$lon&city=Min posisjon")
+            navController.navigate("forecast?lat=$lat&lon=$lon&city=Min posisjon")
 
         }
     ) {
@@ -297,7 +312,7 @@ fun WeatherCard(
             val datePart = if (now.toLocalDate().isEqual(today)) "I dag"
             else now.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
             val timePart = if (forecastHourDetails == null) "00:00"
-                else Format.extractTime(forecastHourDetails.timestamp)
+            else Format.extractTime(forecastHourDetails.timestamp)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -316,7 +331,7 @@ fun WeatherCard(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = placeName, fontSize = 40.sp)
+                Text(text = placeName, style = MaterialTheme.typography.titleLarge)
             }
             forecastHourDetails?.let { details ->
                 Row(
@@ -347,9 +362,11 @@ fun WeatherCard(
                         }
                     )
                     Spacer(modifier = Modifier.width(5.dp))
+                    val tempColor = if (details.temperature <= 0.0) MinusTekst else PlussTekst
                     Text(
                         text = Format.formatTemp(details.temperature),
-                        fontSize = 40.sp)
+                        style = MaterialTheme.typography.titleLarge,
+                        color = tempColor)
                 }
 
             }
@@ -385,7 +402,7 @@ fun ClothingCard(
                     Spacer(modifier = Modifier.size(48.dp))
                     Text(
                         text = "Bekledning",
-                        fontSize = 30.sp,
+                        style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.weight(2f),
                         textAlign = TextAlign.Center
                     )
@@ -406,7 +423,7 @@ fun ClothingCard(
                     Text(
                         text = "Ingen værdata tilgjengelig ennå.",
                         modifier = Modifier.padding(8.dp),
-                        fontSize = 14.sp
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
@@ -434,7 +451,7 @@ fun ClothingCard(
                             Spacer(modifier = Modifier.size(48.dp))
                             Text(
                                 text = "Anbefaling",
-                                fontSize = 24.sp,
+                                style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.weight(2f),
                                 textAlign = TextAlign.Center
@@ -445,12 +462,14 @@ fun ClothingCard(
                         }
                         Text(
                             text = "Anbefalingen tar utgangspunkt i fremkomst til og fra skole eller jobb. Vi antar at reisetidspunktet skjer mellom 8–10 på morgenen og 16–18 på kvelden.",
-                        fontSize = 15.sp
+                            style = MaterialTheme.typography.bodyMedium
                         )
                         OutlinedButton(
                             onClick = { navController.navigate(Routes.CLOTHES) },
+                            border = BorderStroke(2.dp, MediumBlue),
                             colors = ButtonDefaults.outlinedButtonColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                contentColor = MaterialTheme.colorScheme.onSurface
                             ),
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -536,6 +555,6 @@ private fun ClothingCardRow(iconRes: Int, text: String) {
             modifier = Modifier.size(36.dp)
         )
         Spacer(modifier = Modifier.width(12.dp))
-        Text(text = text, fontSize = 14.sp, modifier = Modifier.weight(1f))
+        Text(text = text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
     }
 }
