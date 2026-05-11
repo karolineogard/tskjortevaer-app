@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     kotlin("android")
-    kotlin("plugin.serialization") version "2.2.0"
+    kotlin("plugin.serialization")
 }
 android {
     namespace = "no.uio.ifi.in2000.ieulrich.team32"
@@ -57,68 +57,55 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.compose)
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    
-    implementation(libs.maplibre.android)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.compose.foundation.layout)
-    implementation(libs.volley)
     implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.compose.foundation.layout)
+    implementation(libs.material.icons.extended)
+
+    implementation(libs.maplibre.android)
+    implementation(libs.volley)
+    implementation(libs.navigation.compose)
+    implementation(libs.play.services.location)
+    implementation(libs.androidx.datastore.preferences)
+
+    // Ktor
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.client.okhttp)
+
+    // Coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+    implementation(libs.coil.svg)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.navigation.compose)
+
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
     testRuntimeOnly(libs.junit.platform.launcher)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
-
-    implementation("androidx.compose.material:material-icons-extended")
-
-    // network stuff
-    implementation("io.ktor:ktor-client-core:2.3.7")
-    implementation("io.ktor:ktor-client-cio:2.3.7")
-    implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
-    implementation("io.ktor:ktor-client-okhttp:2.3.7")
-    
-
-    // Coil 3 dependencies
-
-    implementation("io.coil-kt.coil3:coil-compose:3.3.0")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
-    implementation("io.coil-kt.coil3:coil-svg:3.3.0")
-
-    // navigation stuff
-    implementation("androidx.navigation:navigation-compose:2.7.4")
-
-    implementation("androidx.compose.material:material-icons-extended:1.7.8")
-    implementation(platform(libs.androidx.compose.bom))
-    implementation("androidx.compose.material:material-icons-extended")
-
-    // location stuff
-    implementation(libs.play.services.location)
-    // persistent storage
-    implementation(libs.androidx.datastore.preferences)
-
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("io.mockk:mockk:1.13.8")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-
-    // hilt
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-    implementation(libs.hilt.navigation.compose)
 
 }
