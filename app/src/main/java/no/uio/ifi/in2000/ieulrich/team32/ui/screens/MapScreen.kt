@@ -273,6 +273,7 @@ fun MapScreen(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(top = 48.dp, start = 16.dp, end = 16.dp)
+                        .zIndex(10f)
                 ) {
                     if (isSearchExpanded) {
                         SearchBar(
