@@ -27,3 +27,6 @@ val FarevarselGulGjennomsiktig = Color(0xffFCF8CB)
 val FarevarselOranjeGjennomsiktig = Color(0xffFCF4DF)
 val FarevarselRødGjennomsiktig = Color(0xffF7E3E3)
 
+val PlussTekst = Color(0xffBF1D1D)
+val MinusTekst = Color(0xff0358C7)
+

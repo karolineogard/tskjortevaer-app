@@ -73,6 +73,8 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGulGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOranjeGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRødGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.PlussTekst
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.AppLocation
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
@@ -360,7 +362,7 @@ fun WeatherCard(
                         }
                     )
                     Spacer(modifier = Modifier.width(5.dp))
-                    val tempColor = if (details.temperature <= 0.0) Color(0xFF1565C0) else Color(0xFFB71C1C)
+                    val tempColor = if (details.temperature <= 0.0) MinusTekst else PlussTekst
                     Text(
                         text = Format.formatTemp(details.temperature),
                         style = MaterialTheme.typography.titleLarge,
@@ -466,7 +468,8 @@ fun ClothingCard(
                             onClick = { navController.navigate(Routes.CLOTHES) },
                             border = BorderStroke(2.dp, MediumBlue),
                             colors = ButtonDefaults.outlinedButtonColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                contentColor = MaterialTheme.colorScheme.onSurface
                             ),
                             modifier = Modifier.fillMaxWidth()
                         ) {

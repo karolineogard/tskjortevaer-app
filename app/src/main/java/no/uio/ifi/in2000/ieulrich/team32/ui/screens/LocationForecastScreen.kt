@@ -49,6 +49,8 @@ import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ForecastHour
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.PlussTekst
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 
 
@@ -162,7 +164,7 @@ fun DayForecastCard(date: String, forecastForDay: List<ForecastHourDetails>) {
                         precipitationAmount = Format.formatPrecipitation(details.precipitationAmount),
                         symbolCode = details.symbolCode,
                         compact = true,
-                        tempColor = if (details.temperature <= 0.0) Color(0xFF1565C0) else Color(0xFFB71C1C)
+                        tempColor = if (details.temperature <= 0.0) MinusTekst else PlussTekst
                     )
 
                 }
@@ -196,7 +198,7 @@ fun DayForecastCard(date: String, forecastForDay: List<ForecastHourDetails>) {
                         Text(
                             text = Format.formatTemp(maxTemp),
                             style = MaterialTheme.typography.bodySmall,
-                            color = if (maxTemp <= 0.0) Color(0xFF1565C0) else Color(0xFFB71C1C),
+                            color = if (maxTemp <= 0.0) MinusTekst else PlussTekst,
                             modifier = Modifier.weight(1f)
                         )
                         Text(
