@@ -27,21 +27,52 @@ val RobotoMono = FontFamily(
 
 
 val Typography = Typography(
+    titleLarge = TextStyle(
+        fontFamily = RobotoMono,
+        fontWeight = FontWeight.Bold,
+        fontSize = 32.sp
+    ),
+    titleMedium = TextStyle(
+        fontFamily = RobotoMono,
+        fontWeight = FontWeight.Bold,
+        fontSize = 24.sp
+    ),
+    titleSmall = TextStyle(
+        fontFamily = RobotoMono,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp
+    ),
     bodyLarge = TextStyle(
         fontFamily = RobotoMono,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp
     ),
-    titleLarge = TextStyle(
+    bodyMedium = TextStyle(
         fontFamily = RobotoMono,
-        fontWeight = FontWeight.Bold,
-        fontSize = 22.sp
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp
+    ),
+    bodySmall = TextStyle(
+        fontFamily = RobotoMono,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp
+    ),
+    labelLarge = TextStyle(
+        fontFamily = RobotoMono,
+        fontWeight = FontWeight.Light,
+        fontSize = 14.sp
+    ),
+    labelMedium = TextStyle(
+        fontFamily = RobotoMono,
+        fontWeight = FontWeight.Light,
+        fontSize = 12.sp
     ),
     labelSmall = TextStyle(
         fontFamily = RobotoMono,
         fontWeight = FontWeight.Light,
         fontSize = 11.sp
     )
+
 
     /* Other default text styles to override
     titleLarge = TextStyle(
