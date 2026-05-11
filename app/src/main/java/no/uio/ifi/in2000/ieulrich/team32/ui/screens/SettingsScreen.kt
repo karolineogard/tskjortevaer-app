@@ -43,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -96,12 +97,16 @@ fun SettingsScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Innstillinger", fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        stringResource(R.string.settings_title),
+                        fontWeight = FontWeight.Bold
+                    ) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Tilbake"
+                            contentDescription = stringResource(R.string.navbar_back_description)
                         )
                     }
                 },
@@ -122,7 +127,10 @@ fun SettingsScreen(
                     bottom = innerPadding.calculateBottomPadding()
                 )
         ) {
-            Text("Preferanser", fontWeight = FontWeight.Bold)
+            Text(
+                stringResource(R.string.settings_preferences),
+                fontWeight = FontWeight.Bold
+            )
 
             Card(
                 modifier = Modifier
@@ -133,7 +141,7 @@ fun SettingsScreen(
                 )
             ) {
                 val degrees = ((sliderValue - 50f) / 50f * 5).roundToInt()
-                val sign = if (degrees >= 0) "+" else ""
+                val sign = if (degrees >= 0) "+" else "" // TODO: stringResource?
 
                 Row(
                     modifier = Modifier
@@ -143,8 +151,14 @@ fun SettingsScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Hvor varm er du?", fontWeight = FontWeight.Bold)
-                    Text("${sign}${degrees}° C", fontWeight = FontWeight.Bold)
+                    Text(
+                        stringResource(R.string.settings_heat_level),
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        "${sign}${degrees}° C",
+                        fontWeight = FontWeight.Bold
+                    ) //TODO: stringResource?
                 }
 
                 Row(
@@ -157,9 +171,12 @@ fun SettingsScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
                             painter = painterResource(id = R.drawable.ispinne_ikon),
-                            contentDescription = "Ispinne – fryser lett"
+                            contentDescription = stringResource(R.string.settings_cold_description)
                         )
-                        Text("Ispinne", style = MaterialTheme.typography.bodySmall)
+                        Text(
+                            stringResource(R.string.settings_cold),
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
                     AdjustmentSlider(
                         modifier = Modifier.weight(1f),
@@ -169,9 +186,12 @@ fun SettingsScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
                             painter = painterResource(id = R.drawable.viking_ikon),
-                            contentDescription = "Viking – varm av seg"
+                            contentDescription = stringResource(R.string.settings_warm_description)
                         )
-                        Text("Viking", style = MaterialTheme.typography.bodySmall)
+                        Text(
+                            stringResource(R.string.settings_warm),
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
                 }
             }
@@ -186,13 +206,17 @@ fun SettingsScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        "Reiser du fast til andre tidspunkter?",
+                        stringResource(R.string.settings_traveltimes),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
-                    Text("Dra", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
+                    Text(
+                        stringResource(R.string.settings_leave),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
                     TimeInputField(
                         initialHour = startHour,
@@ -205,7 +229,11 @@ fun SettingsScreen(
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
-                    Text("Tilbake", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
+                    Text(
+                        stringResource(R.string.settings_return),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
                     TimeInputField(
                         initialHour = endHour,
@@ -248,7 +276,7 @@ fun SettingsScreen(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 ) {
-                    Text("Lagre")
+                    Text(stringResource(R.string.settings_save))
                 }
             }
         }

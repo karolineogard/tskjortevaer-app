@@ -49,6 +49,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -242,7 +243,7 @@ fun MetalertCard(
             .height(80.dp)
             .clickable { onClick(metAlert) },
         colors = CardDefaults.cardColors(
-            containerColor = when (alert.properties.severity?.lowercase()) {
+            containerColor = when (alert.properties.severity.lowercase()) {
                 "moderate" -> FarevarselGulGjennomsiktig
                 "severe"   -> FarevarselOranjeGjennomsiktig
                 "extreme"  -> FarevarselRødGjennomsiktig
@@ -399,27 +400,35 @@ fun ClothingCard(
                 ) {
                     Spacer(modifier = Modifier.size(48.dp))
                     Text(
-                        text = "Bekledning",
+                        text = stringResource(R.string.home_outfit),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.weight(2f),
                         textAlign = TextAlign.Center
                     )
                     IconButton(onClick = { showInfo = !showInfo }) {
-                        Icon(Icons.Default.Info, contentDescription = "Info")
+                        Icon(
+                            imageVector =Icons.Default.Info,
+                            contentDescription = stringResource(R.string.info_button)
+                        )
                     }
                 }
 
                 HorizontalDivider()
 
                 if (isLoading) {
-                    Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
                         CircularProgressIndicator(modifier = Modifier.size(32.dp))
                     }
                 } else if (recommendation != null) {
                     ClothingCardRecommendationRows(rec = recommendation!!)
                 } else {
                     Text(
-                        text = "Ingen værdata tilgjengelig ennå.",
+                        text = stringResource(R.string.home_no_recommendation),
                         modifier = Modifier.padding(8.dp),
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -448,18 +457,21 @@ fun ClothingCard(
                         ) {
                             Spacer(modifier = Modifier.size(48.dp))
                             Text(
-                                text = "Anbefaling",
+                                text = stringResource(R.string.home_recommendation_title),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.weight(2f),
                                 textAlign = TextAlign.Center
                             )
                             IconButton(onClick = { showInfo = false }) {
-                                Icon(Icons.Default.Close, contentDescription = "Lukk")
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = stringResource(R.string.close_button)
+                                )
                             }
                         }
                         Text(
-                            text = "Anbefalingen tar utgangspunkt i fremkomst til og fra skole eller jobb. Vi antar at reisetidspunktet skjer mellom 8–10 på morgenen og 16–18 på kvelden.",
+                            text = stringResource(R.string.home_info_text),
                             style = MaterialTheme.typography.bodyMedium
                         )
                         OutlinedButton(
@@ -470,7 +482,7 @@ fun ClothingCard(
                             ),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(text = "Jeg har andre behov")
+                            Text(text = stringResource(R.string.home_preferences))
                             Icon(
                                 painter = painterResource(id = R.drawable.arrow_forward_icon),
                                 contentDescription = null,
@@ -497,46 +509,98 @@ fun rememberSvgImageLoader(): ImageLoader{
 private fun ClothingCardRecommendationRows(rec: ClothesRecommendation) {
     // Hodeplagg (kun hvis relevant)
     if (rec.wearSunglasses) {
-        ClothingCardRow(iconRes = R.drawable.solbriller, text = "Solbriller anbefales — det er sol.")
+        ClothingCardRow(
+            iconRes = R.drawable.solbriller,
+            text = stringResource(R.string.clothes_sunglasses)
+        )
     }
     if (rec.wearHatGloves) {
-        ClothingCardRow(iconRes = R.drawable.caps, text = "Lue og hansker anbefales.")
+        ClothingCardRow(
+            iconRes = R.drawable.caps,
+            text = stringResource(R.string.clothes_hat_gloves)
+        )
     }
     if (rec.wearScarf) {
-        ClothingCardRow(iconRes = R.drawable.skjerf, text = "Ta på skjerf.")
+        ClothingCardRow(
+            iconRes = R.drawable.skjerf,
+            text = stringResource(R.string.clothes_scarf)
+        )
     }
 
     // Overkropp
     when {
-        rec.wearTshirt      -> ClothingCardRow(iconRes = R.drawable.t_skjorte, text = "T-skjorte holder fint.")
-        rec.wearSweater     -> ClothingCardRow(iconRes = R.drawable.genser,     text = "Genser passer bra.")
-        rec.wearLightJacket -> ClothingCardRow(iconRes = R.drawable.lett_jakke,     text = "Ta på en lett jakke.")
-        rec.wearHeavyJacket -> ClothingCardRow(iconRes = R.drawable.tykk_jakke,     text = "Tykk jakke anbefales.")
+        rec.wearTshirt ->
+            ClothingCardRow(
+                iconRes = R.drawable.t_skjorte,
+                text = stringResource(R.string.clothes_tshirt)
+            )
+        rec.wearSweater ->
+            ClothingCardRow(
+                iconRes = R.drawable.genser,
+                text = stringResource(R.string.clothes_sweatshirt)
+            )
+        rec.wearLightJacket ->
+            ClothingCardRow(
+                iconRes = R.drawable.lett_jakke,
+                text = stringResource(R.string.clothes_thin_jacket)
+            )
+        rec.wearHeavyJacket ->
+            ClothingCardRow(
+                iconRes = R.drawable.tykk_jakke,
+                text = stringResource(R.string.clothes_thick_jacket)
+            )
     }
     if (rec.wearThermalUnderwear) {
-        ClothingCardRow(iconRes = R.drawable.tskjorte_ikon, text = "Ullundertøy er lurt.")
+        ClothingCardRow(
+            iconRes = R.drawable.tskjorte_ikon,
+            text = stringResource(R.string.clothes_thermal_underwear)
+        )
     }
 
     // Underkropp
     if (rec.wearShorts) {
-        ClothingCardRow(iconRes = R.drawable.shorts, text = "Shorts passer fint.")
+        ClothingCardRow(
+            iconRes = R.drawable.shorts,
+            text = stringResource(R.string.clothes_shorts)
+        )
     } else {
-        ClothingCardRow(iconRes = R.drawable.jeans, text = "Bukse passer til temperaturen.")
+        ClothingCardRow(
+            iconRes = R.drawable.jeans,
+            text = stringResource(R.string.clothes_pants)
+        )
     }
 
     // Sko
     when {
-        rec.wearWinterBoots     -> ClothingCardRow(iconRes = R.drawable.st_vler, text = "Vintersko/støvler anbefales.")
-        rec.wearWaterproofShoes -> ClothingCardRow(iconRes = R.drawable.st_vler, text = "Vanntette sko anbefales.")
-        else                    -> ClothingCardRow(iconRes = R.drawable.sneaker, text = "Hverdagssko passer fint.")
+        rec.wearWinterBoots
+            -> ClothingCardRow(
+            iconRes = R.drawable.st_vler,
+            text = stringResource(R.string.clothes_winter_boots)
+            )
+        rec.wearWaterproofShoes ->
+            ClothingCardRow(
+                iconRes = R.drawable.st_vler,
+                text = stringResource(R.string.clothes_waterproof_shoes)
+            )
+        else ->
+            ClothingCardRow(
+                iconRes = R.drawable.sneaker,
+                text = stringResource(R.string.clothes_shoes)
+            )
     }
 
     // Regn
     if (rec.bringUmbrella) {
-        ClothingCardRow(iconRes = R.drawable.paraply_ikon, text = "Husk paraply.")
+        ClothingCardRow(
+            iconRes = R.drawable.paraply_ikon,
+            text = stringResource(R.string.clothes_bring_umbrella)
+        )
     }
     if (rec.wearRainGear) {
-        ClothingCardRow(iconRes = R.drawable.paraply_ikon, text = "Ta på regntøy.")
+        ClothingCardRow(
+            iconRes = R.drawable.paraply_ikon,
+            text = stringResource(R.string.clothes_wear_rain_gear)
+        )
     }
 }
 
@@ -552,6 +616,10 @@ private fun ClothingCardRow(iconRes: Int, text: String) {
             modifier = Modifier.size(36.dp)
         )
         Spacer(modifier = Modifier.width(12.dp))
-        Text(text = text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.weight(1f)
+        )
     }
 }

@@ -61,9 +61,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -154,7 +154,7 @@ fun ClothesScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Tilpass klesanbefaling",
+                    text = stringResource(R.string.clothes_adjust),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
@@ -187,8 +187,16 @@ fun ClothesScreen(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Når reiser du?", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                        Text("Dra", fontWeight = FontWeight.SemiBold,style = MaterialTheme.typography.bodySmall)
+                        Text(
+                            stringResource(R.string.clothes_when),
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            stringResource(R.string.clothes_leave),
+                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.bodySmall
+                        )
                         TimeInputField(
                             initialHour = localDepHour,
                             initialMinute = localDepMinute,
@@ -198,7 +206,11 @@ fun ClothesScreen(
                             }
                         )
                         HorizontalDivider()
-                        Text("Tilbake", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodySmall)
+                        Text(
+                            stringResource(R.string.clothes_return),
+                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.bodySmall
+                        )
                         TimeInputField(
                             initialHour = localRetHour,
                             initialMinute = localRetMinute,
@@ -216,7 +228,7 @@ fun ClothesScreen(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Skal du være utendørs")
+                        Text(stringResource(R.string.clothes_outdoors))
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Checkbox(
                                 checked = localIsOutdoors == true,
@@ -225,7 +237,7 @@ fun ClothesScreen(
                                     if (!it) { localIsPhysical = null; localActivityLevel = null }
                                 }
                             )
-                            Text("Ja")
+                            Text(stringResource(R.string.check_yes))
                             Spacer(modifier = Modifier.width(16.dp))
                             Checkbox(
                                 checked = localIsOutdoors == false,
@@ -234,7 +246,7 @@ fun ClothesScreen(
                                     if (it) { localIsPhysical = null; localActivityLevel = null }
                                 }
                             )
-                            Text("Nei")
+                            Text(stringResource(R.string.check_no))
                         }
                     }
                 }
@@ -250,7 +262,7 @@ fun ClothesScreen(
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Text("Skal du være fysisk aktiv")
+                            Text(stringResource(R.string.clothes_physical))
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Checkbox(
                                     checked = localIsPhysical == true,
@@ -259,7 +271,7 @@ fun ClothesScreen(
                                         if (!it) localActivityLevel = null
                                     }
                                 )
-                                Text("Ja")
+                                Text(stringResource(R.string.check_yes))
                                 Spacer(modifier = Modifier.width(16.dp))
                                 Checkbox(
                                     checked = localIsPhysical == false,
@@ -268,13 +280,13 @@ fun ClothesScreen(
                                         if (it) localActivityLevel = null
                                     }
                                 )
-                                Text("Nei")
+                                Text(stringResource(R.string.check_no))
                             }
 
                             // Radioknapper, glir inn når fysisk = true
                             AnimatedVisibility(visible = localIsPhysical == true) {
                                 Column {
-                                    Text("Nivå:")
+                                    Text(stringResource(R.string.clothes_activity_level))
                                     ActivityLevel.entries.forEach { level ->
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             RadioButton(
@@ -302,7 +314,7 @@ fun ClothesScreen(
                             isPhysicallyActive = localIsPhysical == true,
                             activityLevel = localActivityLevel
                         )
-                        bannerMessage = "Klesanbefalingen er oppdatert."
+                        bannerMessage = "Klesanbefalingen er oppdatert." // TODO: se på
                         showBanner = true
                         scope.launch { sheetState.bottomSheetState.partialExpand() }
                     },
@@ -313,7 +325,7 @@ fun ClothesScreen(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 ) {
-                    Text("Gi ny klesanbefaling")
+                    Text(stringResource(R.string.clothes_new_recommendation))
                     Icon(
                         painter = painterResource(id = R.drawable.arrow_forward_icon),
                         contentDescription = null,
@@ -343,11 +355,12 @@ fun ClothesScreen(
                     contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
                     item {
-                        Text(text = "Klær", style = MaterialTheme.typography.titleLarge)
+                        Text(
+                            text = stringResource(R.string.clothes_title),
+                            style = MaterialTheme.typography.titleLarge)
                         Spacer(modifier = Modifier.size(4.dp))
                         Text(
-                            text = "Anbefalingen tar utgangspunkt i fremkomst til og fra skole eller jobb.\n" +
-                                    "Swipe opp for å tilpasse klesanbefalingen!",
+                            text = stringResource(R.string.clothes_recommendation_text),
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Spacer(modifier = Modifier.size(4.dp))
@@ -358,7 +371,7 @@ fun ClothesScreen(
                             modifier = Modifier.padding(top = 4.dp)
                         )
                         Text(
-                            text = "Reise: %02d:%02d → %02d:%02d".format(
+                            text = "Reise: %02d:%02d → %02d:%02d".format( //TODO: stringres med parameter?
                                 settings.departureHour, settings.departureMinute,
                                 settings.returnHour, settings.returnMinute
                             ),
@@ -377,7 +390,7 @@ fun ClothesScreen(
                     } else {
                         item {
                             Text(
-                                text = "Ingen værdata tilgjengelig. Prøv å søk opp et sted på hjemskjermen først.",
+                                text = stringResource(R.string.clothes_no_data),
                                 modifier = Modifier.padding(16.dp)
                             )
                         }
@@ -409,7 +422,11 @@ private fun EffectiveTempCard(rec: ClothesRecommendation) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("Effektiv temperatur", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+            Text(
+                stringResource(R.string.clothes_effective_temp),
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold
+            )
             Text(
                 text = "%.1f°C".format(rec.effectiveTemp),
                 style = MaterialTheme.typography.bodyLarge,
@@ -417,7 +434,7 @@ private fun EffectiveTempCard(rec: ClothesRecommendation) {
                 color = if (rec.effectiveTemp <= 0.0) Color(0xFF1565C0) else Color(0xFFB71C1C)
             )
             Text(
-                text = "Justert for vind, skydekke og aktivitet",
+                text = stringResource(R.string.clothes_effective_temp_text),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
@@ -446,7 +463,7 @@ private fun ClothingCard(rec: ClothesRecommendation) {
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = "Klesanbefaling",
+                    text = stringResource(R.string.clothes_recommendation),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f)
@@ -454,23 +471,23 @@ private fun ClothingCard(rec: ClothesRecommendation) {
             }
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-            if (rec.wearSunglasses) ClothingRow(R.drawable.solbriller, "Solbriller anbefales — det er sol.")
-            if (rec.wearHatGloves) ClothingRow(R.drawable.caps, "Lue og hansker/votter anbefales.")
-            if (rec.wearScarf) ClothingRow(R.drawable.skjerf, "Hals/buff/skjerf er lurt i denne kulden.")
-            if (rec.wearHeavyJacket) ClothingRow(R.drawable.tykk_jakke, "Tykk jakke — det er skikkelig kaldt ute.")
-            if (rec.wearLightJacket) ClothingRow(R.drawable.lett_jakke, "Lett jakke eller mellomlag passer bra.")
-            if (rec.wearSweater) ClothingRow(R.drawable.genser, "En genser holder deg komfortabel.")
-            if (rec.wearTshirt) ClothingRow(R.drawable.t_skjorte, "T-skjorte holder — det er fint og varmt ute.")
-            if (rec.wearShorts) ClothingRow(R.drawable.shorts, "Shorts — det er varmt nok til å droppe lange bukser.")
-            if (rec.wearPants) ClothingRow(R.drawable.jeans, "Bukse passer til dagens temperatur.")
-            if (rec.wearThermalUnderwear) ClothingRow(R.drawable.jeggings, "Ullundertøy — det er kaldt nok til å trenge ekstra lag.")
+            if (rec.wearSunglasses) ClothingRow(R.drawable.solbriller, stringResource(R.string.clothes_sunglasses))
+            if (rec.wearHatGloves) ClothingRow(R.drawable.caps, stringResource(R.string.clothes_hat_gloves))
+            if (rec.wearScarf) ClothingRow(R.drawable.skjerf, stringResource(R.string.clothes_scarf))
+            if (rec.wearHeavyJacket) ClothingRow(R.drawable.tykk_jakke, stringResource(R.string.clothes_thick_jacket))
+            if (rec.wearLightJacket) ClothingRow(R.drawable.lett_jakke, stringResource(R.string.clothes_thin_jacket))
+            if (rec.wearSweater) ClothingRow(R.drawable.genser, stringResource(R.string.clothes_sweatshirt ))
+            if (rec.wearTshirt) ClothingRow(R.drawable.t_skjorte, stringResource(R.string.clothes_tshirt))
+            if (rec.wearShorts) ClothingRow(R.drawable.shorts, stringResource(R.string.clothes_shorts))
+            if (rec.wearPants) ClothingRow(R.drawable.jeans, stringResource(R.string.clothes_pants))
+            if (rec.wearThermalUnderwear) ClothingRow(R.drawable.jeggings, stringResource(R.string.clothes_thermal_underwear))
 
             if (rec.wearWinterBoots) {
-                ClothingRow(R.drawable.st_vler, "Vintersko/støvler — det er frost og nedbør.")
+                ClothingRow(R.drawable.st_vler, stringResource(R.string.clothes_winter_boots))
             } else if (rec.wearWaterproofShoes) {
-                ClothingRow(R.drawable.st_vler, "Vanntette sko anbefales — det er ventet nedbør.")
+                ClothingRow(R.drawable.st_vler, stringResource(R.string.clothes_waterproof_shoes))
             } else {
-                ClothingRow(R.drawable.sneaker, "Hverdagssko passer fint i dag.")
+                ClothingRow(R.drawable.sneaker, stringResource(R.string.clothes_shoes))
             }
         }
     }
@@ -486,10 +503,10 @@ private fun RainCard(rec: ClothesRecommendation) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             if (rec.bringUmbrella) {
-                ClothingRow(R.drawable.paraply_ikon, "Ta med paraply — det er ventet nedbør og lite vind.")
+                ClothingRow(R.drawable.paraply_ikon, stringResource(R.string.clothes_bring_umbrella))
             }
             if (rec.wearRainGear) {
-                ClothingRow(R.drawable.paraply_ikon, "Ta på regntøy — det er nedbør kombinert med sterk vind.")
+                ClothingRow(R.drawable.paraply_ikon, stringResource(R.string.clothes_wear_rain_gear))
             }
         }
     }

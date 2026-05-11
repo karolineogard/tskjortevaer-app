@@ -38,10 +38,10 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
@@ -50,6 +50,7 @@ import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ForecastHour
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,7 +81,7 @@ fun LocationForecastScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             painter = painterResource(id = R.drawable.arrow_up_icon),
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.navbar_back_description),
                             modifier = Modifier.rotate(-90f)
                         )
                     }
@@ -157,25 +158,25 @@ fun DayForecastCard(
                 ) {
                     Spacer(modifier = Modifier.weight(1.3f))
                     Text(
-                      text = "Tid", 
+                      text = stringResource(R.string.forecast_time),
                       style = MaterialTheme.typography.bodySmall, 
                       modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.weight(0.5f))
                     Text(
-                      text = "Temp", 
+                      text = stringResource(R.string.forecast_temp),
                       style = MaterialTheme.typography.bodySmall, 
                       modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.weight(0.5f))
                     Text(
-                      text = "Regn", 
+                      text = stringResource(R.string.forecast_precipitation),
                       style = MaterialTheme.typography.bodySmall, 
                       modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.weight(0.5f))
                     Text(
-                      text = "Vind", 
+                      text = stringResource(R.string.forecast_wind),
                       style = MaterialTheme.typography.bodySmall, 
                       modifier = Modifier.weight(1f)
                     )
@@ -247,7 +248,7 @@ fun DayForecastCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    if (expanded) "Vis mindre" else "Detaljer",
+                    if (expanded) stringResource(R.string.forecast_minimize) else stringResource(R.string.forecast_details),
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Icon(

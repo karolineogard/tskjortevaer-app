@@ -2,7 +2,6 @@ package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -11,16 +10,12 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.DeviceThermostat
@@ -35,22 +30,16 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.text.color
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.iconUrl
 import no.uio.ifi.in2000.ieulrich.team32.model.victoriaWMS.WeatherLayer
 import no.uio.ifi.in2000.ieulrich.team32.ui.victoriaWMS.MapViewModel
-import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
@@ -68,7 +57,6 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import org.maplibre.android.style.expressions.Expression.*
 import android.graphics.Color as AndroidColor
-import no.uio.ifi.in2000.ieulrich.team32.ui.screens.AlertDetailScreen
 import android.app.Activity
 import android.content.pm.ActivityInfo
 import androidx.compose.foundation.clickable
@@ -872,7 +860,7 @@ fun AlertListItem(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "${FormatEventName(alert.event)}, ${alert.area}" ?: "Farevarsel",
+                    text = "${formatEventName(alert.event)}, ${alert.area}" ?: "Farevarsel",
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
                     maxLines = 1
                 )

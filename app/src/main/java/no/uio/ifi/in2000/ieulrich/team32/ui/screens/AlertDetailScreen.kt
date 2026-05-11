@@ -21,14 +21,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGul
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGulGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOransje
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOranjeGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRød
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRødGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.RobotoMono
+import no.uio.ifi.in2000.ieulrich.team32.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,12 +38,12 @@ fun AlertDetailScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(FormatEventName(alert.event)) },
+                title = { Text(formatEventName(alert.event)) }, // TODO: remove, already present in API response
                 navigationIcon = {
                     IconButton(onClick = onBack){
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Tilbake"
+                            contentDescription = stringResource(R.string.navbar_back_description)
                         )
                     }
                 },
@@ -67,9 +66,9 @@ fun AlertDetailScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = SeverityColor(alert.severity).copy(alpha = 0.3f)
+                    containerColor = severityColor(alert.severity).copy(alpha = 0.3f)
                 ),
-                border = BorderStroke(2.dp, SeverityColor(alert.severity))
+                border = BorderStroke(2.dp, severityColor(alert.severity))
             ){
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -78,7 +77,7 @@ fun AlertDetailScreen(
                 ) {
                     AsyncImage(
                         model = alert.iconUrl,
-                        contentDescription = "Ikon for ${alert.event}",
+                        contentDescription = stringResource(R.string.alert_icon_description, alert.event ?: ""),
                         modifier = Modifier
                             .size(120.dp)
                             .padding(vertical = 8.dp),
@@ -105,24 +104,39 @@ fun AlertDetailScreen(
 
                     alert.title?.let {
                         InfoSection(
-                            label = "Varsel",
-                            value = "${FormatEventName(alert.event)} – ${alert.area ?: ""}"
+                            label = stringResource(R.string.alert_title),
+                            value = "${formatEventName(alert.event)} – ${alert.area ?: ""}"
                         )
                     }
                     alert.severity?.let {
-                        InfoSection(label = "Alvorlighetsgrad", value = FormatSeverity(it))
+                        InfoSection(
+                            label = stringResource(R.string.alert_severity),
+                            value = formatSeverity(it)
+                        )
                     }
                     alert.area?.let {
-                        InfoSection(label = "Område", value = it)
+                        InfoSection(
+                            label = stringResource(R.string.alert_area),
+                            value = it
+                        )
                     }
                     alert.description?.let {
-                        InfoSection(label = "Beskrivelse", value = it)
+                        InfoSection(
+                            label = stringResource(R.string.alert_description),
+                            value = it
+                        )
                     }
                     alert.consequence?.let {
-                        InfoSection(label = "Konsekvens", value = it)
+                        InfoSection(
+                            label = stringResource(R.string.alert_consequence),
+                            value = it
+                        )
                     }
                     alert.instruction?.let {
-                        InfoSection(label = "Instruksjon", value = it)
+                        InfoSection(
+                            label = stringResource(R.string.alert_instruction),
+                            value = it
+                        )
                     }
                     Spacer(modifier = Modifier.height(2.dp))
                     HorizontalDivider(color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f))
@@ -156,14 +170,15 @@ fun InfoSection(label: String, value: String, color: Color = MaterialTheme.color
 }
 
 
-fun SeverityColor(severity: String?): Color = when (severity?.lowercase()){
+fun severityColor(severity: String?): Color = when (severity?.lowercase()){
     "moderate" -> FarevarselGul
     "severe"   -> FarevarselOransje
     "extreme"  -> FarevarselRød
     else -> Color.LightGray
 }
 
-fun FormatEventName(event: String?): String = when (event?.lowercase()) {
+// TODO: remove, already present in API response
+fun formatEventName(event: String?): String = when (event?.lowercase()) {
     "blowingsnow" -> "Snøfokk"
     "forestfire"  -> "Skogbrannfare"
     "gale"        -> "Kuling"
@@ -179,7 +194,7 @@ fun FormatEventName(event: String?): String = when (event?.lowercase()) {
     else          -> event ?: "Ukjent varsel"
 }
 
-fun FormatSeverity(severity: String?): String = when (severity?.lowercase()) {
+fun formatSeverity(severity: String?): String = when (severity?.lowercase()) {
     "moderate" -> "Gul"
     "severe"   -> "Oransje"
     "extreme"  -> "Rød"
@@ -189,9 +204,21 @@ fun FormatSeverity(severity: String?): String = when (severity?.lowercase()) {
 @Composable
 fun SeverityLegend(modifier: Modifier = Modifier) {
     val levels = listOf(
-        Triple("minor",    FarevarselGul, "Gult: Moderat fare"),
-        Triple("moderate", FarevarselOransje, "Oransje: Stor fare"),
-        Triple("severe",   FarevarselRød, "Rødt: Ekstrem fare og ekstremvær"),
+        Triple(
+            "minor",
+            FarevarselGul,
+            stringResource(R.string.alert_yellow)
+        ),
+        Triple(
+            "moderate",
+            FarevarselOransje,
+            stringResource(R.string.alert_orange)
+        ),
+        Triple(
+            "severe",
+            FarevarselRød,
+            stringResource(R.string.alert_red)
+        ),
     )
 
     Column(
@@ -199,7 +226,7 @@ fun SeverityLegend(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Text(
-            text = "Farenivåer",
+            text = stringResource(R.string.alert_levels),
             fontFamily = RobotoMono,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onPrimary
