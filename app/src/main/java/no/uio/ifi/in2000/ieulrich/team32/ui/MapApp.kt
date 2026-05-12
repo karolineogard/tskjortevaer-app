@@ -190,7 +190,6 @@ fun MapApp(
 
                 composable(route = Routes.CLOTHES) {
                     ClothesScreen(
-                        navController = navController,
                         clothesViewModel = clothesViewModel,
                         settingsViewModel = settingsViewModel,
                         isOnline = isOnline
