@@ -66,13 +66,12 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.R
+import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
@@ -86,8 +85,6 @@ import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClothesScreen(
-    modifier: Modifier = Modifier,
-    navController: NavController,
     clothesViewModel: ClothesViewModel,
     settingsViewModel: SettingsViewModel,
     isOnline: Boolean
@@ -167,8 +164,8 @@ fun ClothesScreen(
                 )
             }
 
-            var localIsOutdoors by remember { mutableStateOf<Boolean?>(if (settings.isOutdoors) true else null) }
-            var localIsPhysical by remember { mutableStateOf<Boolean?>(if (settings.isPhysicallyActive) true else null) }
+            var localIsOutdoors by remember { mutableStateOf(if (settings.isOutdoors) true else null) }
+            var localIsPhysical by remember { mutableStateOf(if (settings.isPhysicallyActive) true else null) }
             var localActivityLevel by remember { mutableStateOf(settings.activityLevel) }
             var localDepHour by remember(settings) { mutableIntStateOf(settings.departureHour) }
             var localDepMinute by remember(settings) { mutableIntStateOf(settings.departureMinute) }
@@ -337,7 +334,7 @@ fun ClothesScreen(
                 ) {
                     item {
                         Column(
-                            modifier = Modifier.padding(horizontal = 16.dp,),
+                            modifier = Modifier.padding(horizontal = 16.dp),
                             horizontalAlignment = Alignment.Start)
                         {
                             Text(
@@ -362,22 +359,22 @@ fun ClothesScreen(
                                 modifier = Modifier.padding(top = 4.dp),
                             )
                             Spacer(modifier = Modifier.size(4.dp))
-                            var infostring = ""
-                            if(settings.isOutdoors) {
-                                infostring = stringResource(R.string.clothes_recommendation_text_outdoors)
+                            var infoString = if(settings.isOutdoors) {
+                                stringResource(R.string.clothes_recommendation_text_outdoors)
                             } else {
-                                infostring = stringResource(R.string.clothes_recommendation_text_default)
+                                stringResource(R.string.clothes_recommendation_text_default)
                             }
+
                             if(settings.isPhysicallyActive) {
-                                when (settings.activityLevel) {
-                                    ActivityLevel.LOW -> infostring += stringResource(R.string.clothes_recommendation_text_physical_low)
-                                    ActivityLevel.MEDIUM -> infostring += stringResource(R.string.clothes_recommendation_text_physical_medium)
-                                    ActivityLevel.HIGH -> infostring += stringResource(R.string.clothes_recommendation_text_physical_high)
-                                    else -> infostring += stringResource(R.string.clothes_recommendation_text_physical)
+                                infoString += when (settings.activityLevel) {
+                                    ActivityLevel.LOW -> stringResource(R.string.clothes_recommendation_text_physical_low)
+                                    ActivityLevel.MEDIUM -> stringResource(R.string.clothes_recommendation_text_physical_medium)
+                                    ActivityLevel.HIGH -> stringResource(R.string.clothes_recommendation_text_physical_high)
+                                    else -> stringResource(R.string.clothes_recommendation_text_physical)
                                 }
                             }
                             Text(
-                                text = infostring,
+                                text = infoString,
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 modifier = Modifier.padding(top = 4.dp),
@@ -445,7 +442,7 @@ private fun EffectiveTempCard(rec: ClothesRecommendation) {
                     }
                 }
                 Text(
-                    text = "%.1f°C".format(rec.effectiveTemp),
+                    text = Format.formatTemp(rec.effectiveTemp),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
                     color = if (rec.effectiveTemp <= 0.0) MinusTekst else PlussTekst
