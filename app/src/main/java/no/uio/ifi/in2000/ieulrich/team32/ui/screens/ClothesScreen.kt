@@ -66,6 +66,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -331,35 +332,58 @@ fun ClothesScreen(
             } else {
                 LazyColumn(
                     modifier = Modifier.padding(12.dp).background(MaterialTheme.colorScheme.background),
-                    horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
                     item {
-                        Text(
-                            text = stringResource(R.string.clothes_title),
-                            style = MaterialTheme.typography.titleLarge)
-                        Spacer(modifier = Modifier.size(4.dp))
-                        Text(
-                            text = stringResource(R.string.clothes_recommendation_text),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Spacer(modifier = Modifier.size(4.dp))
-                        Text(
-                            text = today,
-                            style = MaterialTheme.typography.bodySmall,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
-                        Text(
-                            text = "Reise: %02d:%02d → %02d:%02d".format( //TODO: stringres med parameter?
-                                settings.departureHour, settings.departureMinute,
-                                settings.returnHour, settings.returnMinute
-                            ),
-                            style = MaterialTheme.typography.bodySmall,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
+                        Column(
+                            modifier = Modifier.padding(horizontal = 16.dp,),
+                            horizontalAlignment = Alignment.Start)
+                        {
+                            Text(
+                                text = stringResource(R.string.clothes_title),
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            Spacer(modifier = Modifier.size(4.dp))
+                            Text(
+                                text = today,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.padding(top = 4.dp),
+                            )
+                            Spacer(modifier = Modifier.size(4.dp))
+                            Text(
+                                text = "Dra: %02d:%02d Tilbake: %02d:%02d".format( //TODO: stringres med parameter?
+                                    settings.departureHour, settings.departureMinute,
+                                    settings.returnHour, settings.returnMinute
+                                ),
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.padding(top = 4.dp),
+                            )
+                            Spacer(modifier = Modifier.size(4.dp))
+                            var infostring = ""
+                            if(settings.isOutdoors) {
+                                infostring = stringResource(R.string.clothes_recommendation_text_outdoors)
+                            } else {
+                                infostring = stringResource(R.string.clothes_recommendation_text_default)
+                            }
+                            if(settings.isPhysicallyActive) {
+                                when (settings.activityLevel) {
+                                    ActivityLevel.LOW -> infostring += stringResource(R.string.clothes_recommendation_text_physical_low)
+                                    ActivityLevel.MEDIUM -> infostring += stringResource(R.string.clothes_recommendation_text_physical_medium)
+                                    ActivityLevel.HIGH -> infostring += stringResource(R.string.clothes_recommendation_text_physical_high)
+                                    else -> infostring += stringResource(R.string.clothes_recommendation_text_physical)
+                                }
+                            }
+                            Text(
+                                text = infostring,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.padding(top = 4.dp),
+                            )
+                        }
+
                     }
 
                     if (recommendation != null) {

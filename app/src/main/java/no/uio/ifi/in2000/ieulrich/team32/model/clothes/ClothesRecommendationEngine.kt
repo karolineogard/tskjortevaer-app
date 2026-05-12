@@ -115,7 +115,7 @@ object ClothesRecommendationEngine {
 
     private fun isSunny(symbolCode: String): Boolean {
         val code = symbolCode.lowercase()
-        return code.startsWith("clearsky") || code.startsWith("fair") || code.startsWith("partlycloudy")
+        return code.startsWith("clearsky") || code.startsWith("fair")
     }
 
     private fun windPenalty(windSpeed: Double): Int = when {

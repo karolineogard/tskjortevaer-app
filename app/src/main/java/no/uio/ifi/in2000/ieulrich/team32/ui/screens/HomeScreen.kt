@@ -552,11 +552,11 @@ private fun ClothingCardRecommendationRows(rec: ClothesRecommendation) {
         val lower = if (rec.wearShorts) stringResource(R.string.home_shorts)
          else stringResource(R.string.home_pants)
         val clothingSummary = stringResource(R.string.home_outfit_summary, upper, lower)
-        
-        val rainsuggestion = if (rec.bringUmbrella || rec.wearRainGear) {
-            stringResource(R.string.home_rain)
-        } else {
-            stringResource(R.string.home_no_rain)
+        var rain_icon = R.drawable.ikke_paraply
+        var rainsuggestion = stringResource(R.string.home_no_rain)
+        if (rec.bringUmbrella || rec.wearRainGear) {
+            rainsuggestion = stringResource(R.string.home_rain)
+            rain_icon = R.drawable.paraply
         }
 
         ClothingCardRow(
@@ -565,7 +565,7 @@ private fun ClothingCardRecommendationRows(rec: ClothesRecommendation) {
         )
 
         ClothingCardRow(
-            iconRes = R.drawable.paraply,
+            iconRes = rain_icon,
             text = rainsuggestion
         )
     }
