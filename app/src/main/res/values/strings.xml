@@ -4,8 +4,8 @@
     <string name="degree_sign">°</string>
     <string name="info_button">Info</string>
     <string name="close_button">Lukk</string>
-    <string name="error_no_internet">Ingen internettforbindelse</string>
-    <string name="error_no_internet_text">Koble til internett for å se værdata og klesanbefalinger.</string>
+    <string name="error_no_internet">Kunne ikke laste inn data</string>
+    <string name="error_no_internet_text">Vennligst sjekk internettforbindelsen, og prøv igjen</string>
 
     <!-- Navbar -->
     <string name="navbar_back_description">Tilbake</string>
@@ -121,7 +121,3 @@
     <string name="settings_return">Tilbake</string>
     <string name="settings_save">Lagre</string>
 </resources>
-    <!--
-    stringResource(R.string.)
-    import no.uio.ifi.in2000.ieulrich.team32.R
-    -->

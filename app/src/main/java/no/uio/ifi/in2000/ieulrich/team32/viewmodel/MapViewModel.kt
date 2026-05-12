@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.ieulrich.team32.ui.victoriaWMS
+package no.uio.ifi.in2000.ieulrich.team32.viewmodel
 
 import android.location.Location
 import android.util.Log

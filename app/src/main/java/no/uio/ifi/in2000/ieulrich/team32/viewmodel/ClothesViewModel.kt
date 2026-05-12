@@ -73,10 +73,6 @@ class ClothesViewModel @Inject constructor(
         }
     }
 
-    fun clearRecommendationIfOffline(isOnline: Boolean) {
-        if (!isOnline) _recommendation.value = null
-    }
-
     fun updateTemperatureOffset(offset: Float) {
         temperatureOffset = offset
         computeRecommendation()
