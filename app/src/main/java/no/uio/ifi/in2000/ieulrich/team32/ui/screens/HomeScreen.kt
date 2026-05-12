@@ -37,6 +37,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -195,7 +196,7 @@ fun HomeScreen(
                     }
 
                     item {
-                        ClothingCard(navController = navController, clothesViewModel = clothesViewModel)
+                        ClothingCard(navController = navController, clothesViewModel = clothesViewModel, location = state.location)
                     }
                 }
             }
@@ -381,11 +382,18 @@ fun WeatherCard(
 fun ClothingCard(
     navController: NavController,
     clothesViewModel: ClothesViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    location: AppLocation?
 ) {
     var showInfo by rememberSaveable { mutableStateOf(false) }
     val recommendation by clothesViewModel.recommendation.collectAsStateWithLifecycle()
     val isLoading by clothesViewModel.isLoading.collectAsStateWithLifecycle()
+
+    LaunchedEffect(location) {
+        location?.let {
+            clothesViewModel.updateLocation(it.lat, it.lon)
+        }
+    }
 
     Box(modifier = modifier.fillMaxWidth()) {
         Card(
@@ -559,13 +567,19 @@ private fun ClothingCardRecommendationRows(rec: ClothesRecommendation) {
             stringResource(R.string.home_no_rain)
         }
 
+        val rain_icon = if (rec.bringUmbrella || rec.wearRainGear) {
+            R.drawable.paraply
+        } else {
+            R.drawable.ikke_paraply
+        }
+
         ClothingCardRow(
             iconRes = R.drawable.henger,
             text = clothingSummary
         )
 
         ClothingCardRow(
-            iconRes = R.drawable.paraply,
+            iconRes = rain_icon,
             text = rainsuggestion
         )
     }
