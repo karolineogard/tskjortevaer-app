@@ -72,13 +72,16 @@ fun LocationForecastScreen(
         }
     }
 
-    val forecast by viewmodel.forecast.collectAsStateWithLifecycle()
     val groupedByDay = viewmodel.forecastByDay.collectAsStateWithLifecycle()
+    val place = viewmodel.placeName.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(city, fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        text = place.value,
+                        fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
