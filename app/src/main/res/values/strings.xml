@@ -21,7 +21,7 @@
     <string name="check_no">Nei</string>
 
     <!-- Home screen -->
-    <string name="home_outfit">Bekledning</string>
+    <string name="home_outfit">Klesanbefaling</string>
     <string name="home_no_recommendation">Ingen værdata tilgjengelig ennå.</string>
     <string name="home_recommendation_title">Anbefaling</string>
     <string name="home_info_text">Anbefalingen tar utgangspunkt i fremkomst til og fra skole eller jobb. Vi antar at reisetidspunktet skjer mellom 8–10 på morgenen og 16–18 på kvelden.</string>
@@ -48,11 +48,16 @@
     <string name="clothes_leave">Dra</string>
     <string name="clothes_return">Tilbake</string>
     <string name="clothes_activity_level">Aktivitetsnivå</string>
-    <string name="clothes_effective_temp">Effektiv temperatur</string>
+    <string name="clothes_effective_temp">Føles som:</string>
     <string name="clothes_recommendation_updated">Klesanbefalingen er oppdatert.</string>
     <string name="clothes_new_recommendation">Gi ny klesanbefaling</string>
-    <string name="clothes_title">Klær</string>
-    <string name="clothes_recommendation_text">Anbefalingen tar utgangspunkt i fremkomst til og fra skole eller jobb.\n Swipe opp for å tilpasse klesanbefalingen!</string>
+    <string name="clothes_title">Klesanbefaling</string>
+    <string name="clothes_recommendation_text_default">For deg som pendler i rushtid</string>
+    <string name="clothes_recommendation_text_outdoors">"For deg som skal være utendørs "</string>
+    <string name="clothes_recommendation_text_physical_low">og fysisk aktiv på et lavt aktivitetsnivå</string>
+    <string name="clothes_recommendation_text_physical_medium">og fysisk aktiv på et middels aktivitetsnivå</string>
+    <string name="clothes_recommendation_text_physical_high">og fysisk aktiv på et høy aktivitetsnivå</string>
+    <string name="clothes_recommendation_text_physical">og fysisk aktiv</string>
     <string name="clothes_no_data">Ingen værdata tilgjengelig. Prøv å søk opp et sted på hjemskjermen først.</string>
     <string name="clothes_effective_temp_text">Justert for vind, skydekke og aktivitet</string>
     <string name="clothes_recommendation">Klesanbefaling</string>

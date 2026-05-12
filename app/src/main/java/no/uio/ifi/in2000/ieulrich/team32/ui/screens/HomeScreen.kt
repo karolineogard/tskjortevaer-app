@@ -37,6 +37,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -194,7 +195,7 @@ fun HomeScreen(
                     }
 
                     item {
-                        ClothingCard(navController = navController, clothesViewModel = clothesViewModel)
+                        ClothingCard(navController = navController, clothesViewModel = clothesViewModel, location = state.location)
                     }
                 }
             }
@@ -369,11 +370,18 @@ fun WeatherCard(
 fun ClothingCard(
     navController: NavController,
     clothesViewModel: ClothesViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    location: AppLocation?
 ) {
     var showInfo by rememberSaveable { mutableStateOf(false) }
     val recommendation by clothesViewModel.recommendation.collectAsStateWithLifecycle()
     val isLoading by clothesViewModel.isLoading.collectAsStateWithLifecycle()
+
+    LaunchedEffect(location) {
+        location?.let {
+            clothesViewModel.updateLocation(it.lat, it.lon)
+        }
+    }
 
     Box(modifier = modifier.fillMaxWidth()) {
         Card(
@@ -392,7 +400,6 @@ fun ClothingCard(
                         text = stringResource(R.string.home_outfit),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.weight(2f),
-                        textAlign = TextAlign.Center
                     )
                     IconButton(onClick = { showInfo = !showInfo }) {
                         Icon(
@@ -540,11 +547,17 @@ private fun ClothingCardRecommendationRows(rec: ClothesRecommendation) {
         val lower = if (rec.wearShorts) stringResource(R.string.home_shorts)
          else stringResource(R.string.home_pants)
         val clothingSummary = stringResource(R.string.home_outfit_summary, upper, lower)
-        
+
         val rainsuggestion = if (rec.bringUmbrella || rec.wearRainGear) {
             stringResource(R.string.home_rain)
         } else {
             stringResource(R.string.home_no_rain)
+        }
+
+        val rain_icon = if (rec.bringUmbrella || rec.wearRainGear) {
+            R.drawable.paraply
+        } else {
+            R.drawable.ikke_paraply
         }
 
         ClothingCardRow(
@@ -553,7 +566,7 @@ private fun ClothingCardRecommendationRows(rec: ClothesRecommendation) {
         )
 
         ClothingCardRow(
-            iconRes = R.drawable.paraply,
+            iconRes = rain_icon,
             text = rainsuggestion
         )
     }
