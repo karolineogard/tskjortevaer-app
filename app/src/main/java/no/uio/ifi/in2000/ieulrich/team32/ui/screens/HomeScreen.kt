@@ -1,9 +1,8 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
-import android.location.Location
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -106,25 +105,7 @@ fun HomeScreen(
         when (val state = uiState) {
             is UiState.Loading -> {
                 if (!isOnline) {
-                    Box(
-                        modifier = Modifier.fillMaxSize().padding(32.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Text(
-                                text = stringResource(R.string.error_no_internet),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = stringResource(R.string.error_no_internet_text),
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
+                  NoInternetScreen()
                 } else {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -138,25 +119,7 @@ fun HomeScreen(
             }
 
             is UiState.Error -> {
-                Box(
-                    modifier = Modifier.fillMaxSize().padding(32.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Text(
-                            text = "Kunne ikke hente værdata.", // TODO: Stringres
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "Sjekk at du har internettforbindelse og prøv igjen.", // TODO: stringres
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
+                NoInternetScreen()
             }
 
             is UiState.Success -> {
