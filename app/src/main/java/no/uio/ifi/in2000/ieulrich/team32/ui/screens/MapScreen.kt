@@ -80,6 +80,7 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGulGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOranjeGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRødGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.R
+import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.toMetAlert
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -208,21 +209,8 @@ fun MapScreen(
                                         val features = map.queryRenderedFeatures(
                                             map.projection.toScreenLocation(point), "alerts-layer"
                                         )
-                                        if (features.isNotEmpty()) {
-                                            val feature = features[0]
-                                            val alert = MetAlert(
-                                                event = feature.getStringProperty("event") ?: "",
-                                                severity = feature.getStringProperty("severity")
-                                                    ?: "",
-                                                description = feature.getStringProperty("description")
-                                                    ?: "",
-                                                area = feature.getStringProperty("area") ?: "",
-                                                instruction = feature.getStringProperty("instruction")
-                                                    ?: "",
-                                                consequence = feature.getStringProperty("consequence")
-                                                    ?: "",
-                                                title = feature.getStringProperty("title") ?: "",
-                                            )
+                                        val alert = features.firstOrNull()?.toMetAlert()
+                                        if (alert != null) {
                                             viewModel.selectAlert(alert)
                                             return@addOnMapClickListener true
                                         }

@@ -1,9 +1,7 @@
 package no.uio.ifi.in2000.ieulrich.team32.viewmodel
 
-import android.location.Location
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,23 +17,22 @@ import kotlinx.coroutines.test.setMain
 import no.uio.ifi.in2000.ieulrich.team32.data.geocoding.LocationRepository
 import no.uio.ifi.in2000.ieulrich.team32.data.location.DeviceLocationDataSource
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.LocationForecastRepository
-import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.AlertFeature
-import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.AlertProperties
-import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.AlertsRepository
-import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.TimeInterval
+import no.uio.ifi.in2000.ieulrich.team32.data.victoriaWMS.WeatherRepository
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
+import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
+import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.TimeInterval
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertInstanceOf
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.AfterEach
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
     private val deviceLocationDataSource: DeviceLocationDataSource = mockk()
     private val locationForecastRepository: LocationForecastRepository = mockk()
-    private val alertsRepository: AlertsRepository = mockk()
+    private val weatherRepository: WeatherRepository = mockk()
     private val locationRepository: LocationRepository = mockk()
 
     private val testDispatcher = StandardTestDispatcher()
@@ -59,8 +56,7 @@ class HomeViewModelTest {
 
     // brukte et ekte varsel som mock data
     private val fakeAlerts = listOf(
-        AlertFeature(
-            properties = AlertProperties(
+        MetAlert(
                 area = "Frøyabanken",
                 consequences = "Middels høye bølger: Bølgekammene er ved å brytes opp til sjørokk.",
                 eventAwarenessName = "Kuling",
@@ -72,10 +68,8 @@ class HomeViewModelTest {
                 ),
                 awarenessResponse = "Følg med",
                 instruction = "Ikke dra ut i småbåt: Det er farlig å være ute i småbåt."
-            )
         ),
-        AlertFeature(
-            properties = AlertProperties(
+        MetAlert(
                 area = "Melbu - Torsvåg",
                 consequences = "Høye bølger: Sjøen begynner å rulle. Sjørokket kan minske synsvidden.",
                 eventAwarenessName = "Kuling",
@@ -87,10 +81,8 @@ class HomeViewModelTest {
                 ),
                 awarenessResponse = "Følg med",
                 instruction = "Ikke dra ut i småbåt: Det er farlig å være ute i småbåt. Ved motorstopp kan man drive raskt mot land."
-            )
         ),
-        AlertFeature(
-            properties = AlertProperties(
+        MetAlert(
                 area = "E3",
                 consequences = "Høye bølger: Sjøen begynner å rulle. Sjørokket kan minske synsvidden.",
                 eventAwarenessName = "Storm",
@@ -102,10 +94,8 @@ class HomeViewModelTest {
                 ),
                 awarenessResponse = "Følg med",
                 instruction = "Ikke dra ut i småbåt: Det er farlig å være ute i småbåt."
-            )
         ),
-        AlertFeature(
-            properties = AlertProperties(
+        MetAlert(
                 area = "Vesterålsbankene",
                 consequences = "Høye bølger: Sjøen begynner å rulle. Sjørokket kan minske synsvidden.",
                 eventAwarenessName = "Storm",
@@ -117,10 +107,8 @@ class HomeViewModelTest {
                 ),
                 awarenessResponse = "Følg med",
                 instruction = "Ikke dra ut i småbåt: Det er farlig å være ute i småbåt."
-            )
         ),
-        AlertFeature(
-            properties = AlertProperties(
+        MetAlert(
                 area = "Svinøy - Frøya",
                 consequences = "Grov sjø: Hvitt skum fra bølgetopper som brekker.",
                 eventAwarenessName = "Kuling",
@@ -132,10 +120,8 @@ class HomeViewModelTest {
                 ),
                 awarenessResponse = "Følg med",
                 instruction = "Vurder å la båten ligge: Det kan være farlig å være ute i småbåt. Ved motorstopp kan man drive raskt mot land."
-            )
         ),
-        AlertFeature(
-            properties = AlertProperties(
+        MetAlert(
                 area = "Deler av Vestland",
                 consequences = "Vegetasjonen kan lett antennes: Store områder kan bli berørt.",
                 eventAwarenessName = "Skogbrannfare",
@@ -149,7 +135,6 @@ class HomeViewModelTest {
                 instruction = "Vegetasjonen kan lett antennes: Ikke bruk åpen ild. Følg instruksjoner fra lokale myndigheter."
             )
         )
-    )
 
     @BeforeEach
     fun setup(){
@@ -164,7 +149,7 @@ class HomeViewModelTest {
     private fun createViewModel() = HomeViewModel(
         deviceLocationDataSource,
         locationForecastRepository,
-        alertsRepository,
+        weatherRepository,
         locationRepository
     )
 
@@ -172,12 +157,12 @@ class HomeViewModelTest {
         location: AppLocation? = fakeLocation,
         forecast: ForecastHourDetails? = fakeForecast,
         place: String = "Oslo",
-        alerts: List<AlertFeature> = fakeAlerts
+        alerts: List<MetAlert> = fakeAlerts
     ) {
         coEvery { deviceLocationDataSource.getCurrentLocation() } returns location
         coEvery { locationForecastRepository.getForecastNow(any(), any()) } returns forecast
         coEvery { locationRepository.getPlaceName(any(), any()) } returns place
-        coEvery { alertsRepository.getCurrentAlerts(any(), any()) } returns alerts
+        coEvery { weatherRepository.getAlertsByLocation(any(), any()) } returns alerts
     }
 
     // tester som burde være suksess
@@ -216,7 +201,7 @@ class HomeViewModelTest {
         // verifiserer at faktiske koordinater blir brukt, ikke fallback
         coVerify {
             locationForecastRepository.getForecastNow(59.9432, 10.7173)
-            alertsRepository.getCurrentAlerts(59.9432, 10.7173)
+            weatherRepository.getAlertsByLocation(59.9432,10.7173)
             locationRepository.getPlaceName(59.9432, 10.7173)
         }
     }
@@ -231,7 +216,7 @@ class HomeViewModelTest {
 
         coVerify {
             locationForecastRepository.getForecastNow(59.9432, 10.7173)
-            alertsRepository.getCurrentAlerts(59.9432, 10.7173)
+            weatherRepository.getAlertsByLocation(59.9432, 10.7173)
             locationRepository.getPlaceName(59.9432, 10.7173)
         }
 
@@ -284,7 +269,7 @@ class HomeViewModelTest {
     fun `loadData emits Error when alertsRepository throws`() = runTest {
         stubHappyPath()
         coEvery {
-            alertsRepository.getCurrentAlerts(any(), any())
+            weatherRepository.getAlertsByLocation(any(), any())
         } throws Exception("Timeout")
 
         viewModel = createViewModel()
@@ -370,7 +355,7 @@ class HomeViewModelTest {
         coEvery { locationRepository.getPlaceName(any(), any()) } coAnswers {
             delay(100); "Oslo"
         }
-        coEvery { alertsRepository.getCurrentAlerts(any(), any()) } coAnswers {
+        coEvery { weatherRepository.getAlertsByLocation(any(), any()) } coAnswers {
             delay(100); fakeAlerts
         }
 

@@ -44,7 +44,7 @@ class MapViewModelTest {
 
         every { repository.getAlertsUrl() } returns "https://api.met.no/alerts"
         every { repository.getWmsUrl(any(), any()) } returns "https://weather.met.no/wms?service=WMS"
-        coEvery { repository.getAlerts() } returns emptyList()
+        coEvery { repository.getAllAlerts() } returns emptyList()
 
         viewModel = MapViewModel(repository)
     }
@@ -90,7 +90,7 @@ class MapViewModelTest {
 
     @Test
     fun `onAlertsSelected repository exception handling`() = runTest {
-        coEvery { repository.getAlerts() } throws Exception("Network error")
+        coEvery { repository.getAllAlerts() } throws Exception("Network error")
 
         // Skal ikke krasje
         viewModel.onAlertsSelected()

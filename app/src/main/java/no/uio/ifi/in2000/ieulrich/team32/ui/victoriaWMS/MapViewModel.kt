@@ -59,7 +59,7 @@ class MapViewModel @Inject constructor(
     ) }
         viewModelScope.launch {
             try {
-                val fetchedAlerts = repository.getAlerts()
+                val fetchedAlerts = repository.getAllAlerts()
                 _uiState.update { it.copy(
                     alerts = fetchedAlerts
                 ) }
@@ -67,6 +67,7 @@ class MapViewModel @Inject constructor(
             } catch (e: Exception) {
                 Log.e("MapViewModel", "Feil ved henting av farevarsler")
             }
+
         }
 
     }

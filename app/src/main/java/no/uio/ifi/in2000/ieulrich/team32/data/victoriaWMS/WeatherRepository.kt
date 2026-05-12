@@ -1,13 +1,7 @@
 package no.uio.ifi.in2000.ieulrich.team32.data.victoriaWMS
 
-import android.util.Log
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.http.HttpHeaders
+import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.MetAlertsDatasource
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
-import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlertsResponse
 import no.uio.ifi.in2000.ieulrich.team32.model.victoriaWMS.WeatherLayer
 import javax.inject.Inject
 
@@ -15,11 +9,12 @@ interface WeatherRepository {
     fun getWmsUrl(layer: WeatherLayer, Time: String): String
     fun getAlertsUrl(): String
 
-    suspend fun getAlerts(): List<MetAlert>
+    suspend fun getAllAlerts(): List<MetAlert>
+    suspend fun getAlertsByLocation(lat: Double, lon: Double): List<MetAlert>
 }
 
 class WeatherRepositoryImpl @Inject constructor(
-    private val client: HttpClient
+    private val datasource: MetAlertsDatasource
 ) : WeatherRepository {
     override fun getWmsUrl(layer: WeatherLayer, Time: String): String {
 
@@ -39,16 +34,16 @@ class WeatherRepositoryImpl @Inject constructor(
         return "https://in2000.api.met.no/weatherapi/metalerts/2.0/current.json"
     }
 
-    override suspend fun getAlerts(): List<MetAlert> {
-        return try {
-            val response: MetAlertsResponse = client.get(getAlertsUrl()){
-                header(HttpHeaders.UserAgent, "IN2000 Team 32")
-            }.body()
+    override suspend fun getAlertsByLocation(lat: Double, lon: Double): List<MetAlert> =
+        datasource.getAlertsByLocation(lat, lon)
+            ?.features
+            ?.map { it.properties }
+            ?: emptyList()
 
-            response.features.map{ it.properties }
-        } catch (e: Exception) {
-            Log.e("WeatherRepository", "Kunne ikke hente farevarsler: ${e.message}")
-            emptyList()
-        }
-    }
+
+    override suspend fun getAllAlerts(): List<MetAlert> =
+        datasource.getAllAlerts()
+            ?.features
+            ?.map { it.properties }
+            ?: emptyList()
 }
