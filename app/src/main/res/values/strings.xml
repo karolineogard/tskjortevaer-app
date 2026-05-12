@@ -21,7 +21,7 @@
     <string name="check_no">Nei</string>
 
     <!-- Home screen -->
-    <string name="home_outfit">Bekledning</string>
+    <string name="home_outfit">Klesanbefaling</string>
     <string name="home_no_recommendation">Ingen værdata tilgjengelig ennå.</string>
     <string name="home_recommendation_title">Anbefaling</string>
     <string name="home_info_text">Anbefalingen tar utgangspunkt i fremkomst til og fra skole eller jobb. Vi antar at reisetidspunktet skjer mellom 8–10 på morgenen og 16–18 på kvelden.</string>

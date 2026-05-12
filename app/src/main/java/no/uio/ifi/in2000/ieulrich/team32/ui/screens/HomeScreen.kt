@@ -412,7 +412,6 @@ fun ClothingCard(
                         text = stringResource(R.string.home_outfit),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.weight(2f),
-                        textAlign = TextAlign.Center
                     )
                     IconButton(onClick = { showInfo = !showInfo }) {
                         Icon(
