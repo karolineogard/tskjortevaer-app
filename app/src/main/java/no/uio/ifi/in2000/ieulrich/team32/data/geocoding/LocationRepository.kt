@@ -28,4 +28,4 @@ class LocationRepository @Inject constructor (
 }
 
 fun NominatimAddress.bestName(): String =
-    city ?: town?: suburb ?: cityDistrict ?: county ?: "Ukjent lokasjon"
+    city ?: town?: suburb ?: cityDistrict ?: municipality ?: county ?: "Ukjent lokasjon"
