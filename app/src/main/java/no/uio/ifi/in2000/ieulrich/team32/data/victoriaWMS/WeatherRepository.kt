@@ -37,13 +37,13 @@ class WeatherRepositoryImpl @Inject constructor(
     override suspend fun getAlertsByLocation(lat: Double, lon: Double): List<MetAlert> =
         datasource.getAlertsByLocation(lat, lon)
             ?.features
-            ?.map { it.properties }
+            ?.map { it.toMetAlert() }
             ?: emptyList()
 
 
     override suspend fun getAllAlerts(): List<MetAlert> =
         datasource.getAllAlerts()
             ?.features
-            ?.map { it.properties }
+            ?.map { it.toMetAlert() }
             ?: emptyList()
 }

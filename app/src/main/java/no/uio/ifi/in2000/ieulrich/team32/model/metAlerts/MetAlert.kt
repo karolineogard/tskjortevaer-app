@@ -18,7 +18,7 @@ data class MetAlert(
     val awarenessResponse: String? = null,
     @SerialName("awareness_level") val awarenessLevel: String? = null,
     val title: String? = null,
-    @SerialName("when") val timeInterval: TimeInterval? = null
+    val timeInterval: TimeInterval? = null
 
 )
 
@@ -37,8 +37,11 @@ data class MetAlertsResponse(
 
 @Serializable
 data class MetFeature(
-    val properties: MetAlert
-)
+    val properties: MetAlert,
+    @SerialName("when") val timeInterval: TimeInterval? = null
+){
+    fun toMetAlert() = properties.copy(timeInterval = timeInterval)
+}
 
 fun Feature.toMetAlert(): MetAlert? {
     return try {
