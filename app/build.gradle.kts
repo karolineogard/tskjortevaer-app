@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -6,6 +8,7 @@ plugins {
     kotlin("android")
     kotlin("plugin.serialization")
 }
+
 android {
     namespace = "no.uio.ifi.in2000.ieulrich.team32"
     compileSdk = 36
@@ -36,10 +39,6 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
     buildFeatures {
         compose = true
     }
@@ -50,6 +49,12 @@ android {
         unitTests {
             isReturnDefaultValues = true
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
     }
 }
 
