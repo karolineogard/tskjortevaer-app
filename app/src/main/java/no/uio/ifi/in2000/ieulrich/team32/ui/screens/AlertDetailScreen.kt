@@ -126,7 +126,7 @@ fun AlertDetailScreen(
                             value = it
                         )
                     }
-                    alert.consequence?.let {
+                    alert.consequences?.let {
                         InfoSection(
                             label = stringResource(R.string.alert_consequence),
                             value = it

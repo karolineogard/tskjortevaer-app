@@ -61,7 +61,6 @@ import coil3.compose.AsyncImage
 import coil3.svg.SvgDecoder
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
-import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.AlertFeature
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.imageUrl
@@ -205,7 +204,7 @@ fun HomeScreen(
 
 @Composable
 fun MetalertCarousel(
-    alerts: List<AlertFeature>,
+    alerts: List<MetAlert>,
     onAlertClick: (MetAlert) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -224,28 +223,17 @@ fun MetalertCarousel(
 }
 @Composable
 fun MetalertCard(
-    alert: AlertFeature,
+    alert: MetAlert,
     onClick: (MetAlert) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val metAlert = MetAlert(
-        event = alert.properties.event,
-        severity = alert.properties.severity,
-        description = alert.properties.description,
-        area = alert.properties.area,
-        instruction = alert.properties.instruction,
-        consequence = alert.properties.consequences,
-        awarnessResponse = alert.properties.awarenessResponse,
-        title = alert.properties.eventAwarenessName
-    )
-
     Card(
         modifier = modifier
             .fillMaxWidth()
             .height(80.dp)
-            .clickable { onClick(metAlert) },
+            .clickable { onClick(alert) },
         colors = CardDefaults.cardColors(
-            containerColor = when (alert.properties.severity.lowercase()) {
+            containerColor = when (alert.severity?.lowercase()) {
                 "moderate" -> FarevarselGulGjennomsiktig
                 "severe"   -> FarevarselOranjeGjennomsiktig
                 "extreme"  -> FarevarselRødGjennomsiktig
@@ -262,20 +250,20 @@ fun MetalertCard(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             AsyncImage(
-                model = metAlert.iconUrl,
-                contentDescription = "Ikon for ${alert.properties.event}",
+                model = alert.iconUrl,
+                contentDescription = "Ikon for ${alert.event}",
                 modifier = Modifier.size(52.dp),
                 contentScale = ContentScale.Fit
             )
             Column {
                 Text(
-                    text = alert.properties.eventAwarenessName,
+                    text = alert.eventAwarenessName ?: "",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
                 Text(
-                    text = alert.properties.area,
+                    text = alert.area ?: "",
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.DarkGray
                 )
