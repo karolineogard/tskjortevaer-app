@@ -52,6 +52,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -284,7 +285,12 @@ fun WeatherCard(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = placeName, style = MaterialTheme.typography.titleLarge)
+                Text(
+                    text = placeName,
+                    style = MaterialTheme.typography.titleLarge,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
             forecastHourDetails?.let { details ->
                 Row(
@@ -358,7 +364,6 @@ fun ClothingCard(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Spacer(modifier = Modifier.width(60.dp))
                     Text(
                         text = stringResource(R.string.home_outfit),
                         style = MaterialTheme.typography.titleMedium,
@@ -367,7 +372,7 @@ fun ClothingCard(
                     IconButton(onClick = { showInfo = !showInfo }) {
                         Icon(
                             imageVector = Icons.Default.Info,
-                            contentDescription = "Info",
+                            contentDescription = stringResource(R.string.info_button),
                             modifier = Modifier.size(24.dp),
                         )
                     }
@@ -379,17 +384,15 @@ fun ClothingCard(
                     verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     Row(modifier = Modifier.fillMaxWidth()) {
-                        Spacer(modifier = Modifier.width(60.dp))
                         Text(
                             text = stringResource(R.string.home_clothing_explanation_title),
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
                     Row(modifier = Modifier.fillMaxWidth()) {
-                        Spacer(modifier = Modifier.width(60.dp))
                         Text(
                             text = stringResource(R.string.home_clothing_explanation_text),
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
                 }
@@ -549,7 +552,7 @@ private fun ClothingCardRow(iconRes: Int, text: String) {
         Spacer(modifier = Modifier.width(20.dp))
         Text(
             text = text,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyMedium,
             lineHeight = 28.sp,
         )
     }

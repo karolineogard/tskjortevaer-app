@@ -75,6 +75,7 @@ import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
+import no.uio.ifi.in2000.ieulrich.team32.ui.components.TravelTimesCard
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
@@ -176,39 +177,15 @@ fun ClothesScreen(
                     modifier = Modifier.padding(horizontal = 16.dp).verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Card(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                stringResource(R.string.clothes_when),
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                stringResource(R.string.clothes_leave),
-                                fontWeight = FontWeight.SemiBold,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                            TimeInputField(
-                                initialHour = localDepHour,
-                                initialMinute = localDepMinute,
-                                onTimeChanged = { hour, minute -> localDepHour = hour; localDepMinute = minute }
-                            )
-                            HorizontalDivider()
-                            Text(
-                                stringResource(R.string.clothes_return),
-                                fontWeight = FontWeight.SemiBold,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                            TimeInputField(
-                                initialHour = localRetHour,
-                                initialMinute = localRetMinute,
-                                onTimeChanged = { hour, minute -> localRetHour = hour; localRetMinute = minute }
-                            )
-                        }
-                    }
+                    TravelTimesCard(
+                        title = stringResource(R.string.clothes_when),
+                        departureHour = localDepHour,
+                        departureMinute = localDepMinute,
+                        returnHour = localRetHour,
+                        returnMinute = localRetMinute,
+                        onDepartureTimeChanged = { h, m -> localDepHour = h; localDepMinute = m },
+                        onReturnTimeChanged = { h, m -> localRetHour = h; localRetMinute = m },
+                    )
 
                     Card(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
