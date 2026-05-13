@@ -56,6 +56,7 @@ import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TopAppBar
+import no.uio.ifi.in2000.ieulrich.team32.ui.components.TravelTimesCard
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
@@ -228,75 +229,15 @@ fun SettingsScreen(
             }
 
             // Kort 2 — Reisetider
-            Box {
-                Card(
-                    modifier = Modifier
-                      .fillMaxWidth()
-                      .padding(vertical = 8.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                stringResource(R.string.settings_traveltimes),
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.weight(1f)
-                            )
-                            IconButton(onClick = { showTimeInfo = true }) {
-                                Icon(
-                                  Icons.Default.Info, 
-                                  contentDescription = "Info", 
-                                  modifier = Modifier.size(20.dp))
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                          stringResource(R.string.settings_leave),
-                          style = MaterialTheme.typography.bodyLarge, 
-                          fontWeight = FontWeight.SemiBold
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        TimeInputField(
-                          initialHour = startHour, 
-                          initialMinute = startMinute, 
-                          onTimeChanged = { h, m -> startHour = h; startMinute = m }
-                        )
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
-                        Text(
-                          stringResource(R.string.settings_return),
-                          style = MaterialTheme.typography.bodyLarge, 
-                          fontWeight = FontWeight.SemiBold
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        TimeInputField(
-                          initialHour = endHour, 
-                          initialMinute = endMinute, 
-                          onTimeChanged = { h, m -> endHour = h; endMinute = m }
-                        )
-                    }
-                }
-
-                if (showTimeInfo) {
-                    Card(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-                    ) {
-                        Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
-                            Text("Info kommer", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-                            IconButton(onClick = { showTimeInfo = false }, modifier = Modifier.size(20.dp)) {
-                                Icon(Icons.Default.Close, contentDescription = "Lukk", modifier = Modifier.size(16.dp))
-                            }
-                        }
-                    }
-                }
-            }
+            TravelTimesCard(
+                title = stringResource(R.string.settings_traveltimes),
+                departureHour = startHour,
+                departureMinute = startMinute,
+                returnHour = endHour,
+                returnMinute = endMinute,
+                onDepartureTimeChanged = { hour, minute -> startHour = hour; startMinute = minute },
+                onReturnTimeChanged = { hour, minute -> endHour = hour; endMinute = minute }
+            )
 
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 OutlinedButton(
