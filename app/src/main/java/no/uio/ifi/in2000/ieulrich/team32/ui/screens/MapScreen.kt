@@ -80,6 +80,7 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOranjeGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRødGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.toMetAlert
+import androidx.core.graphics.toColorInt
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -437,17 +438,16 @@ fun TemperatureLegendCard(modifier: Modifier = Modifier) {
                 Text("°C", style = MaterialTheme.typography.labelMedium)
             }
             Spacer(modifier = Modifier.height(8.dp))
-            LazyColumn(
-                modifier = Modifier.height(220.dp),
+            Column(
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
-                itemsIndexed(tempRanges) { index, range ->
+                tempRanges.forEachIndexed { index, range ->
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             modifier = Modifier
                                 .size(12.dp)
                                 .clip(RoundedCornerShape(2.dp))
-                                .background(Color(android.graphics.Color.parseColor(colors[index])))
+                                .background(Color(colors[index].toColorInt()))
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(range, style = MaterialTheme.typography.labelSmall, color = Color.Black)
@@ -485,17 +485,16 @@ fun PrecipitationLegendCard(modifier: Modifier = Modifier) {
                 Text("mm", style = MaterialTheme.typography.labelMedium)
             }
             Spacer(modifier = Modifier.height(8.dp))
-            LazyColumn(
-                modifier = Modifier.height(180.dp),
+            Column(
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
-                itemsIndexed(precipRanges) { index, range ->
+                precipRanges.forEachIndexed { index, range ->
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             modifier = Modifier
                                 .size(12.dp)
                                 .clip(RoundedCornerShape(2.dp))
-                                .background(Color(android.graphics.Color.parseColor(colors[index])))
+                                .background(Color(colors[index].toColorInt()))
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(range, style = MaterialTheme.typography.labelSmall, color = Color.Black)
@@ -532,11 +531,10 @@ fun WindLegendCard(modifier: Modifier = Modifier) {
                 Text("m/s", style = MaterialTheme.typography.labelMedium)
             }
             Spacer(modifier = Modifier.height(8.dp))
-            LazyColumn(
-                modifier = Modifier.height(180.dp),
+            Column(
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
-                itemsIndexed(windRanges) { index, range ->
+                windRanges.forEachIndexed { index, range ->
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             modifier = Modifier
@@ -689,7 +687,7 @@ fun TimeSliderCard(
         shadowElevation = 4.dp
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Text("$timeLabel kl. $formattedTime", style = MaterialTheme.typography.titleMedium)
+            Text("$timeLabel kl. $formattedTime", style = MaterialTheme.typography.titleSmall)
             Spacer(modifier = Modifier.height(4.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(
