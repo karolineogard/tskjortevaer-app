@@ -104,6 +104,10 @@
     <string name="alert_orange">Oransje: Stor fare</string>
     <string name="alert_red">Rødt: Ekstrem fare og ekstremvær</string>
     <string name="alert_levels">Farenivåer</string>
+    <string name="alert_validity">Tidsperiode</string>
+    <string name="alert_ongoing">Pågår:  </string>
+
+
 
     <!-- Settings screen -->
     <string name="settings_title">Innstillinger</string>

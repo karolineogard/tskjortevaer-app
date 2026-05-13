@@ -38,7 +38,7 @@ fun AlertDetailScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(formatEventName(alert.event)) }, // TODO: remove, already present in API response
+                title = { }, // TODO: remove, already present in API response
                 navigationIcon = {
                     IconButton(onClick = onBack){
                         Icon(
@@ -49,7 +49,8 @@ fun AlertDetailScreen(
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
-                )
+                ),
+                expandedHeight = 38.dp
             )
         }
     ) { innerPadding ->
@@ -75,37 +76,33 @@ fun AlertDetailScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    AsyncImage(
-                        model = alert.iconUrl,
-                        contentDescription = stringResource(R.string.alert_icon_description, alert.event ?: ""),
-                        modifier = Modifier
-                            .size(120.dp)
-                            .padding(vertical = 8.dp),
-                        contentScale = ContentScale.Fit,
-                        onState = { state ->
-                            when (state) {
-                                is coil3.compose.AsyncImagePainter.State.Error -> {
-                                    Log.e(
-                                        "MetAlertIcon",
-                                        "Feil ved lasting av ikon: ${state.result.throwable.message}"
-                                    )
-                                    Log.e("MetAlertIcon", "Prøvde å hente: ${alert.iconUrl}")
-                                }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        AsyncImage(
+                            model = alert.iconUrl,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(86.dp)
+                                .padding(end = 16.dp),
+                            contentScale = ContentScale.Fit
+                        )
+                        Text(
+                            text = stringResource(R.string.alert_ongoing) + formatEventName(alert.event),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = RobotoMono,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
 
-                                is coil3.compose.AsyncImagePainter.State.Success -> {
-                                    Log.d("MetAlertIcon", "Vellykket lasting av: ${alert.iconUrl}")
-                                }
-
-                                else -> {}
-                            }
-                        }
-
-                    )
-
-                    alert.title?.let {
+                    alert.timeInterval?.let { interval ->
+                        val from = formatAlertTime(interval.validFrom)
+                        val to = formatAlertTime(interval.validTo)
                         InfoSection(
-                            label = stringResource(R.string.alert_title),
-                            value = "${formatEventName(alert.event)} – ${alert.area ?: ""}"
+                            label = stringResource(R.string.alert_validity),
+                            value = "$from – $to",
                         )
                     }
                     alert.severity?.let {
@@ -114,6 +111,14 @@ fun AlertDetailScreen(
                             value = formatSeverity(it)
                         )
                     }
+
+                    alert.title?.let {
+                        InfoSection(
+                            label = stringResource(R.string.alert_title),
+                            value = "${formatEventName(alert.event)} – ${alert.area ?: ""}"
+                        )
+                    }
+
                     alert.area?.let {
                         InfoSection(
                             label = stringResource(R.string.alert_area),
@@ -138,6 +143,7 @@ fun AlertDetailScreen(
                             value = it
                         )
                     }
+
                     Spacer(modifier = Modifier.height(2.dp))
                     HorizontalDivider(color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f))
                     Spacer(modifier = Modifier.height(2.dp))
@@ -200,7 +206,17 @@ fun formatSeverity(severity: String?): String = when (severity?.lowercase()) {
     "extreme"  -> "Rød"
     else       -> severity ?: "Ukjent"
 }
-
+fun formatAlertTime(isoString: String?): String {
+    if (isoString == null) return "?"
+    return try {
+        val odt = java.time.OffsetDateTime.parse(isoString)
+        val zoned = odt.atZoneSameInstant(java.time.ZoneId.of("Europe/Oslo"))
+        val formatter = java.time.format.DateTimeFormatter.ofPattern("EEEE d. MMM HH:mm", java.util.Locale("no"))
+        zoned.format(formatter)
+    } catch (e: Exception) {
+        isoString
+    }
+}
 @Composable
 fun SeverityLegend(modifier: Modifier = Modifier) {
     val levels = listOf(
