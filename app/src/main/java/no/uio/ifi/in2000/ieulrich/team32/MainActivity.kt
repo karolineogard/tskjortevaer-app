@@ -58,7 +58,6 @@ class MainActivity : ComponentActivity() {
                 this, Manifest.permission.ACCESS_COARSE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED -> {
                 homeViewModel.loadData()
-                viewModel.loadForecastForDevice()
             }
             shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION) -> {
                 // TODO: rationale for location permission
@@ -72,7 +71,6 @@ class MainActivity : ComponentActivity() {
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { _ ->
-        viewModel.loadForecastForDevice()
         homeViewModel.loadData()
     }
 }
