@@ -1,5 +1,7 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
+import android.app.Activity
+import android.content.pm.ActivityInfo
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
@@ -8,21 +10,56 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.outlined.Air
 import androidx.compose.material.icons.outlined.DeviceThermostat
 import androidx.compose.material.icons.outlined.WaterDrop
-import androidx.compose.material.icons.outlined.Air
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,19 +67,40 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.zIndex
+import androidx.core.graphics.toColorInt
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.iconUrl
+import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.toMetAlert
 import no.uio.ifi.in2000.ieulrich.team32.model.victoriaWMS.WeatherLayer
+import no.uio.ifi.in2000.ieulrich.team32.ui.components.SearchBar
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGul
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGulGjennomsiktig
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOranjeGjennomsiktig
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOransje
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRød
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRødGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.MapViewModel
+import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
+import org.maplibre.android.style.expressions.Expression.color
+import org.maplibre.android.style.expressions.Expression.get
+import org.maplibre.android.style.expressions.Expression.literal
+import org.maplibre.android.style.expressions.Expression.match
 import org.maplibre.android.style.layers.FillLayer
 import org.maplibre.android.style.layers.PropertyFactory
 import org.maplibre.android.style.layers.RasterLayer
@@ -55,32 +113,7 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import org.maplibre.android.style.expressions.Expression.*
 import android.graphics.Color as AndroidColor
-import android.app.Activity
-import android.content.pm.ActivityInfo
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.ui.res.painterResource
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import no.uio.ifi.in2000.ieulrich.team32.ui.components.SearchBar
-import org.maplibre.android.camera.CameraUpdateFactory
-import androidx.compose.ui.zIndex
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGul
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOransje
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRød
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGulGjennomsiktig
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOranjeGjennomsiktig
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRødGjennomsiktig
-import no.uio.ifi.in2000.ieulrich.team32.R
-import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.toMetAlert
-import androidx.core.graphics.toColorInt
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -540,7 +573,7 @@ fun WindLegendCard(modifier: Modifier = Modifier) {
                             modifier = Modifier
                                 .size(12.dp)
                                 .clip(RoundedCornerShape(2.dp))
-                                .background(Color(android.graphics.Color.parseColor(colors[index])))
+                                .background(Color(colors[index].toColorInt()))
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(range, style = MaterialTheme.typography.labelSmall, color = Color.Black)
@@ -750,7 +783,7 @@ fun AlertsSheetContent(
         ) {
             Text(
                 text = "Gjeldende farevarsler",
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier
                     .padding(horizontal = 12.dp, vertical = 4.dp)
             )
@@ -837,8 +870,8 @@ fun AlertListItem(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "${formatEventName(alert.event)}, ${alert.area}" ?: "Farevarsel",
-                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
+                    text = "${formatEventName(alert.event)}, ${alert.area}",
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                     maxLines = 1
                 )
 
@@ -869,9 +902,8 @@ private fun updateWmsLayer(style: Style, wmsUrl: String, layerId: String) {
     if (wmsUrl.isEmpty()) return
 
     if (layerId == "WIND") {
-        val speedUrl = wmsUrl
 
-        addSingleLayer(style, speedUrl, "wind-speed")
+        addSingleLayer(style, wmsUrl, "wind-speed")
 
         val directionUrl = wmsUrl
             .replace("wind_100m_speed", "wind_10m_vector")
@@ -919,7 +951,7 @@ private fun updateAlertsLayer(style: Style, show: Boolean, alertsUrl: String) {
             match(
                 get("severity"),
                 literal("Moderate"), color(AndroidColor.YELLOW),
-                literal("Severe"),   color(AndroidColor.parseColor("#FFA500")),
+                literal("Severe"),   color("#FFA500".toColorInt()),
                 literal("Extreme"),  color(AndroidColor.RED),
                 color(AndroidColor.GRAY)
             )
