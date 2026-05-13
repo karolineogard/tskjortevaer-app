@@ -450,21 +450,33 @@ private fun EffectiveTempCard(rec: ClothesRecommendation) {
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
-                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
-                    Text(
-                        stringResource(R.string.clothes_effective_temp_info_text),
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.weight(1f)
-                    )
-                    IconButton(
-                        onClick = { showInfo = false },
-                        modifier = Modifier.size(20.dp)
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            Icons.Default.Close,
-                            contentDescription = stringResource(R.string.close_button),
-                            modifier = Modifier.size(16.dp))
+                        Text(
+                            text = stringResource(R.string.clothes_effective_temp_info_title_text),
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.weight(1f)
+                        )
+                        IconButton(
+                            onClick = { showInfo = false },
+                            modifier = Modifier.size(20.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = stringResource(R.string.close_button),
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
                     }
+                    Spacer(modifier = Modifier.size(8.dp))
+                    Text(
+                        text = stringResource(R.string.clothes_effective_temp_info_text),
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
         }
@@ -564,16 +576,21 @@ private fun ClothingCard(rec: ClothesRecommendation) {
             }
         }
 
-            if (showInfo) {
-                Card(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-                ) {
-                    Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
+        if (showInfo) {
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
-                            text = stringResource(R.string.clothes_clothing_info_text),
-                            style = MaterialTheme.typography.bodySmall,
+                            text = stringResource(R.string.clothes_clothing_info_title_text),
+                            style = MaterialTheme.typography.titleSmall,
                             modifier = Modifier.weight(1f)
                         )
                         IconButton(
@@ -587,9 +604,15 @@ private fun ClothingCard(rec: ClothesRecommendation) {
                             )
                         }
                     }
-
+                    Spacer(modifier = Modifier.size(8.dp))
+                    Text(
+                        text = stringResource(R.string.clothes_clothing_info_text),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
         }
+
     }
 }
 @Composable

@@ -63,10 +63,10 @@
     <string name="clothes_no_data">Ingen værdata tilgjengelig. Prøv å søk opp et sted på hjemskjermen først.</string>
     <string name="clothes_effective_temp_text">Justert for vind, skydekke og aktivitet</string>
     <string name="clothes_recommendation">Klesanbefaling</string>
-    <string name="clothes_effective_temp_info_text">Føles som temperaturen er justert etter vind, skydekke, aktivitet og reisetidspunktene dine\n</string>
-
-    <string name="clothes_clothing_info_text">Klesanbefalingen regnes ut utifra temperaturen ute, reisetidspunktene dine og aktivitetsnivået ditt</string>
-
+    <string name="clothes_effective_temp_info_title_text">Føles som temperaturen</string>
+    <string name="clothes_effective_temp_info_text">Temperaturen er justert basert på vind, skydekke, aktivitetsnivå og reisetidspunktene dine – slik at den gjenspeiler hvordan det faktisk føles ute.</string>
+    <string name="clothes_clothing_info_title_text">Info om klesanbefalinger.</string>
+    <string name="clothes_clothing_info_text">Anbefalingen er basert på hvordan det føles ute i løpet av reisetiden din. Vi tar hensyn til temperatur, vind, skydekke og aktivitetsnivået du har oppgitt, og foreslår klær som passer for hele turen – både tur og retur.</string>
 
     <!-- text for each clothing item -->
     <string name="clothes_sunglasses">Solbriller anbefales — det er sol</string>
@@ -128,8 +128,8 @@
     <string name="settings_leave">Dra</string>
     <string name="settings_return">Tilbake</string>
     <string name="settings_save">Lagre</string>
-    <string name="settings_slider_info_title">Innstillinger for temperatur-preferanse</string>
-    <string name="settings_slider_info">Føler du at du alltid er varmere eller kaldere enn andre? \nHer kan du justere hvor mange grader kaldere/varmere du ønsker å få klesanbefalingene dine</string>
+    <string name="settings_slider_info_title">Innstillinger for temperaturpreferanse</string>
+    <string name="settings_slider_info">Føler du at du alltid er varmere eller kaldere enn andre? \nHer kan du justere klesanbefalingene slik at de passer bedre for deg.</string>
     <string name="settings_traveltime_info_title">Innstillinger for justeringer av reisetidspunkter</string>
     <string name="settings_traveltime_info">Reiser du fast til andre tidspunkter enn mellom 08-10 og 16-18? \nHer kan du justere pendler-tidspunktene dine, disse vil påvirke alle klesanbefalingene du får, med mindre du tilpasser tidspunktene i klesanbefalingen </string>
 </resources>
