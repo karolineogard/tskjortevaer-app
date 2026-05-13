@@ -183,7 +183,7 @@ fun MapScreen(
             },
             sheetDragHandle = null,
             sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
-        ) { innerPadding ->
+        ) { _ ->
             if (isOnline) {
                 Box(modifier = modifier.fillMaxSize()) {
                     AndroidView(
