@@ -157,7 +157,11 @@ fun SettingsScreen(
 
                         // Gradstal på egen linje
                         Text(
-                            text = "${sign}${degrees}° C",
+                            text = stringResource(
+                                R.string.settings_temperature_value,
+                                sign,
+                                degrees
+                            ),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = tempColor
@@ -250,7 +254,8 @@ fun SettingsScreen(
                 onDepartureTimeChanged = { hour, minute -> startHour = hour; startMinute = minute },
                 onReturnTimeChanged = { hour, minute -> endHour = hour; endMinute = minute }
             )
-
+            val settingsSaved = stringResource(R.string.settings_saved)
+            val dismiss = stringResource(R.string.dismiss)
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 OutlinedButton(
                     border = BorderStroke(2.dp, MediumBlue),
@@ -263,15 +268,13 @@ fun SettingsScreen(
                             returnMinute      = endMinute,
                             temperatureOffset = offsetDegrees
                         )
+
                         scope.launch {
-                            val result = snackbarHostState.showSnackbar(
-                                message = "Innstillinger lagret!",
-                                actionLabel = "✕",
+                            snackbarHostState.showSnackbar(
+                                message = settingsSaved,
+                                actionLabel = dismiss,
                                 duration = SnackbarDuration.Short
                             )
-                            if (result == SnackbarResult.ActionPerformed) {
-                                snackbarHostState.currentSnackbarData?.dismiss()
-                            }
                         }
                     },
                     colors = ButtonDefaults.outlinedButtonColors(

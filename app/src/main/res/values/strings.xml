@@ -7,6 +7,7 @@
     <string name="error_no_internet">Kunne ikke laste inn data</string>
     <string name="error_no_internet_text">Vennligst sjekk internettforbindelsen, og prøv igjen</string>
     <string name="error_no_internet_banner">Ingen internettforbindelse</string>
+    <string name="dismiss">x</string>
 
 
     <!-- Navbar -->
@@ -133,4 +134,6 @@
     <string name="settings_slider_info">Føler du at du alltid er varmere eller kaldere enn andre? \nHer kan du justere klesanbefalingene slik at de passer bedre for deg.</string>
     <string name="settings_traveltime_info_title">Faste reisetidspunkter</string>
     <string name="settings_traveltime_info">Reiser du fast til andre tidspunkter enn mellom 08-10 og 16-18? \nHer kan du justere pendler-tidspunktene dine, disse vil påvirke alle klesanbefalingene du får, med mindre du tilpasser tidspunktene i klesanbefalingen </string>
+    <string name="settings_saved">Innstillinger lagret</string>
+    <string name="settings_temperature_value">%1$s%2$s°C</string>
 </resources>
