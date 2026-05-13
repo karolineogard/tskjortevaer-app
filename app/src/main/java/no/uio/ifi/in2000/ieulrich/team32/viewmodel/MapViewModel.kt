@@ -64,7 +64,7 @@ class MapViewModel @Inject constructor(
                     alerts = fetchedAlerts
                 ) }
                 Log.d("MapViewModel", "Hentet ${fetchedAlerts.size} varsler")
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 Log.e("MapViewModel", "Feil ved henting av farevarsler")
             }
 
@@ -76,10 +76,6 @@ class MapViewModel @Inject constructor(
         _uiState.update { it.copy(
             selectedAlert = alert
         ) }
-    }
-
-    fun toggleAlerts() {
-        _uiState.update { it.copy(showAlerts = !it.showAlerts) }
     }
 
     private fun updateLayer(layer: WeatherLayer) {
