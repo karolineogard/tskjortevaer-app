@@ -164,7 +164,10 @@ fun MapApp(
                     popEnterTransition = { EnterTransition.None },
                     popExitTransition = { ExitTransition.None }
                 ) {
-                    MapScreen(navController = navController, isOnline = isOnline)
+                    MapScreen(
+                        navController = navController,
+                        isOnline = isOnline
+                    )
                 }
 
                 composable(route = "forecast?lat={lat}&lon={lon}&city={city}") { backStackEntry ->
