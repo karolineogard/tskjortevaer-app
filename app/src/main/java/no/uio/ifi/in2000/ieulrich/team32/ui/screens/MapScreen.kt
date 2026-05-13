@@ -18,11 +18,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -144,10 +147,11 @@ fun MapScreen(
             activity.requestedOrientation = originalOrientation
         }
     }
-
+    val systemBars = WindowInsets.statusBars.asPaddingValues()
+    val statusBarHeight = systemBars.calculateTopPadding()
     // Dynamically calculate the top padding for the legend based on search bar state
     val legendTopPadding by animateDpAsState(
-        targetValue = if (isSearchExpanded) 120.dp else 48.dp,
+        targetValue = if (isSearchExpanded) statusBarHeight + 80.dp else statusBarHeight + 8.dp,
         label = "legendTopPadding"
     )
 
@@ -255,12 +259,11 @@ fun MapScreen(
                             )
                         }
                     }
-
                     // Top Search Bar
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
-                            .padding(top = 48.dp, start = 16.dp, end = 16.dp)
+                            .padding(top = statusBarHeight + 8.dp, start = 16.dp, end = 16.dp)
                             .zIndex(10f)
                     ) {
                         if (isSearchExpanded) {
