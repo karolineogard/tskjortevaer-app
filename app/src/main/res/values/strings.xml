@@ -50,23 +50,24 @@
     <string name="clothes_leave">Dra</string>
     <string name="clothes_return">Tilbake</string>
     <string name="clothes_activity_level">Aktivitetsnivå</string>
-    <string name="clothes_effective_temp">Føles som:</string>
-    <string name="clothes_recommendation_updated">Klesanbefalingen er oppdatert.</string>
+    <string name="clothes_effective_temp">Føles som</string>
+    <string name="clothes_recommendation_updated">Klesanbefalingen er oppdatert</string>
     <string name="clothes_new_recommendation">Gi ny klesanbefaling</string>
     <string name="clothes_title">Klesanbefaling</string>
     <string name="clothes_recommendation_text_default">For deg som pendler i rushtid</string>
-    <string name="clothes_recommendation_text_outdoors">"For deg som skal være utendørs "</string>
+    <string name="clothes_recommendation_text_outdoors">For deg som skal være utendørs mellom %1$02d:%2$02d og %3$02d:%4$02d</string>
     <string name="clothes_recommendation_text_physical_low">og fysisk aktiv på et lavt aktivitetsnivå</string>
     <string name="clothes_recommendation_text_physical_medium">og fysisk aktiv på et middels aktivitetsnivå</string>
     <string name="clothes_recommendation_text_physical_high">og fysisk aktiv på et høy aktivitetsnivå</string>
     <string name="clothes_recommendation_text_physical">og fysisk aktiv</string>
     <string name="clothes_no_data">Ingen værdata tilgjengelig. Prøv å søk opp et sted på hjemskjermen først.</string>
-    <string name="clothes_effective_temp_text">Justert for vind, skydekke og aktivitet</string>
+    <string name="clothes_effective_temp_text">Justert etter værforhold, tilpasninger og preferanser</string>
     <string name="clothes_recommendation">Klesanbefaling</string>
     <string name="clothes_effective_temp_info_title_text">Føles som temperaturen</string>
     <string name="clothes_effective_temp_info_text">Temperaturen er justert basert på vind, skydekke, aktivitetsnivå og reisetidspunktene dine – slik at den gjenspeiler hvordan det faktisk føles ute.</string>
     <string name="clothes_clothing_info_title_text">Info om klesanbefalinger.</string>
     <string name="clothes_clothing_info_text">Anbefalingen er basert på hvordan det føles ute i løpet av reisetiden din. Vi tar hensyn til temperatur, vind, skydekke og aktivitetsnivået du har oppgitt, og foreslår klær som passer for hele turen – både tur og retur.</string>
+    <string name="clothes_travel_times">For deg som drar hjemmefra %1$02d:%2$02d, og tilbake %3$02d:%4$02d</string>
 
     <!-- text for each clothing item -->
     <string name="clothes_sunglasses">Solbriller anbefales — det er sol</string>
@@ -128,8 +129,8 @@
     <string name="settings_leave">Dra</string>
     <string name="settings_return">Tilbake</string>
     <string name="settings_save">Lagre</string>
-    <string name="settings_slider_info_title">Innstillinger for temperaturpreferanse</string>
+    <string name="settings_slider_info_title">Temperaturpreferanse</string>
     <string name="settings_slider_info">Føler du at du alltid er varmere eller kaldere enn andre? \nHer kan du justere klesanbefalingene slik at de passer bedre for deg.</string>
-    <string name="settings_traveltime_info_title">Innstillinger for justeringer av reisetidspunkter</string>
+    <string name="settings_traveltime_info_title">Faste reisetidspunkter</string>
     <string name="settings_traveltime_info">Reiser du fast til andre tidspunkter enn mellom 08-10 og 16-18? \nHer kan du justere pendler-tidspunktene dine, disse vil påvirke alle klesanbefalingene du får, med mindre du tilpasser tidspunktene i klesanbefalingen </string>
 </resources>
