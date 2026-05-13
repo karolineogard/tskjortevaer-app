@@ -103,11 +103,33 @@ fun TravelTimesCard(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
-                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
-                    Text("Info kommer", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-                    IconButton(onClick = { showTimeInfo = false }, modifier = Modifier.size(20.dp)) {
-                        Icon(Icons.Default.Close, contentDescription = "Lukk", modifier = Modifier.size(16.dp))
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) { Text(
+                            text = stringResource(R.string.settings_traveltime_info_title),
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.weight(1f),
+
+                        )
+                        IconButton(
+                            onClick = { showTimeInfo = false },
+                            modifier = Modifier.size(20.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Lukk",
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
                     }
+                    Spacer(modifier = Modifier.size(8.dp))
+                    Text(
+                        text = stringResource(R.string.settings_traveltime_info),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
         }
