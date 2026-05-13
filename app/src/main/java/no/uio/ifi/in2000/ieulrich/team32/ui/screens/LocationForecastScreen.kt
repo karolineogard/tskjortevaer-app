@@ -49,6 +49,7 @@ import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ForecastHour
+import no.uio.ifi.in2000.ieulrich.team32.ui.components.TopAppBar
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.PlussTekst
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
@@ -77,25 +78,9 @@ fun LocationForecastScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = place.value,
-                        fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.arrow_up_icon),
-                            contentDescription = stringResource(R.string.navbar_back_description),
-                            modifier = Modifier.rotate(-90f)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.White,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
-                ),
+            TopAppBar(
+                title = place.value,
+                onBack = { navController.popBackStack() }
             )
         }
     ) { innerPadding: PaddingValues ->

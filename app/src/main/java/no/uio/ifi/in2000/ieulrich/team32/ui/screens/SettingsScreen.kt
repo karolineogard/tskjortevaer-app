@@ -55,6 +55,7 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
+import no.uio.ifi.in2000.ieulrich.team32.ui.components.TopAppBar
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
@@ -103,24 +104,9 @@ fun SettingsScreen(
         },
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        stringResource(R.string.settings_title),
-                        fontWeight = FontWeight.Bold
-                    ) },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.navbar_back_description)
-                        )
-                    }
-                },
-                expandedHeight = 32.dp,
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+            TopAppBar(
+                title = stringResource(R.string.settings_title),
+                onBack = { navController.popBackStack() }
             )
         }
     ) { innerPadding ->
