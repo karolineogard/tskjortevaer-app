@@ -89,7 +89,8 @@ import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
 fun ClothesScreen(
     clothesViewModel: ClothesViewModel,
     settingsViewModel: SettingsViewModel,
-    isOnline: Boolean
+    isOnline: Boolean,
+    expandSheet: Boolean = false
 ) {
     val defaultDepHour by settingsViewModel.defaultDepartureHour.collectAsStateWithLifecycle()
     val defaultRetHour by settingsViewModel.defaultReturnHour.collectAsStateWithLifecycle()
@@ -126,6 +127,11 @@ fun ClothesScreen(
 
     LaunchedEffect(Unit) { clothesViewModel.loadRecommendation() }
 
+    LaunchedEffect(expandSheet) {
+        if (expandSheet) {
+            sheetState.bottomSheetState.expand()
+        }
+    }
     if (recommendation != null) {
         BottomSheetScaffold(
             scaffoldState = sheetState,

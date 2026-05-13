@@ -191,11 +191,13 @@ fun MapApp(
                     SettingsScreen(navController = navController, settingsViewModel = settingsViewModel)
                 }
 
-                composable(route = Routes.CLOTHES) {
+                composable("${Routes.CLOTHES}?expandSheet={expandSheet}") { backStackEntry ->
+                    val expandSheet = backStackEntry.arguments?.getString("expandSheet") == "true"
                     ClothesScreen(
                         clothesViewModel = clothesViewModel,
                         settingsViewModel = settingsViewModel,
-                        isOnline = isOnline
+                        isOnline = isOnline,
+                        expandSheet = expandSheet
                     )
                 }
 

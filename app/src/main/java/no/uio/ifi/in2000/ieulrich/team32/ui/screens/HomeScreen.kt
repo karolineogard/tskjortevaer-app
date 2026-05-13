@@ -460,7 +460,7 @@ fun ClothingCard(
                             style = MaterialTheme.typography.bodyMedium
                         )
                         OutlinedButton(
-                            onClick = { navController.navigate(Routes.CLOTHES) },
+                            onClick = { navController.navigate("${Routes.CLOTHES}?expandSheet=true") },
                             border = BorderStroke(2.dp, MediumBlue),
                             colors = ButtonDefaults.outlinedButtonColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
