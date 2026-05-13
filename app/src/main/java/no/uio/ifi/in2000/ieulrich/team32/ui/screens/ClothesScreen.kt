@@ -75,32 +75,26 @@ import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
-import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TravelTimesCard
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.PlussTekst
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClothesScreen(
     clothesViewModel: ClothesViewModel,
-    settingsViewModel: SettingsViewModel,
-    isOnline: Boolean,
     expandSheet: Boolean = false
 ) {
-    val defaultDepHour by settingsViewModel.defaultDepartureHour.collectAsStateWithLifecycle()
-    val defaultRetHour by settingsViewModel.defaultReturnHour.collectAsStateWithLifecycle()
 
     var showBanner by remember { mutableStateOf(false) }
-    var bannerMessage by remember { mutableStateOf("") }
 
     val today = remember {
         java.time.LocalDate.now()
-            .format(java.time.format.DateTimeFormatter.ofPattern("EEEE d. MMMM", java.util.Locale("no")))
+            .format(java.time.format.DateTimeFormatter.ofPattern("EEEE d. MMMM", Locale.forLanguageTag("no")))
             .replaceFirstChar { it.uppercase() }
     }
 
@@ -282,7 +276,6 @@ fun ClothesScreen(
                                 isPhysicallyActive = localIsPhysical == true,
                                 activityLevel = localActivityLevel
                             )
-                            bannerMessage = "Klesanbefalingen er oppdatert." // TODO: se på
                             showBanner = true
                             scope.launch { sheetState.bottomSheetState.partialExpand() }
                         },
@@ -333,20 +326,22 @@ fun ClothesScreen(
                                     modifier = Modifier.padding(top = 4.dp),
                                 )
                                 Spacer(modifier = Modifier.size(4.dp))
-                                Text(
-                                    text = "Dra: %02d:%02d Tilbake: %02d:%02d".format( //TODO: stringres med parameter?
-                                        settings.departureHour, settings.departureMinute,
-                                        settings.returnHour, settings.returnMinute
-                                    ),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier.padding(top = 4.dp),
-                                )
-                                Spacer(modifier = Modifier.size(4.dp))
                                 var infoString = if(settings.isOutdoors) {
-                                    stringResource(R.string.clothes_recommendation_text_outdoors)
+                                    stringResource(
+                                        R.string.clothes_recommendation_text_outdoors,
+                                        settings.departureHour,
+                                        settings.departureMinute,
+                                        settings.returnHour,
+                                        settings.returnMinute
+                                    )
                                 } else {
-                                    stringResource(R.string.clothes_recommendation_text_default)
+                                    stringResource(
+                                        R.string.clothes_travel_times,
+                                        settings.departureHour,
+                                        settings.departureMinute,
+                                        settings.returnHour,
+                                        settings.returnMinute
+                                    )
                                 }
 
                                 if(settings.isPhysicallyActive) {
@@ -389,7 +384,10 @@ fun ClothesScreen(
                         exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
                         modifier = Modifier.align(Alignment.TopCenter).zIndex(1f)
                     ) {
-                        TopBanner(message = bannerMessage, onDismiss = { showBanner = false })
+                        TopBanner(
+                            message = stringResource(R.string.clothes_recommendation_updated),
+                            onDismiss = { showBanner = false }
+                        )
                     }
                 }
             }
@@ -430,7 +428,7 @@ private fun EffectiveTempCard(rec: ClothesRecommendation) {
                 }
                 Text(
                     text = Format.formatTemp(rec.effectiveTemp),
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = if (rec.effectiveTemp <= 0.0) MinusTekst else PlussTekst
                 )
