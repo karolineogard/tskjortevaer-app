@@ -6,6 +6,8 @@
     <string name="close_button">Lukk</string>
     <string name="error_no_internet">Kunne ikke laste inn data</string>
     <string name="error_no_internet_text">Vennligst sjekk internettforbindelsen, og prøv igjen</string>
+    <string name="error_no_internet_banner">Ingen internettforbindelse</string>
+
 
     <!-- Navbar -->
     <string name="navbar_back_description">Tilbake</string>

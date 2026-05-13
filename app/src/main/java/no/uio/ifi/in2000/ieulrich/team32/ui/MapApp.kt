@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -41,6 +42,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.data.client.NetworkMonitor
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.ClothesScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.HomeScreen
@@ -208,7 +210,7 @@ fun MapApp(
                     .padding(top = innerPadding.calculateTopPadding())
             ) {
                 Text(
-                    text = "Ingen internettforbindelse",
+                    text = stringResource(R.string.error_no_internet_banner),
                     color = MaterialTheme.colorScheme.onError,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,
