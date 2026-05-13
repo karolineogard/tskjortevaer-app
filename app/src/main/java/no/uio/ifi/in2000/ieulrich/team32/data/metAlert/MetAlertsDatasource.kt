@@ -7,6 +7,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlertsResponse
+import java.util.Locale
 import javax.inject.Inject
 
 class MetAlertsDatasource @Inject constructor(private val client: HttpClient) {
@@ -14,8 +15,8 @@ class MetAlertsDatasource @Inject constructor(private val client: HttpClient) {
     suspend fun getAlertsByLocation(lat: Double, lon: Double): MetAlertsResponse? {
         return try {
             client.get("https://in2000.api.met.no/weatherapi/metalerts/2.0/current.json") {
-                parameter("lat", "%.4f".format(lat))
-                parameter("lon", "%.4f".format(lon))
+                parameter("lat", "%.4f".format(Locale.US, lat))
+                parameter("lon", "%.4f".format(Locale.US, lon))
                 header("User-Agent", "IN2000 Team 32")
             }.body()
         } catch (e: Throwable) {

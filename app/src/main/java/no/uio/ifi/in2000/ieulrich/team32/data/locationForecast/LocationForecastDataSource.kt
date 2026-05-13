@@ -8,6 +8,7 @@ import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.http.HttpStatusCode
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.dto.LocationForecastResponse
+import java.util.Locale
 import javax.inject.Inject
 import kotlin.math.abs
 
@@ -30,8 +31,8 @@ class LocationForecastDataSource @Inject constructor(
             val response = client.get(
                 "https://in2000.api.met.no/weatherapi/locationforecast/2.0/compact"
             ) {
-                parameter("lat", "%.4f".format(lat))
-                parameter("lon", "%.4f".format(lon))
+                parameter("lat", "%.4f".format(Locale.US, lat))
+                parameter("lon", "%.4f".format(Locale.US, lon))
                 header("User-Agent", "IN2000 Team 32")
                 lastModified?.let { header("If-Modified-Since", it) }
             }
