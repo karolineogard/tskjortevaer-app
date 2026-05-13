@@ -1,5 +1,9 @@
 # Modellering for T-skjortevær
 
+## Arkitekturskisse
+<img width="6005" height="3807" alt="UI Layer and Data Layer-2026-05-12-082335" src="https://github.uio.no/user-attachments/assets/d5b6e28b-63f8-4570-a714-d67150202c8d" />
+
+
 ## Tekstlige use case
 ### Klesanbefaling
 Primæraktør: Bruker
