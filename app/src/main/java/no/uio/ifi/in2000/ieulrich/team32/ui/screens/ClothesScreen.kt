@@ -562,6 +562,7 @@ private fun ClothingCard(rec: ClothesRecommendation) {
                     ClothingRow(R.drawable.sneaker, stringResource(R.string.clothes_shoes))
                 }
             }
+        }
 
             if (showInfo) {
                 Card(
@@ -586,7 +587,7 @@ private fun ClothingCard(rec: ClothesRecommendation) {
                             )
                         }
                     }
-                }
+
             }
         }
     }
