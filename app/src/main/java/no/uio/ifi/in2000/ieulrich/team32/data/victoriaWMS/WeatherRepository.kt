@@ -6,7 +6,7 @@ import no.uio.ifi.in2000.ieulrich.team32.model.victoriaWMS.WeatherLayer
 import javax.inject.Inject
 
 interface WeatherRepository {
-    fun getWmsUrl(layer: WeatherLayer, Time: String): String
+    fun getWmsUrl(layer: WeatherLayer, time: String): String
     fun getAlertsUrl(): String
 
     suspend fun getAllAlerts(): List<MetAlert>
@@ -16,10 +16,10 @@ interface WeatherRepository {
 class WeatherRepositoryImpl @Inject constructor(
     private val datasource: MetAlertsDatasource
 ) : WeatherRepository {
-    override fun getWmsUrl(layer: WeatherLayer, Time: String): String {
+    override fun getWmsUrl(layer: WeatherLayer, time: String): String {
 
         return "https://public-victoria.met.no/wms?service=WMS&version=1.3.0&request=GetMap" +
-                "${layer.layerName}" +
+                layer.layerName +
                 "&styles=${layer.styleName}" +
                 "&crs=EPSG:3857" +
                 "&format=image/png" +
@@ -27,7 +27,7 @@ class WeatherRepositoryImpl @Inject constructor(
                 "&width=256" +
                 "&height=256" +
                 "&bbox={bbox-epsg-3857}" +
-                "&time=$Time"
+                "&time=$time"
     }
 
     override fun getAlertsUrl(): String {
