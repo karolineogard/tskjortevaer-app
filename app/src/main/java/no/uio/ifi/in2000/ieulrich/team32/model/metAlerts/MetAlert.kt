@@ -47,7 +47,7 @@ fun Feature.toMetAlert(): MetAlert? {
     return try {
         Json { ignoreUnknownKeys = true }
             .decodeFromString<MetFeature>(this.toJson())
-            .properties
+            .toMetAlert()
     } catch (e: Exception) {
         Log.e("Feature", "Failed to parse alert feature", e)
         null

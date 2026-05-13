@@ -27,6 +27,7 @@ import coil3.compose.AsyncImage
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.imageUrl
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
 
 @Composable
 fun ForecastHour(
@@ -37,7 +38,8 @@ fun ForecastHour(
     precipitationAmount: String,
     symbolCode: String,
     compact: Boolean = false,
-    tempColor: Color = Color.Unspecified
+    tempColor: Color = Color.Unspecified,
+    rainColor: Color = Color.Unspecified
 )
 
 {
@@ -102,7 +104,8 @@ fun ForecastHour(
             fontSize = size,
             modifier = Modifier
                 .weight(1f),
-            textAlign = TextAlign.Left
+            textAlign = TextAlign.Left,
+            color = MinusTekst
         )
         Spacer(modifier = Modifier.weight(0.5f))
         Text(

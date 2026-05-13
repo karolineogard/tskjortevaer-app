@@ -63,6 +63,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -133,7 +134,7 @@ fun ClothesScreen(
             sheetDragHandle = null,
             sheetShadowElevation = 16.dp,
             sheetTonalElevation = 16.dp,
-            sheetContainerColor = MaterialTheme.colorScheme.background,
+            sheetContainerColor = White,
             sheetContent = {
                 Row(
                     modifier = Modifier

@@ -51,6 +51,7 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.screens.MapScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.SettingsScreen
 //import no.uio.ifi.in2000.ieulrich.team32.ui.screens.SplashScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.Grey
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.LightBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
@@ -113,7 +114,7 @@ fun MapApp(
         modifier = modifier,
         bottomBar = {
 
-                NavigationBar {
+                NavigationBar(containerColor = MediumBlue) {
                     Destination.entries.forEachIndexed { index, destination ->
                         NavigationBarItem(
                             selected = currentRoute == destination.route,
@@ -130,7 +131,7 @@ fun MapApp(
                             },
                             label = { Text(destination.label, fontWeight = FontWeight.SemiBold) },
                             colors = NavigationBarItemDefaults.colors(
-                                indicatorColor = MediumBlue,
+                                indicatorColor = LightBlue,
                                 selectedIconColor = Grey,
                                 selectedTextColor = Grey,
                                 unselectedIconColor = Grey,

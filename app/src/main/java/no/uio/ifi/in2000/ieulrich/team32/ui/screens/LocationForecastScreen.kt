@@ -146,7 +146,9 @@ fun DayForecastCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Spacer(modifier = Modifier.weight(1.3f))
+                    Spacer(modifier = Modifier.size(36.dp))
+                    Spacer(modifier = Modifier.weight(0.5f))
+
                     Text(
                       text = stringResource(R.string.forecast_time),
                       style = MaterialTheme.typography.bodySmall, 
@@ -170,6 +172,7 @@ fun DayForecastCard(
                       style = MaterialTheme.typography.bodySmall, 
                       modifier = Modifier.weight(1f)
                     )
+                    Spacer(modifier = Modifier.weight(0.5f))
                 }
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                 forecastForDay.forEachIndexed { index, details ->
@@ -182,7 +185,8 @@ fun DayForecastCard(
                         precipitationAmount = Format.formatPrecipitation(details.precipitationAmount),
                         symbolCode = details.symbolCode,
                         compact = true,
-                        tempColor = if (details.temperature <= 0.0) MinusTekst else PlussTekst
+                        tempColor = if (details.temperature <= 0.0) MinusTekst else PlussTekst,
+                        rainColor = MinusTekst
                     )
 
                 }
@@ -222,7 +226,8 @@ fun DayForecastCard(
                         Text(
                             text = Format.formatPrecipitation(totalPrecipitation),
                             style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            color = MinusTekst
                         )
                         Text(
                             text = Format.formatWind(avgWind),
