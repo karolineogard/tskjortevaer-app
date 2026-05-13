@@ -35,7 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -49,7 +49,6 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.screens.HomeScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.LocationForecastScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.MapScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.SettingsScreen
-//import no.uio.ifi.in2000.ieulrich.team32.ui.screens.SplashScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.Grey
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.LightBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
@@ -115,7 +114,7 @@ fun MapApp(
         bottomBar = {
 
                 NavigationBar(containerColor = MediumBlue) {
-                    Destination.entries.forEachIndexed { index, destination ->
+                    Destination.entries.forEach { destination ->
                         NavigationBarItem(
                             selected = currentRoute == destination.route,
                             onClick = {
@@ -198,8 +197,6 @@ fun MapApp(
                     val expandSheet = backStackEntry.arguments?.getString("expandSheet") == "true"
                     ClothesScreen(
                         clothesViewModel = clothesViewModel,
-                        settingsViewModel = settingsViewModel,
-                        isOnline = isOnline,
                         expandSheet = expandSheet
                     )
                 }
