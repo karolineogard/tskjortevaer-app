@@ -24,7 +24,7 @@ class DeviceLocationDataSource @Inject constructor(
             context, Manifest.permission.ACCESS_COARSE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
 
-        if (!hasPermission) return null
+        if (!hasPermission) return AppLocation(lat = 59.9432, lon = 10.7173)
 
         return suspendCancellableCoroutine { continuation ->
             val cts = CancellationTokenSource()
