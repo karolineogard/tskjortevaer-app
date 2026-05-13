@@ -1,6 +1,7 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -52,6 +54,7 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.components.ForecastHour
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TopAppBar
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.PlussTekst
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastUiState
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 
 
@@ -62,7 +65,6 @@ fun LocationForecastScreen(
     viewmodel: LocationForecastViewmodel,
     lat: Double?,
     lon: Double?,
-    city: String = "Værvarsel",
     navController: NavController
 ) {
     if (lat == null || lon == null) {
@@ -73,31 +75,52 @@ fun LocationForecastScreen(
         }
     }
 
-    val groupedByDay = viewmodel.forecastByDay.collectAsStateWithLifecycle()
-    val place = viewmodel.placeName.collectAsStateWithLifecycle()
+    val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = place.value,
-                onBack = { navController.popBackStack() }
-            )
+    when (val state = uiState) {
+        is LocationForecastUiState.Loading -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(modifier = Modifier.size(32.dp))
+            }
         }
-    ) { innerPadding: PaddingValues ->
-        LazyColumn(
-            modifier = Modifier.padding(
-                top = innerPadding.calculateTopPadding(),
-                start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
-                bottom = 0.dp
-            )
-        ) {
-            groupedByDay.value?.forEach { (date, forecastForDay) ->
-                item {
-                    DayForecastCard(
-                        date = date,
-                        forecastForDay = forecastForDay
+
+        is LocationForecastUiState.Error -> {
+            NoInternetScreen()
+        }
+
+        is LocationForecastUiState.Success -> {
+            val forecastByDay = state.forecastByDay
+            val placeName = state.placeName
+
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = placeName,
+                        onBack = { navController.popBackStack() }
                     )
+                }
+            ) { innerPadding: PaddingValues ->
+                LazyColumn(
+                    modifier = Modifier.padding(
+                        top = innerPadding.calculateTopPadding(),
+                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
+                        bottom = 0.dp
+                    )
+                ) {
+                    forecastByDay.forEach { (date, forecastForDay) ->
+                        item {
+                            DayForecastCard(
+                                date = date,
+                                forecastForDay = forecastForDay
+                            )
+                        }
+                    }
                 }
             }
         }
