@@ -216,3 +216,9 @@ sequenceDiagram
     VM-->>UI: Oppdater state (Vær + Klær)
     UI-->>Bruker: Viser vær og klesanbefaling
 ```
+
+
+## Use-case diagram
+
+<img width="1172" height="637" alt="image" src="https://github.uio.no/user-attachments/assets/7e0cf22a-5bf6-4b1c-8399-eeb85b0f08d9" />
+
