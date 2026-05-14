@@ -110,7 +110,11 @@ fun MapApp(
                                     contentDescription = destination.contentDescription
                                 )
                             },
-                            label = { Text(destination.label, fontWeight = FontWeight.SemiBold) },
+                            label = {
+                                Text(
+                                    destination.label,
+                                    style = MaterialTheme.typography.labelSmall
+                                ) },
                             colors = NavigationBarItemDefaults.colors(
                                 indicatorColor = LightBlue,
                                 selectedIconColor = Grey,
