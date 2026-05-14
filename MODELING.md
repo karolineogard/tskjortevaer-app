@@ -93,7 +93,94 @@ Postbetingelser: Ingen
 ##### Alternativ flyt punkt 
 
 
+## Klassediagram
+```mermaid
+classDiagram
+    direction TB
 
+    %% View / UI
+    class HomeScreen {
+        <<Composable>>+HomeViewModel viewModel
+    }
+
+    %% ViewModel
+    class HomeViewModel {
+        -DeviceLocationDataSource deviceLocationDataSource
+        -LocationForecastRepository locationForecastRepository
+        -WeatherRepository weatherRepository
+        -LocationRepository locationRepository
+        +MutableStateFlow~UiState~ uiState
+        +loadData()
+    }
+
+    class UiState {
+        <<sealed>>
+    }
+
+    class Success {
+        +AppLocation location
+        +ForecastHourDetails forecast
+        +String place
+        +List~MetAlert~ alerts
+        +ClothesRecommendation recommendation
+    }
+
+    %% Business Logic
+    class ClothesRecommendationEngine {
+        <<utility>>
+        +recommend(forecasts, settings, offset) ClothesRecommendation
+    }
+
+    %% Repositories / Data Sources
+    class DeviceLocationDataSource {
+        +getCurrentLocation() AppLocation
+    }
+
+    class LocationForecastRepository {
+        -LocationForecastDataSource dataSource
+        +getForecastNow(lat, lon) ForecastHourDetails
+    }
+
+    class WeatherRepository {
+        -MetAlertsDatasource alertDataSource
+        +getAlertsByLocation(lat, lon) List~MetAlert~
+    }
+
+    class LocationRepository {
+        +getPlaceName(lat, lon) String
+    }
+
+    %% Data Models
+    class AppLocation {
+        +Double lat
+        +Double lon
+    }
+
+    class ForecastHourDetails {
+        +Double airTemperature
+        +Double windSpeed
+        +String symbolCode
+        +Double precipitationAmount
+    }
+
+    %% Relationships
+    HomeScreen --> HomeViewModel : observerer
+    HomeViewModel ..> UiState : oppdaterer
+    UiState <|-- Success
+    
+    HomeViewModel --> DeviceLocationDataSource : bruker
+    HomeViewModel --> LocationForecastRepository : bruker
+    HomeViewModel --> WeatherRepository : bruker
+    HomeViewModel --> LocationRepository : bruker
+    HomeViewModel ..> ClothesRecommendationEngine : beregner via
+
+    LocationForecastRepository --> AppLocation : krever
+    WeatherRepository --> AppLocation : krever
+    
+    Success --> AppLocation
+    Success --> ForecastHourDetails
+
+```
 
 ## sekvensdiagram
 
@@ -101,7 +188,8 @@ Postbetingelser: Ingen
 sequenceDiagram
     actor Bruker
     participant UI as App/UI
-    participant VM as ViewModel    participant Loc as LocationService
+    participant VM as ViewModel    
+    participant Loc as LocationService
     participant Repo as WeatherRepository
     participant API as MET API
 
@@ -120,7 +208,7 @@ sequenceDiagram
     end
 
     VM->>Repo: Hent værdata(koordinater)
-    Repo->>API: forespørsel (LocationForecast)
+    Repo->>API: forespørsel (LocationForecast, MetAlerts)
     API-->>Repo: Værdata (JSON)
     Repo-->>VM: Prosessert værdata
     
