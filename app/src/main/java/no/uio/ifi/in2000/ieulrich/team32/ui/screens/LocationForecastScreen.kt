@@ -63,7 +63,7 @@ fun LocationForecastScreen(
 ) {
     val viewModel: LocationForecastViewmodel = hiltViewModel()
     if (lat == null || lon == null) {
-        // TODO: handle null values
+        ErrorScreen()
     } else {
         LaunchedEffect(lat, lon) {
             viewModel.loadForecast(lat, lon)
@@ -85,7 +85,7 @@ fun LocationForecastScreen(
         }
 
         is LocationForecastUiState.Error -> {
-            NoInternetScreen()
+            ErrorScreen()
         }
 
         is LocationForecastUiState.Success -> {
@@ -197,14 +197,12 @@ fun DayForecastCard(
                     if (index > 0) HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                     ForecastHour(
                         time = Format.extractHour(details.timestamp),
-                        temp = Format.formatTemp(details.temperature),
-                        windSpeed = Format.formatWind(details.windSpeed),
+                        temp = details.temperature,
+                        windSpeed = details.windSpeed,
                         windDirection = details.windDirection,
-                        precipitationAmount = Format.formatPrecipitation(details.precipitationAmount),
+                        precipitationAmount = details.precipitationAmount,
                         symbolCode = details.symbolCode,
-                        compact = true,
                         tempColor = if (details.temperature <= 0.0) MinusTekst else PlussTekst,
-                        rainColor = MinusTekst
                     )
 
                 }
@@ -214,6 +212,7 @@ fun DayForecastCard(
                     val avgWind = hours.map { it.windSpeed }.average()
                     val totalPrecipitation = hours.sumOf { it.precipitationAmount }
                     val symbolCode = hours.firstOrNull()?.symbolCode ?: ""
+                    val windDirection = hours.firstOrNull()?.windDirection ?: 0.0
                     val imageUrl =
                         "https://raw.githubusercontent.com/metno/weathericons/main/weather/svg/$symbolCode.svg"
 
@@ -241,12 +240,16 @@ fun DayForecastCard(
                             color = if (maxTemp <= 0.0) MinusTekst else PlussTekst,
                             modifier = Modifier.weight(1f)
                         )
-                        Text(
-                            text = Format.formatPrecipitation(totalPrecipitation),
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.weight(1f),
-                            color = MinusTekst
-                        )
+                        if (totalPrecipitation > 0) {
+                            Text(
+                                text = Format.formatPrecipitation(totalPrecipitation),
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.weight(1f),
+                                color = MinusTekst
+                            )
+                        } else {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
                         Text(
                             text = Format.formatWind(avgWind),
                             style = MaterialTheme.typography.bodySmall,
