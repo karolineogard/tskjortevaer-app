@@ -442,7 +442,7 @@ fun MapScreen(
                     }
                 }
             } else {
-                NoInternetScreen()
+                ErrorScreen()
             }
         }
     }

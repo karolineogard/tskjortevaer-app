@@ -393,7 +393,7 @@ fun ClothesScreen(
             }
         }
     } else {
-        NoInternetScreen()
+        ErrorScreen()
     }
 }
 
