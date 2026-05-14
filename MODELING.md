@@ -75,7 +75,7 @@ Postbetingelser: Ingen
 2. Appen ber om tilgang til lokasjon
 3. Bruker tillatter lokasjonstilgang
 4. Appen henter brukerens posisjon
-5. Appen viser været og klesanbefaling basert på brukerens posisjon
+5. Appen viser været, mulige farevarsler og klesanbefaling basert på brukerens posisjon
 
 ##### Alternativ flyt punkt 3
 3.1 Bruker tillater ikke lokasjonstilgang
