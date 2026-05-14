@@ -37,8 +37,8 @@ fun TimeInputField(
     initialMinute: Int = 0,
     onTimeChanged: ((hour: Int, minute: Int) -> Unit)? = null
 ) {
-    var hour by remember { mutableIntStateOf(initialHour) }
-    var minute by remember { mutableIntStateOf(initialMinute) }
+    var hour by remember(initialHour) { mutableIntStateOf(initialHour) }
+    var minute by remember(initialMinute) { mutableIntStateOf(initialMinute) }
     val hourFocus = remember { FocusRequester() }
     val minuteFocus = remember { FocusRequester() }
     var hourFocused by remember { mutableStateOf(false) }

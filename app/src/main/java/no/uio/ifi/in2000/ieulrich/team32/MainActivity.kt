@@ -17,14 +17,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import no.uio.ifi.in2000.ieulrich.team32.ui.MapApp
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.Team32Theme
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.UiState
 import org.maplibre.android.MapLibre
 import org.maplibre.android.WellKnownTileServer
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val viewModel: LocationForecastViewmodel by viewModels()
     private val homeViewModel: HomeViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,7 +56,6 @@ class MainActivity : ComponentActivity() {
                 this, Manifest.permission.ACCESS_COARSE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED -> {
                 homeViewModel.loadData()
-                viewModel.loadForecastForDevice()
             }
             shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION) -> {
                 // TODO: rationale for location permission
@@ -72,7 +69,6 @@ class MainActivity : ComponentActivity() {
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { _ ->
-        viewModel.loadForecastForDevice()
         homeViewModel.loadData()
     }
 }

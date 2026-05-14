@@ -27,8 +27,8 @@
     <string name="home_outfit">Klesanbefaling</string>
     <string name="home_no_recommendation">Ingen værdata tilgjengelig ennå.</string>
     <string name="home_recommendation_title">Anbefaling</string>
-    <string name="home_info_text">Anbefalingen tar utgangspunkt i fremkomst til og fra skole eller jobb. Vi antar at reisetidspunktet skjer mellom 8–10 på morgenen og 16–18 på kvelden.</string>
-    <string name="home_preferences">Jeg har andre behov</string>
+    <string name="home_info_text">Anbefalingen tar utgangspunkt i reise til og fra skole eller jobb. Vi antar at reisen skjer mellom 8–10 på morgenen og 16–18 på kvelden. Har du andre behov? </string>
+    <string name="home_preferences">Tilpass klesanbefalingen</string>
     <string name="home_heavy_jacket">Tykk jakke</string>
     <string name="home_light_jacket">Lett jakke</string>
     <string name="home_sweatshirt">Genser</string>
@@ -57,10 +57,10 @@
     <string name="clothes_title">Klesanbefaling</string>
     <string name="clothes_recommendation_text_default">For deg som pendler i rushtid</string>
     <string name="clothes_recommendation_text_outdoors">For deg som skal være utendørs mellom %1$02d:%2$02d og %3$02d:%4$02d</string>
-    <string name="clothes_recommendation_text_physical_low">og fysisk aktiv på et lavt aktivitetsnivå</string>
-    <string name="clothes_recommendation_text_physical_medium">og fysisk aktiv på et middels aktivitetsnivå</string>
-    <string name="clothes_recommendation_text_physical_high">og fysisk aktiv på et høy aktivitetsnivå</string>
-    <string name="clothes_recommendation_text_physical">og fysisk aktiv</string>
+    <string name="clothes_recommendation_text_physical_low"> og fysisk aktiv på et lavt aktivitetsnivå</string>
+    <string name="clothes_recommendation_text_physical_medium"> og fysisk aktiv på et middels aktivitetsnivå</string>
+    <string name="clothes_recommendation_text_physical_high"> og fysisk aktiv på et høy aktivitetsnivå</string>
+    <string name="clothes_recommendation_text_physical"> og fysisk aktiv</string>
     <string name="clothes_no_data">Ingen værdata tilgjengelig. Prøv å søk opp et sted på hjemskjermen først.</string>
     <string name="clothes_effective_temp_text">Justert etter værforhold, tilpasninger og preferanser</string>
     <string name="clothes_recommendation">Klesanbefaling</string>

@@ -3,8 +3,6 @@ package no.uio.ifi.in2000.ieulrich.team32.data.location
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.location.Location
-import androidx.compose.ui.tooling.data.SourceContext
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority

@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.ieulrich.team32.data.geocoding.dto
 
-import android.icu.text.LocaleDisplayNames
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

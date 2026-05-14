@@ -1,12 +1,14 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -16,16 +18,14 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,14 +34,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
@@ -52,52 +50,72 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.components.ForecastHour
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TopAppBar
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.PlussTekst
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastUiState
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationForecastScreen(
-    viewmodel: LocationForecastViewmodel,
     lat: Double?,
     lon: Double?,
-    city: String = "Værvarsel",
     navController: NavController
 ) {
+    val viewModel: LocationForecastViewmodel = hiltViewModel()
     if (lat == null || lon == null) {
-        // TODO: handle null values
+        ErrorScreen()
     } else {
         LaunchedEffect(lat, lon) {
-            viewmodel.loadForecast(lat, lon)
+            viewModel.loadForecast(lat, lon)
         }
     }
 
-    val groupedByDay = viewmodel.forecastByDay.collectAsStateWithLifecycle()
-    val place = viewmodel.placeName.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = place.value,
-                onBack = { navController.popBackStack() }
-            )
+    when (val state = uiState) {
+        is LocationForecastUiState.Loading -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(modifier = Modifier.size(32.dp))
+            }
         }
-    ) { innerPadding: PaddingValues ->
-        LazyColumn(
-            modifier = Modifier.padding(
-                top = innerPadding.calculateTopPadding(),
-                start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
-                bottom = 0.dp
-            )
-        ) {
-            groupedByDay.value?.forEach { (date, forecastForDay) ->
-                item {
-                    DayForecastCard(
-                        date = date,
-                        forecastForDay = forecastForDay
+
+        is LocationForecastUiState.Error -> {
+            ErrorScreen()
+        }
+
+        is LocationForecastUiState.Success -> {
+            val forecastByDay = state.forecastByDay
+            val placeName = state.placeName
+
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = placeName,
+                        onBack = { navController.popBackStack() }
                     )
+                }
+            ) { innerPadding: PaddingValues ->
+                LazyColumn(
+                    modifier = Modifier.padding(
+                        top = innerPadding.calculateTopPadding(),
+                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
+                        bottom = 0.dp
+                    )
+                ) {
+                    forecastByDay.forEach { (date, forecastForDay) ->
+                        item {
+                            DayForecastCard(
+                                date = date,
+                                forecastForDay = forecastForDay
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -179,14 +197,12 @@ fun DayForecastCard(
                     if (index > 0) HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                     ForecastHour(
                         time = Format.extractHour(details.timestamp),
-                        temp = Format.formatTemp(details.temperature),
-                        windSpeed = Format.formatWind(details.windSpeed),
+                        temp = details.temperature,
+                        windSpeed = details.windSpeed,
                         windDirection = details.windDirection,
-                        precipitationAmount = Format.formatPrecipitation(details.precipitationAmount),
+                        precipitationAmount = details.precipitationAmount,
                         symbolCode = details.symbolCode,
-                        compact = true,
                         tempColor = if (details.temperature <= 0.0) MinusTekst else PlussTekst,
-                        rainColor = MinusTekst
                     )
 
                 }
@@ -196,6 +212,7 @@ fun DayForecastCard(
                     val avgWind = hours.map { it.windSpeed }.average()
                     val totalPrecipitation = hours.sumOf { it.precipitationAmount }
                     val symbolCode = hours.firstOrNull()?.symbolCode ?: ""
+                    val windDirection = hours.firstOrNull()?.windDirection ?: 0.0
                     val imageUrl =
                         "https://raw.githubusercontent.com/metno/weathericons/main/weather/svg/$symbolCode.svg"
 
@@ -223,12 +240,16 @@ fun DayForecastCard(
                             color = if (maxTemp <= 0.0) MinusTekst else PlussTekst,
                             modifier = Modifier.weight(1f)
                         )
-                        Text(
-                            text = Format.formatPrecipitation(totalPrecipitation),
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.weight(1f),
-                            color = MinusTekst
-                        )
+                        if (totalPrecipitation > 0) {
+                            Text(
+                                text = Format.formatPrecipitation(totalPrecipitation),
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.weight(1f),
+                                color = MinusTekst
+                            )
+                        } else {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
                         Text(
                             text = Format.formatWind(avgWind),
                             style = MaterialTheme.typography.bodySmall,
