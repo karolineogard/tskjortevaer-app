@@ -9,12 +9,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.data.geocoding.LocationRepository
-import no.uio.ifi.in2000.ieulrich.team32.data.location.DeviceLocationDataSource
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.LocationForecastRepository
-import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.dto.LocationForecastResponse
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.mapper.toForecastByDay
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
-import no.uio.ifi.in2000.ieulrich.team32.ui.screens.LocationForecastScreen
 import javax.inject.Inject
 
 sealed class LocationForecastUiState {
