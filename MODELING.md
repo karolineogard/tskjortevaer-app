@@ -83,7 +83,7 @@ Postbetingelser: Ingen
 
 ### Søk på sted
 Primæraktør: Bruker
-Sekundæraktør:
+Sekundæraktør: LocationForecast, MetAlerts
 Prebetingelser: Bruker har installert appen T-skjortevær på sin enhet
 Postbetingelser: Ingen
 
