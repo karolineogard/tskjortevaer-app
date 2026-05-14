@@ -56,9 +56,7 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.theme.LightBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SearchViewModel
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.UiState
 
 @Composable
@@ -66,9 +64,7 @@ fun MapApp(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
-    val locationForecastViewmodel: LocationForecastViewmodel = hiltViewModel()
     val homeViewModel: HomeViewModel = hiltViewModel()
-    val settingsViewModel: SettingsViewModel = hiltViewModel()
     val clothesViewModel: ClothesViewModel = hiltViewModel()
     val searchViewModel: SearchViewModel = hiltViewModel()
     val context = LocalContext.current
@@ -90,27 +86,6 @@ fun MapApp(
             homeViewModel.loadData()
         }
         if (!isOnline) wasOffline = true
-    }
-
-    // Sync temperatureOffset fra innstillinger til klesanbefalingen
-    val temperatureOffset by settingsViewModel.temperatureOffset.collectAsStateWithLifecycle()
-    LaunchedEffect(temperatureOffset) {
-        clothesViewModel.updateTemperatureOffset(temperatureOffset)
-    }
-
-
-    val savedDepHour   by settingsViewModel.defaultDepartureHour.collectAsStateWithLifecycle()
-    val savedDepMinute by settingsViewModel.defaultDepartureMinute.collectAsStateWithLifecycle()
-    val savedRetHour   by settingsViewModel.defaultReturnHour.collectAsStateWithLifecycle()
-    val savedRetMinute by settingsViewModel.defaultReturnMinute.collectAsStateWithLifecycle()
-
-    LaunchedEffect(savedDepHour, savedDepMinute, savedRetHour, savedRetMinute) {
-        clothesViewModel.applyDefaultTimes(
-            departureHour   = savedDepHour,
-            departureMinute = savedDepMinute,
-            returnHour      = savedRetHour,
-            returnMinute    = savedRetMinute
-        )
     }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
