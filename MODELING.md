@@ -66,7 +66,7 @@ flowchart TB
 ## Tekstlige use case
 ### Klesanbefaling
 Primæraktør: Bruker
-Sekundæraktør:
+Sekundæraktør: LocationForecast, MetAlerts
 Prebetingelser: Bruker har installert appen T-skjortevær på sin enhet
 Postbetingelser: Ingen
 
@@ -83,7 +83,7 @@ Postbetingelser: Ingen
 
 ### Søk på sted
 Primæraktør: Bruker
-Sekundæraktør: LocationForecast, MetAlerts
+Sekundæraktør:
 Prebetingelser: Bruker har installert appen T-skjortevær på sin enhet
 Postbetingelser: Ingen
 
