@@ -9,7 +9,7 @@ import javax.inject.Inject
 class LocationForecastRepository @Inject constructor(
     private val api: LocationForecastDataSource
 ) {
-    var forecastByDay: Map<String, List<ForecastHourDetails>> = emptyMap()
+    private var forecastByDay: Map<String, List<ForecastHourDetails>> = emptyMap()
 
     suspend fun getForecastByDay(lat: Double, lon: Double): Map<String, List<ForecastHourDetails>> {
         val response = api.getForecast(lat, lon) ?: return forecastByDay
