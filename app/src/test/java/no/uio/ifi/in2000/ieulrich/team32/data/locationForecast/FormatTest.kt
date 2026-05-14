@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class FormatTest {
+    // alle testene som har med tid å gjøre her har en svakhet i at de kun vil passere i samme tidssone.
     @Test
     fun extractHourShouldAssertTrue() {
         // Arrange
