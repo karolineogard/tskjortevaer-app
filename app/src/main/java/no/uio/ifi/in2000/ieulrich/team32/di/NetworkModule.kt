@@ -1,7 +1,6 @@
 package no.uio.ifi.in2000.ieulrich.team32.di
 
 import android.content.Context
-import android.preference.PreferenceDataStore
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.google.android.gms.location.FusedLocationProviderClient
