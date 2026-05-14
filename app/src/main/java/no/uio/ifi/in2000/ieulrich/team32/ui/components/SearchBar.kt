@@ -24,11 +24,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -37,9 +36,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SearchViewModel
 
@@ -50,21 +49,28 @@ fun SearchBar(
     onPlaceSelected: (name: String, location: Location) -> Unit
 ) {
     val viewModel: SearchViewModel = hiltViewModel()
-    val scope = rememberCoroutineScope()
+    val selectedLocation by viewModel.selectedLocation.collectAsStateWithLifecycle()
     var searchText by remember { mutableStateOf("") }
     var hasFocus by remember { mutableStateOf(false) }
 
-    val suggestions by viewModel.suggestions.collectAsState()
-    val recentSearches by viewModel.recentSearches.collectAsState()
+    val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()
+    val recentSearches by viewModel.recentSearches.collectAsStateWithLifecycle()
 
     val showSuggestions = hasFocus && suggestions.isNotEmpty()
     val showRecent = hasFocus && searchText.isEmpty() && recentSearches.isNotEmpty()
 
     fun selectPlace(name: String, location: Location) {
-        viewModel.addRecentSearch(name)
+        viewModel.addRecentSearch(name, location)
         searchText = ""
         viewModel.clearSearch()
         onPlaceSelected(name, location)
+    }
+
+    LaunchedEffect(selectedLocation) {
+        selectedLocation?.let { location ->
+            selectPlace(searchText, location)
+            viewModel.onLocationConsumed()
+        }
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -112,10 +118,7 @@ fun SearchBar(
                         if (first != null) {
                             selectPlace(first.first, first.second)
                         } else {
-                            scope.launch {
-                                val location = viewModel.getCoordinatesForName(searchText)
-                                if (location != null) selectPlace(searchText, location)
-                            }
+                            viewModel.selectPlace(searchText)
                         }
                     }
                 )
@@ -141,7 +144,7 @@ fun SearchBar(
                     style = MaterialTheme.typography.labelMedium,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
-                recentSearches.forEach { name ->
+                recentSearches.forEach { (name, location) ->
                     ListItem(
                         headlineContent = { Text(name) },
                         leadingContent = {
@@ -150,12 +153,7 @@ fun SearchBar(
                                 contentDescription = stringResource(R.string.search_recent)
                             )
                         },
-                        modifier = Modifier.clickable {
-                            scope.launch {
-                                val location = viewModel.getCoordinatesForName(name)
-                                if (location != null) selectPlace(name, location)
-                            }
-                        }
+                        modifier = Modifier.clickable { selectPlace(name, location) }
                     )
                 }
             }
