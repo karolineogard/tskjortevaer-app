@@ -65,10 +65,10 @@ flowchart TB
 
 ## Tekstlige use case
 ### Klesanbefaling
-Primæraktør: Bruker
-Sekundæraktør: LocationForecast, MetAlerts
-Prebetingelser: Bruker har installert appen T-skjortevær på sin enhet
-Postbetingelser: Ingen
+Primæraktør: Bruker \
+Sekundæraktør: LocationForecast, MetAlerts \
+Prebetingelser: Bruker har installert appen T-skjortevær på sin enhet \
+Postbetingelser: Ingen 
 
 ##### Hovedflyt
 1. Bruker åpner appen 
@@ -78,21 +78,48 @@ Postbetingelser: Ingen
 5. Appen viser været, mulige farevarsler og klesanbefaling basert på brukerens posisjon
 
 ##### Alternativ flyt punkt 3
-3.1 Bruker tillater ikke lokasjonstilgang
-3.2 Appen går videre med default-lokasjon (Oslo)
+3.1 Bruker tillater ikke lokasjonstilgang \
+3.2 Appen går videre med default-lokasjon (Oslo) \
 
 ### Søk på sted
-Primæraktør: Bruker
-Sekundæraktør:
-Prebetingelser: Bruker har installert appen T-skjortevær på sin enhet
-Postbetingelser: Ingen
+Primæraktør: Bruker \
+Sekundæraktør: Locationforecast \
+Prebetingelser: Bruker har installert appen T-skjortevær på sin enhet \
+Postbetingelser: Ingen \
 
 ##### Hovedflyt
-
+1. Bruker åpner appen \
+2. Bruker trykker i søkefeltet på hjemskjermen \
+3. Bruker taster inn "oslo" \
+4. Appen viser forslag basert på søketeksten \
+5. Bruker trykker på et av forslagene \
+6. Appen laster inn værmelding for stedet bruker valgte \
+7. 
 
 ##### Alternativ flyt punkt 
 
 
+## Aktivitetsdiagram
+```mermaid
+flowchart LR
+    Start((Start))
+    Åpne([Bruker åpner appen])
+    Lokasjon([Appen spør bruker om tilgang til lokasjon])
+    Standard([Bruker standard-lokasjon])
+    Tilgang{Tillat lokasjonstilgang?}
+    Vær([Henter værmelding for lokasjon])
+    Klær([Viser klesanbefaling for lokasjon])
+    Slutt(((Slutt)))
+
+    Start --> Åpne
+    Åpne --> Lokasjon
+    Lokasjon --> Tilgang
+    Tilgang --Tillater tilgang--> Vær
+    Tilgang --Tillater ikke tilgang --> Standard
+    Standard --> Vær
+    Vær --> Klær
+    Klær --> Slutt
+```
 ## Klassediagram
 ```mermaid
 classDiagram
