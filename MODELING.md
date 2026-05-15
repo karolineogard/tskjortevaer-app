@@ -275,7 +275,8 @@ sequenceDiagram
 ```
 
 
-## Use-case diagram
+## Use Case Diagram
+Her har vi laget et Use Case Diagram. Et Use Case Diagram viser målene til primæraktøren og hvordan sekundæraktører hjelper med å nå dette målet gjennom systemet. Dette diagrammet er laget til use caset  «klesanbefaling». 
 
 <img width="1172" height="637" alt="image" src="https://github.uio.no/user-attachments/assets/7e0cf22a-5bf6-4b1c-8399-eeb85b0f08d9" />
 
