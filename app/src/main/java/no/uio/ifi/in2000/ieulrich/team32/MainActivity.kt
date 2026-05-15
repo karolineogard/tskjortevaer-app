@@ -1,6 +1,7 @@
 package no.uio.ifi.in2000.ieulrich.team32
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -58,8 +59,20 @@ class MainActivity : ComponentActivity() {
                 homeViewModel.loadData()
             }
             shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION) -> {
-                // TODO: rationale for location permission
-                locationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                AlertDialog.Builder(this)
+                    .setTitle("Lokasjon")
+                    .setMessage(
+                        "T-skjortevær bruker posisjonen din for å vise " +
+                                "værmelding og klesanbefaling for der du er. " +
+                                "Uten tilgang bruker vi Oslo som standard."
+                    )
+                    .setPositiveButton("Gi tilgang") { _, _ ->
+                        locationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                    }
+                    .setNegativeButton("Ikke nå") { _, _ ->
+                        homeViewModel.loadData()
+                    }
+                    .show()
             }
             else -> {
                 locationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
