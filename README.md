@@ -116,3 +116,11 @@ MET sine API-er brukes via IFI sin proxyserver (`in2000.api.met.no`) i tråd med
 
 ---
 
+## Kilder til bilder
+Værikonene er hentet fra MET sin github: https://github.com/metno
+ 
+Andre ikoner brukt i appen for f.eks. navigasjon og handling, er hovedsakelig hentet fra Material 3 Design Kit sitt bibliotek samt Figma sitt "Simple Design Systems"-bibliotek innebygd i Figma. Klesikonene ble hentet fra et gratis bibliotek hentet fra Figma Community. Enkelte illustrasjonsikoner, f.eks. for "viking" er hentet fra diverse bibliotek gjennom den innebygde søkefunksjonen i Figma. Appikonene er tegnet selv.
+
+Lenke til klesikoner: https://www.figma.com/design/ZboyOHzK2l8UFFlUQZYsVy/Clothes-Icon-Pack-%7C-1024-Free-Icons--Community-?node-id=0-1&p=f&t=CO3v92vkBkcgflhx-0
+
+
