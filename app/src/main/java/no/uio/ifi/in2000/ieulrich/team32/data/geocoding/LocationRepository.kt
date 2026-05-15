@@ -1,7 +1,6 @@
 package no.uio.ifi.in2000.ieulrich.team32.data.geocoding
 
 import android.location.Location
-import io.ktor.utils.io.errors.IOException
 import no.uio.ifi.in2000.ieulrich.team32.data.geocoding.dto.NominatimAddress
 import javax.inject.Inject
 
@@ -18,7 +17,7 @@ class LocationRepository @Inject constructor (
         }
     }
 
-    suspend fun getCoordinatesFromName(name: String): Location?{
+    suspend fun getCoordinatesForName(name: String): Location?{
         return api.getCoordinatesFromName(name)
     }
 

@@ -62,8 +62,9 @@ import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import coil3.svg.SvgDecoder
 import no.uio.ifi.in2000.ieulrich.team32.R
-import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
+import no.uio.ifi.in2000.ieulrich.team32.ui.util.Format
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
+import no.uio.ifi.in2000.ieulrich.team32.model.location.AppLocation
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.imageUrl
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
@@ -77,7 +78,6 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRødGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.PlussTekst
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.AppLocation
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.UiState
@@ -96,6 +96,8 @@ fun HomeScreen(
     val focusManager = LocalFocusManager.current
     val padding = 16.dp
     var selectedAlert by remember { mutableStateOf<MetAlert?>(null) }
+    val recommendation by clothesViewModel.recommendation.collectAsStateWithLifecycle()
+    val isLoading by clothesViewModel.isLoading.collectAsStateWithLifecycle()
 
     selectedAlert?.let { alert ->
         AlertDetailScreen(
@@ -107,7 +109,7 @@ fun HomeScreen(
         when (val state = uiState) {
             is UiState.Loading -> {
                 if (!isOnline) {
-                  NoInternetScreen()
+                  ErrorScreen()
                 } else {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -121,10 +123,15 @@ fun HomeScreen(
             }
 
             is UiState.Error -> {
-                NoInternetScreen()
+                ErrorScreen()
             }
 
             is UiState.Success -> {
+                LaunchedEffect(state.location) {
+                    state.location?.let {
+                        clothesViewModel.updateLocation(it.lat, it.lon)
+                    }
+                }
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -160,7 +167,11 @@ fun HomeScreen(
                     }
 
                     item {
-                        ClothingCard(navController = navController, clothesViewModel = clothesViewModel, location = state.location)
+                        ClothingCard(
+                            navController = navController,
+                            recommendation = recommendation,
+                            isLoading =  isLoading
+                        )
                     }
                 }
             }
@@ -338,20 +349,12 @@ fun WeatherCard(
 
 @Composable
 fun ClothingCard(
-    navController: NavController,
-    clothesViewModel: ClothesViewModel,
     modifier: Modifier = Modifier,
-    location: AppLocation?
+    navController: NavController,
+    recommendation: ClothesRecommendation?,
+    isLoading: Boolean = false,
 ) {
     var showInfo by rememberSaveable { mutableStateOf(false) }
-    val recommendation by clothesViewModel.recommendation.collectAsStateWithLifecycle()
-    val isLoading by clothesViewModel.isLoading.collectAsStateWithLifecycle()
-
-    LaunchedEffect(location) {
-        location?.let {
-            clothesViewModel.updateLocation(it.lat, it.lon)
-        }
-    }
 
     Box(modifier = modifier.fillMaxWidth()) {
         Card(
@@ -400,23 +403,27 @@ fun ClothingCard(
 
                 HorizontalDivider()
 
-                if (isLoading) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                when {
+                    isLoading -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                        }
                     }
-                } else if (recommendation != null) {
-                    ClothingCardRecommendationRows(rec = recommendation!!)
-                } else {
-                    Text(
-                        text = stringResource(R.string.home_no_recommendation),
-                        modifier = Modifier.padding(8.dp),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    recommendation != null -> {
+                        ClothingCardRecommendationRows(rec = recommendation)
+                    }
+                    else -> {
+                        Text(
+                            text = stringResource(R.string.home_no_recommendation),
+                            modifier = Modifier.padding(8.dp),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 }
             }
         }
@@ -521,7 +528,7 @@ private fun ClothingCardRecommendationRows(rec: ClothesRecommendation) {
             stringResource(R.string.home_no_rain)
         }
 
-        val rain_icon = if (rec.bringUmbrella || rec.wearRainGear) {
+        val rainIcon = if (rec.bringUmbrella || rec.wearRainGear) {
             R.drawable.paraply
         } else {
             R.drawable.ikke_paraply
@@ -533,7 +540,7 @@ private fun ClothingCardRecommendationRows(rec: ClothesRecommendation) {
         )
 
         ClothingCardRow(
-            iconRes = rain_icon,
+            iconRes = rainIcon,
             text = rainsuggestion
         )
     }

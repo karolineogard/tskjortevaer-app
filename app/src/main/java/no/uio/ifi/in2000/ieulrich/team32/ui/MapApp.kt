@@ -25,7 +25,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -33,9 +35,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -49,14 +52,12 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.screens.HomeScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.LocationForecastScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.MapScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.screens.SettingsScreen
-//import no.uio.ifi.in2000.ieulrich.team32.ui.screens.SplashScreen
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.Grey
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.LightBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
+import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SearchViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.UiState
 
 @Composable
@@ -64,10 +65,9 @@ fun MapApp(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
-    val locationForecastViewmodel: LocationForecastViewmodel = hiltViewModel()
     val homeViewModel: HomeViewModel = hiltViewModel()
-    val settingsViewModel: SettingsViewModel = hiltViewModel()
     val clothesViewModel: ClothesViewModel = hiltViewModel()
+    val searchViewModel: SearchViewModel = hiltViewModel()
     val context = LocalContext.current
 
     // Nettverksovervåking
@@ -77,34 +77,16 @@ fun MapApp(
     }
 
     val isOnline by networkMonitor.isOnline.collectAsStateWithLifecycle()
+    var wasOffline by remember { mutableStateOf(!isOnline) }
     val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
 
-// Prøv å laste data på nytt når nett kommer tilbake og vi ikke har data
+    // Prøv å laste data på nytt når nett kommer tilbake og vi ikke har data
     LaunchedEffect(isOnline) {
-        if (isOnline && homeUiState !is UiState.Success) {
+        searchViewModel.setOnlineStatus(isOnline)
+        if (isOnline && wasOffline && homeUiState !is UiState.Success) {
             homeViewModel.loadData()
         }
-    }
-
-    // Sync temperatureOffset fra innstillinger til klesanbefalingen
-    val temperatureOffset by settingsViewModel.temperatureOffset.collectAsStateWithLifecycle()
-    LaunchedEffect(temperatureOffset) {
-        clothesViewModel.updateTemperatureOffset(temperatureOffset)
-    }
-
-
-    val savedDepHour   by settingsViewModel.defaultDepartureHour.collectAsStateWithLifecycle()
-    val savedDepMinute by settingsViewModel.defaultDepartureMinute.collectAsStateWithLifecycle()
-    val savedRetHour   by settingsViewModel.defaultReturnHour.collectAsStateWithLifecycle()
-    val savedRetMinute by settingsViewModel.defaultReturnMinute.collectAsStateWithLifecycle()
-
-    LaunchedEffect(savedDepHour, savedDepMinute, savedRetHour, savedRetMinute) {
-        clothesViewModel.applyDefaultTimes(
-            departureHour   = savedDepHour,
-            departureMinute = savedDepMinute,
-            returnHour      = savedRetHour,
-            returnMinute    = savedRetMinute
-        )
+        if (!isOnline) wasOffline = true
     }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -115,9 +97,9 @@ fun MapApp(
         bottomBar = {
 
                 NavigationBar(containerColor = MediumBlue) {
-                    Destination.entries.forEachIndexed { index, destination ->
+                    Destination.entries.forEach { destination ->
                         NavigationBarItem(
-                            selected = currentRoute == destination.route,
+                            selected = currentRoute?.startsWith(destination.route) == true,
                             onClick = {
                                 navController.navigate(destination.route) {
                                     launchSingleTop = true
@@ -129,7 +111,13 @@ fun MapApp(
                                     contentDescription = destination.contentDescription
                                 )
                             },
-                            label = { Text(destination.label, fontWeight = FontWeight.SemiBold) },
+                            label = {
+                                Text(
+                                    destination.label,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                ) },
                             colors = NavigationBarItemDefaults.colors(
                                 indicatorColor = LightBlue,
                                 selectedIconColor = Grey,
@@ -164,14 +152,16 @@ fun MapApp(
                     popEnterTransition = { EnterTransition.None },
                     popExitTransition = { ExitTransition.None }
                 ) {
-                    MapScreen(navController = navController, isOnline = isOnline)
+                    MapScreen(
+                        navController = navController,
+                        isOnline = isOnline
+                    )
                 }
 
                 composable(route = "forecast?lat={lat}&lon={lon}&city={city}") { backStackEntry ->
                     val lat = backStackEntry.arguments?.getString("lat")?.toDoubleOrNull()
                     val lon = backStackEntry.arguments?.getString("lon")?.toDoubleOrNull()
                     LocationForecastScreen(
-                        viewmodel = locationForecastViewmodel,
                         lat = lat,
                         lon = lon,
                         navController = navController
@@ -188,15 +178,13 @@ fun MapApp(
                 }
 
                 composable(route = Routes.SETTINGS) {
-                    SettingsScreen(navController = navController, settingsViewModel = settingsViewModel)
+                    SettingsScreen(navController = navController)
                 }
 
                 composable("${Routes.CLOTHES}?expandSheet={expandSheet}") { backStackEntry ->
                     val expandSheet = backStackEntry.arguments?.getString("expandSheet") == "true"
                     ClothesScreen(
                         clothesViewModel = clothesViewModel,
-                        settingsViewModel = settingsViewModel,
-                        isOnline = isOnline,
                         expandSheet = expandSheet
                     )
                 }

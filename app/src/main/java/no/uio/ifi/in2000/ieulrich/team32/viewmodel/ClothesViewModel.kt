@@ -11,21 +11,21 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.LocationForecastRepository
+import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ActivityLevel
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendationEngine
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.UserSettings
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
-import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
+import no.uio.ifi.in2000.ieulrich.team32.ui.util.Format
 import javax.inject.Inject
 
 private object ClothesSettingsKeys {
-    val DEPARTURE_HOUR     = intPreferencesKey("departure_hour")
-    val DEPARTURE_MINUTE   = intPreferencesKey("departure_minute")
-    val RETURN_HOUR        = intPreferencesKey("return_hour")
-    val RETURN_MINUTE      = intPreferencesKey("return_minute")
+    val DEPARTURE_HOUR = intPreferencesKey("departure_hour")
+    val DEPARTURE_MINUTE = intPreferencesKey("departure_minute")
+    val RETURN_HOUR = intPreferencesKey("return_hour")
+    val RETURN_MINUTE = intPreferencesKey("return_minute")
     val TEMPERATURE_OFFSET = floatPreferencesKey("temperature_offset")
 }
 
@@ -56,26 +56,24 @@ class ClothesViewModel @Inject constructor(
         Log.d("ClothesViewModel", "Initialiserer ClothesViewModel")
         // Les lagrede innstillinger direkte fra DataStore ved oppstart
         viewModelScope.launch {
-            val prefs = dataStore.data.first()
-            val depHour    = prefs[ClothesSettingsKeys.DEPARTURE_HOUR]     ?: 8
-            val depMinute  = prefs[ClothesSettingsKeys.DEPARTURE_MINUTE]   ?: 0
-            val retHour    = prefs[ClothesSettingsKeys.RETURN_HOUR]        ?: 16
-            val retMinute  = prefs[ClothesSettingsKeys.RETURN_MINUTE]      ?: 0
-            val tempOffset = prefs[ClothesSettingsKeys.TEMPERATURE_OFFSET] ?: 0f
+            dataStore.data.collect { prefs ->
+                val tempOffset = try {
+                    prefs[ClothesSettingsKeys.TEMPERATURE_OFFSET] ?: 0f
+                } catch (e: ClassCastException) { 0f }
 
-            temperatureOffset = tempOffset
-            _settings.value = _settings.value.copy(
-                departureHour   = depHour,
-                departureMinute = depMinute,
-                returnHour      = retHour,
-                returnMinute    = retMinute
-            )
+                temperatureOffset = tempOffset
+
+                if (!userHasOverriddenTimes) {
+                    _settings.value = _settings.value.copy(
+                        departureHour = prefs[ClothesSettingsKeys.DEPARTURE_HOUR] ?: 8,
+                        departureMinute = prefs[ClothesSettingsKeys.DEPARTURE_MINUTE] ?: 0,
+                        returnHour = prefs[ClothesSettingsKeys.RETURN_HOUR] ?: 16,
+                        returnMinute = prefs[ClothesSettingsKeys.RETURN_MINUTE] ?: 0
+                    )
+                }
+                computeRecommendation()
+            }
         }
-    }
-
-    fun updateTemperatureOffset(offset: Float) {
-        temperatureOffset = offset
-        computeRecommendation()
     }
 
     fun updateLocation(lat: Double, lon: Double) {
@@ -86,24 +84,6 @@ class ClothesViewModel @Inject constructor(
 
     fun loadRecommendation() {
         computeRecommendation()
-    }
-
-    /** Kalles fra innstillinger — oppdaterer kun hvis brukeren ikke har overstyrt i bottom sheet */
-    fun applyDefaultTimes(
-        departureHour: Int,
-        departureMinute: Int,
-        returnHour: Int,
-        returnMinute: Int
-    ) {
-        if (!userHasOverriddenTimes) {
-            _settings.value = _settings.value.copy(
-                departureHour   = departureHour,
-                departureMinute = departureMinute,
-                returnHour      = returnHour,
-                returnMinute    = returnMinute
-            )
-            computeRecommendation()
-        }
     }
 
     /** Kalles fra bottom sheet — overstyrer faste tider for denne sesjonen */
@@ -167,7 +147,7 @@ class ClothesViewModel @Inject constructor(
         returnHour: Int
     ): List<ForecastHourDetails> {
         return forecasts.filter { forecast ->
-            val hour = no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
+            val hour = Format
                 .extractHour(forecast.timestamp).toIntOrNull() ?: return@filter false
             if (departureHour <= returnHour) {
                 hour in departureHour until returnHour

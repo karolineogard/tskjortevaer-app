@@ -72,35 +72,29 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.R
-import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
+import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ActivityLevel
+import no.uio.ifi.in2000.ieulrich.team32.ui.util.Format
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
-import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
-import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TravelTimesCard
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.PlussTekst
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClothesScreen(
     clothesViewModel: ClothesViewModel,
-    settingsViewModel: SettingsViewModel,
-    isOnline: Boolean,
     expandSheet: Boolean = false
 ) {
-    val defaultDepHour by settingsViewModel.defaultDepartureHour.collectAsStateWithLifecycle()
-    val defaultRetHour by settingsViewModel.defaultReturnHour.collectAsStateWithLifecycle()
 
     var showBanner by remember { mutableStateOf(false) }
-    var bannerMessage by remember { mutableStateOf("") }
 
     val today = remember {
         java.time.LocalDate.now()
-            .format(java.time.format.DateTimeFormatter.ofPattern("EEEE d. MMMM", java.util.Locale("no")))
+            .format(java.time.format.DateTimeFormatter.ofPattern("EEEE d. MMMM", Locale.forLanguageTag("no")))
             .replaceFirstChar { it.uppercase() }
     }
 
@@ -284,7 +278,6 @@ fun ClothesScreen(
                                 isPhysicallyActive = localIsPhysical == true,
                                 activityLevel = localActivityLevel
                             )
-                            bannerMessage = "Klesanbefalingen er oppdatert." // TODO: se på
                             showBanner = true
                             scope.launch { sheetState.bottomSheetState.partialExpand() }
                         },
@@ -335,20 +328,22 @@ fun ClothesScreen(
                                     modifier = Modifier.padding(top = 4.dp),
                                 )
                                 Spacer(modifier = Modifier.size(4.dp))
-                                Text(
-                                    text = "Dra: %02d:%02d Tilbake: %02d:%02d".format( //TODO: stringres med parameter?
-                                        settings.departureHour, settings.departureMinute,
-                                        settings.returnHour, settings.returnMinute
-                                    ),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier.padding(top = 4.dp),
-                                )
-                                Spacer(modifier = Modifier.size(4.dp))
                                 var infoString = if(settings.isOutdoors) {
-                                    stringResource(R.string.clothes_recommendation_text_outdoors)
+                                    stringResource(
+                                        R.string.clothes_recommendation_text_outdoors,
+                                        settings.departureHour,
+                                        settings.departureMinute,
+                                        settings.returnHour,
+                                        settings.returnMinute
+                                    )
                                 } else {
-                                    stringResource(R.string.clothes_recommendation_text_default)
+                                    stringResource(
+                                        R.string.clothes_travel_times,
+                                        settings.departureHour,
+                                        settings.departureMinute,
+                                        settings.returnHour,
+                                        settings.returnMinute
+                                    )
                                 }
 
                                 if(settings.isPhysicallyActive) {
@@ -391,13 +386,16 @@ fun ClothesScreen(
                         exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
                         modifier = Modifier.align(Alignment.TopCenter).zIndex(1f)
                     ) {
-                        TopBanner(message = bannerMessage, onDismiss = { showBanner = false })
+                        TopBanner(
+                            message = stringResource(R.string.clothes_recommendation_updated),
+                            onDismiss = { showBanner = false }
+                        )
                     }
                 }
             }
         }
     } else {
-        NoInternetScreen()
+        ErrorScreen()
     }
 }
 
@@ -432,7 +430,7 @@ private fun EffectiveTempCard(rec: ClothesRecommendation) {
                 }
                 Text(
                     text = Format.formatTemp(rec.effectiveTemp),
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = if (rec.effectiveTemp <= 0.0) MinusTekst else PlussTekst
                 )
@@ -452,21 +450,33 @@ private fun EffectiveTempCard(rec: ClothesRecommendation) {
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
-                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
-                    Text(
-                        stringResource(R.string.clothes_effective_temp_info_text),
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.weight(1f)
-                    )
-                    IconButton(
-                        onClick = { showInfo = false },
-                        modifier = Modifier.size(20.dp)
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            Icons.Default.Close,
-                            contentDescription = stringResource(R.string.close_button),
-                            modifier = Modifier.size(16.dp))
+                        Text(
+                            text = stringResource(R.string.clothes_effective_temp_info_title_text),
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.weight(1f)
+                        )
+                        IconButton(
+                            onClick = { showInfo = false },
+                            modifier = Modifier.size(20.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = stringResource(R.string.close_button),
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
                     }
+                    Spacer(modifier = Modifier.size(8.dp))
+                    Text(
+                        text = stringResource(R.string.clothes_effective_temp_info_text),
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
         }
@@ -566,16 +576,21 @@ private fun ClothingCard(rec: ClothesRecommendation) {
             }
         }
 
-            if (showInfo) {
-                Card(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-                ) {
-                    Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
+        if (showInfo) {
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
-                            text = stringResource(R.string.clothes_clothing_info_text),
-                            style = MaterialTheme.typography.bodySmall,
+                            text = stringResource(R.string.clothes_clothing_info_title_text),
+                            style = MaterialTheme.typography.titleSmall,
                             modifier = Modifier.weight(1f)
                         )
                         IconButton(
@@ -589,9 +604,15 @@ private fun ClothingCard(rec: ClothesRecommendation) {
                             )
                         }
                     }
-
+                    Spacer(modifier = Modifier.size(8.dp))
+                    Text(
+                        text = stringResource(R.string.clothes_clothing_info_text),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
         }
+
     }
 }
 @Composable

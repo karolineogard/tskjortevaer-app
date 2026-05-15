@@ -1,45 +1,35 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui.components
 
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import no.uio.ifi.in2000.ieulrich.team32.R
-import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
-import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.imageUrl
+import no.uio.ifi.in2000.ieulrich.team32.ui.util.Format
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
 
 @Composable
 fun ForecastHour(
     time: String,
-    temp: String,
-    windSpeed: String,
+    temp: Double,
+    windSpeed: Double,
     windDirection: Double,
-    precipitationAmount: String,
+    precipitationAmount: Double,
     symbolCode: String,
-    compact: Boolean = false,
-    tempColor: Color = Color.Unspecified,
-    rainColor: Color = Color.Unspecified
+    tempColor: Color = Color.Unspecified
 )
 
 {
@@ -91,7 +81,7 @@ fun ForecastHour(
         )
         Spacer(modifier = Modifier.weight(0.5f))
         Text(
-            temp,
+            Format.formatTemp(temp),
             fontSize = size,
             color = tempColor,
             modifier = Modifier
@@ -99,17 +89,21 @@ fun ForecastHour(
             textAlign = TextAlign.Left
         )
         Spacer(modifier = Modifier.weight(0.5f))
-        Text(
-            text = precipitationAmount,
-            fontSize = size,
-            modifier = Modifier
-                .weight(1f),
-            textAlign = TextAlign.Left,
-            color = MinusTekst
-        )
+        if (precipitationAmount > 0) {
+            Text(
+                text = Format.formatPrecipitation(precipitationAmount),
+                fontSize = size,
+                modifier = Modifier
+                    .weight(1f),
+                textAlign = TextAlign.Left,
+                color = MinusTekst
+            )
+        } else {
+            Spacer(modifier = Modifier.weight(1f))
+        }
         Spacer(modifier = Modifier.weight(0.5f))
         Text(
-            windSpeed,
+            Format.formatWind(windSpeed),
             fontSize = size,
             modifier = Modifier
                 .weight(1f),
@@ -128,9 +122,9 @@ fun ForecastHour(
 fun PreviewForecastHour(){
     ForecastHour(
         time = "16:00",
-        temp = "17°",
-        windSpeed = "5 m/s",
-        precipitationAmount = "3",
+        temp = 17.5,
+        windSpeed = 5.0,
+        precipitationAmount = 0.0,
         windDirection = 10.0,
         symbolCode = "clearsky_day")
 }

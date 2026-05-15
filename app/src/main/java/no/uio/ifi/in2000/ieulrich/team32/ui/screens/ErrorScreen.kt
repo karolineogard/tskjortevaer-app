@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.ieulrich.team32.R
 
 @Composable
-fun NoInternetScreen(){
+fun ErrorScreen(){
     Box(
         modifier = Modifier.fillMaxSize().padding(32.dp),
         contentAlignment = Alignment.Center

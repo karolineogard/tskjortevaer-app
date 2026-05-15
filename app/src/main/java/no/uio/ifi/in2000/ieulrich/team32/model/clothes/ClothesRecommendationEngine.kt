@@ -1,7 +1,6 @@
 package no.uio.ifi.in2000.ieulrich.team32.model.clothes
 
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
-import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
 
 data class UserSettings(
     val departureHour: Int = 8,
@@ -41,7 +40,7 @@ object ClothesRecommendationEngine {
     ): ClothesRecommendation? {
         if (forecasts.isEmpty()) return null
 
-        val temperatures = forecasts.map { it.rawTemperature() }
+        val temperatures = forecasts.map { it.temperature }
         val baseTemp = if (settings.isOutdoors) {
             temperatures.average()
         } else {
@@ -59,7 +58,7 @@ object ClothesRecommendationEngine {
             }
         } else 0
 
-        val maxWind = forecasts.maxOf { it.rawWindSpeed() }
+        val maxWind = forecasts.maxOf { it.windSpeed }
         val windPenalty = windPenalty(maxWind)
 
         val hoursOutdoors = if (settings.isOutdoors) {
@@ -72,7 +71,7 @@ object ClothesRecommendationEngine {
         // temperatureOffset legges til sist: viking (+5) → lettere klær, ispinne (-5) → tykkere
         val effectiveTemp = baseTemp + cloudBonus + activityBonus - windPenalty - outdoorPenalty + temperatureOffset
 
-        val maxPrecipitation = forecasts.maxOf { it.rawPrecipitation() }
+        val maxPrecipitation = forecasts.maxOf { it.precipitationAmount }
         val hasSun = forecasts.any { isSunny(it.symbolCode) }
 
         val shorts = effectiveTemp > 19.5
@@ -99,10 +98,6 @@ object ClothesRecommendationEngine {
             wearSneakers = sneakers
         )
     }
-
-    private fun ForecastHourDetails.rawTemperature(): Double = temperature
-    private fun ForecastHourDetails.rawWindSpeed(): Double = windSpeed
-    private fun ForecastHourDetails.rawPrecipitation(): Double = precipitationAmount
 
     private fun cloudBonus(symbolCode: String): Int {
         val code = symbolCode.lowercase()

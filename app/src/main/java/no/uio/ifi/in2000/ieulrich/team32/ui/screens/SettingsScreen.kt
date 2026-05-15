@@ -13,15 +13,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,9 +30,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -50,11 +45,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.R
-import no.uio.ifi.in2000.ieulrich.team32.ui.components.TimeInputField
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TopAppBar
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TravelTimesCard
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
@@ -67,23 +62,18 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    modifier: Modifier = Modifier,
     navController: NavController,
-    settingsViewModel: SettingsViewModel
 ) {
-    val savedDepHour   by settingsViewModel.defaultDepartureHour.collectAsStateWithLifecycle()
-    val savedDepMinute by settingsViewModel.defaultDepartureMinute.collectAsStateWithLifecycle()
-    val savedRetHour   by settingsViewModel.defaultReturnHour.collectAsStateWithLifecycle()
-    val savedRetMinute by settingsViewModel.defaultReturnMinute.collectAsStateWithLifecycle()
-    val savedOffset    by settingsViewModel.temperatureOffset.collectAsStateWithLifecycle()
+    val settingsViewModel: SettingsViewModel = hiltViewModel()
+    val uiState by settingsViewModel.uiState.collectAsStateWithLifecycle()
 
-    var startHour   by remember(savedDepHour)   { mutableIntStateOf(savedDepHour) }
-    var startMinute by remember(savedDepMinute) { mutableIntStateOf(savedDepMinute) }
-    var endHour     by remember(savedRetHour)   { mutableIntStateOf(savedRetHour) }
-    var endMinute   by remember(savedRetMinute) { mutableIntStateOf(savedRetMinute) }
+    var startHour   by remember(uiState.departureHour)   { mutableIntStateOf(uiState.departureHour) }
+    var startMinute by remember(uiState.departureMinute) { mutableIntStateOf(uiState.departureMinute) }
+    var endHour     by remember(uiState.returnHour)   { mutableIntStateOf(uiState.returnHour) }
+    var endMinute   by remember(uiState.returnMinute) { mutableIntStateOf(uiState.returnMinute) }
 
-    var sliderValue by remember(savedOffset) {
-        mutableFloatStateOf(savedOffset / 5f * 50f + 50f)
+    var sliderValue by remember(uiState.temperatureOffset) {
+        mutableFloatStateOf(uiState.temperatureOffset / 5f * 50f + 50f)
     }
 
     var showSliderInfo by remember { mutableStateOf(false) }
@@ -157,11 +147,15 @@ fun SettingsScreen(
 
                         // Gradstal på egen linje
                         Text(
-                            text = "${sign}${degrees}° C",
+                            text = stringResource(
+                                R.string.settings_temperature_value,
+                                sign,
+                                degrees
+                            ),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = tempColor
-                        ) //TODO: stringResource?
+                        )
 
                         Spacer(modifier = Modifier.height(8.dp))
                     }
@@ -250,7 +244,8 @@ fun SettingsScreen(
                 onDepartureTimeChanged = { hour, minute -> startHour = hour; startMinute = minute },
                 onReturnTimeChanged = { hour, minute -> endHour = hour; endMinute = minute }
             )
-
+            val settingsSaved = stringResource(R.string.settings_saved)
+            val dismiss = stringResource(R.string.dismiss)
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 OutlinedButton(
                     border = BorderStroke(2.dp, MediumBlue),
@@ -263,15 +258,13 @@ fun SettingsScreen(
                             returnMinute      = endMinute,
                             temperatureOffset = offsetDegrees
                         )
+
                         scope.launch {
-                            val result = snackbarHostState.showSnackbar(
-                                message = "Innstillinger lagret!",
-                                actionLabel = "✕",
+                            snackbarHostState.showSnackbar(
+                                message = settingsSaved,
+                                actionLabel = dismiss,
                                 duration = SnackbarDuration.Short
                             )
-                            if (result == SnackbarResult.ActionPerformed) {
-                                snackbarHostState.currentSnackbarData?.dismiss()
-                            }
                         }
                     },
                     colors = ButtonDefaults.outlinedButtonColors(

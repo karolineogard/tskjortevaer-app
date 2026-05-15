@@ -12,15 +12,13 @@ import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.data.geocoding.LocationRepository
 import no.uio.ifi.in2000.ieulrich.team32.data.location.DeviceLocationDataSource
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.LocationForecastRepository
-import no.uio.ifi.in2000.ieulrich.team32.data.victoriaWMS.WeatherRepository
+import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.MetAlertsRepository
+import no.uio.ifi.in2000.ieulrich.team32.data.weather.WeatherRepository
+import no.uio.ifi.in2000.ieulrich.team32.model.location.AppLocation
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
 import javax.inject.Inject
 
-data class AppLocation(
-    val lat: Double,
-    val lon: Double
-)
 sealed class UiState {
     object Loading : UiState()
 
@@ -38,7 +36,7 @@ sealed class UiState {
 class HomeViewModel @Inject constructor (
     private val deviceLocationDataSource: DeviceLocationDataSource,
     private val locationForecastRepository: LocationForecastRepository,
-    private val weatherRepository: WeatherRepository,
+    private val alertsRepository: MetAlertsRepository,
     private val locationRepository: LocationRepository
 ): ViewModel() {
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
@@ -62,7 +60,7 @@ class HomeViewModel @Inject constructor (
                 coroutineScope {
                     val forecastDeferred = async { locationForecastRepository.getForecastNow(lat, lon) }
                     val placeDeferred = async { locationRepository.getPlaceName(lat, lon) }
-                    val alertsDeferred = async { weatherRepository.getAlertsByLocation(lat, lon) }
+                    val alertsDeferred = async { alertsRepository.getAlertsByLocation(lat, lon) }
 
                     val forecast = forecastDeferred.await()
                     val place = placeDeferred.await()

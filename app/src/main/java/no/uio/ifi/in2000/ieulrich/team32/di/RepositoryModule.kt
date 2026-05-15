@@ -4,8 +4,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import no.uio.ifi.in2000.ieulrich.team32.data.victoriaWMS.WeatherRepository
-import no.uio.ifi.in2000.ieulrich.team32.data.victoriaWMS.WeatherRepositoryImpl
+import no.uio.ifi.in2000.ieulrich.team32.data.weather.WeatherRepository
+import no.uio.ifi.in2000.ieulrich.team32.data.weather.WeatherRepositoryImpl
 import javax.inject.Singleton
 
 @Module

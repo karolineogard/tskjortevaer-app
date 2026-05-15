@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import no.uio.ifi.in2000.ieulrich.team32.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -24,7 +25,9 @@ fun TopAppBar(title: String, onBack: () -> Unit){
             Text(
                 text = title,
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             ) },
         navigationIcon = {
             IconButton(onClick = onBack) {
