@@ -95,7 +95,7 @@ fun HomeScreen(
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
     val padding = 16.dp
-    var selectedAlert by remember { mutableStateOf<MetAlert?>(null) }
+    var selectedAlert by rememberSaveable { mutableStateOf<MetAlert?>(null) }
     val recommendation by clothesViewModel.recommendation.collectAsStateWithLifecycle()
     val isLoading by clothesViewModel.isLoading.collectAsStateWithLifecycle()
 
