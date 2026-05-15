@@ -24,12 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import no.uio.ifi.in2000.ieulrich.team32.R
-
-enum class ActivityLevel(val displayValue: String) {
-    LOW("Lav"),
-    MEDIUM("Medium"),
-    HIGH("Høy")
-}
+import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ActivityLevel
 
 @Composable
 fun TimeInputField(
@@ -123,37 +118,4 @@ private fun findNewDigit(old: String, new: String): Int? {
     val newDigits = new.filter { it.isDigit() }
     if (newDigits.length <= oldDigits.length) return null
     return newDigits.last().digitToInt()
-}
-
-@Composable
-fun CheckboxSection(
-    isOutdoors: Boolean,
-    onOutdoorsChange: (Boolean) -> Unit,
-    isPhysical: Boolean,
-    onPhysicalChange: (Boolean) -> Unit,
-    activityLevel: ActivityLevel?,
-    onActivityLevelChange: (ActivityLevel?) -> Unit
-) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(stringResource(R.string.clothes_outdoors))
-    }
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Checkbox(checked = isOutdoors, onCheckedChange = {
-            onOutdoorsChange(it)
-            if (!it) {
-                onPhysicalChange(false)
-                onActivityLevelChange(null)
-            }
-        })
-        Text(stringResource(R.string.check_yes))
-        Spacer(modifier = Modifier.width(16.dp))
-        Checkbox(checked = !isOutdoors, onCheckedChange = {
-            onOutdoorsChange(!it)
-            if (it) {
-                onPhysicalChange(false)
-                onActivityLevelChange(null)
-            }
-        })
-        Text(stringResource(R.string.check_no))
-    }
 }

@@ -10,9 +10,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import no.uio.ifi.in2000.ieulrich.team32.data.victoriaWMS.WeatherRepository
+import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.MetAlertsRepository
+import no.uio.ifi.in2000.ieulrich.team32.data.weather.WeatherRepository
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
-import no.uio.ifi.in2000.ieulrich.team32.model.victoriaWMS.WeatherLayer
+import no.uio.ifi.in2000.ieulrich.team32.model.weather.WeatherLayer
 import org.maplibre.android.geometry.LatLng
 import java.time.Instant
 import java.time.ZoneOffset
@@ -33,9 +34,10 @@ data class MapUiState(
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val repository: WeatherRepository
+    private val weatherRepository: WeatherRepository,
+    private val alertsRepository: MetAlertsRepository
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(MapUiState(alertsUrl = repository.getAlertsUrl()))
+    private val _uiState = MutableStateFlow(MapUiState(alertsUrl = alertsRepository.getAlertsUrl()))
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
 
     private val _zoomToLocation = MutableStateFlow<Location?>(null)
@@ -59,7 +61,7 @@ class MapViewModel @Inject constructor(
     ) }
         viewModelScope.launch {
             try {
-                val fetchedAlerts = repository.getAllAlerts()
+                val fetchedAlerts = alertsRepository.getAllAlerts()
                 _uiState.update { it.copy(
                     alerts = fetchedAlerts
                 ) }
@@ -81,7 +83,7 @@ class MapViewModel @Inject constructor(
     private fun updateLayer(layer: WeatherLayer) {
             _uiState.update { it.copy(
                 currentLayer = layer,
-                wmsUrl = repository.getWmsUrl(layer, getCurrentTime()),
+                wmsUrl = weatherRepository.getWmsUrl(layer, getCurrentTime()),
                 showAlerts = false
             ) }
     }
@@ -101,7 +103,7 @@ class MapViewModel @Inject constructor(
     fun onTimeChanged(formattedTimeUTC: String) {
         val current = _uiState.value.currentLayer ?: return
         _uiState.update { it.copy(
-            wmsUrl = repository.getWmsUrl(current, formattedTimeUTC)
+            wmsUrl = weatherRepository.getWmsUrl(current, formattedTimeUTC)
         ) }
     }
 

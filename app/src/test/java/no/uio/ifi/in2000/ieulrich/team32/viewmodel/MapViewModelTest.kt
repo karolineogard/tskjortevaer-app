@@ -14,8 +14,9 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import no.uio.ifi.in2000.ieulrich.team32.data.victoriaWMS.WeatherRepositoryImpl
-import no.uio.ifi.in2000.ieulrich.team32.model.victoriaWMS.WeatherLayer
+import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.MetAlertsRepository
+import no.uio.ifi.in2000.ieulrich.team32.data.weather.WeatherRepositoryImpl
+import no.uio.ifi.in2000.ieulrich.team32.model.weather.WeatherLayer
 import org.junit.Assert
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -27,7 +28,8 @@ import java.time.ZoneOffset
 class MapViewModelTest {
 
     private lateinit var viewModel: MapViewModel
-    private val repository: WeatherRepositoryImpl = mockk()
+    private val weatherRepository: WeatherRepositoryImpl = mockk()
+    private val alertsRepository: MetAlertsRepository = mockk()
     private val testDispatcher = StandardTestDispatcher()
 
     @BeforeEach
@@ -39,11 +41,11 @@ class MapViewModelTest {
         every { Log.d(any(), any()) } returns 0
         every { Log.e(any(), any()) } returns 0
 
-        every { repository.getAlertsUrl() } returns "https://api.met.no/alerts"
-        every { repository.getWmsUrl(any(), any()) } returns "https://weather.met.no/wms?service=WMS"
-        coEvery { repository.getAllAlerts() } returns emptyList()
+        every { alertsRepository.getAlertsUrl() } returns "https://api.met.no/alerts"
+        every { weatherRepository.getWmsUrl(any(), any()) } returns "https://weather.met.no/wms?service=WMS"
+        coEvery { alertsRepository.getAllAlerts() } returns emptyList()
 
-        viewModel = MapViewModel(repository)
+        viewModel = MapViewModel(weatherRepository, alertsRepository)
     }
 
     @AfterEach
@@ -87,7 +89,7 @@ class MapViewModelTest {
 
     @Test
     fun `onAlertsSelected repository exception handling`() = runTest {
-        coEvery { repository.getAllAlerts() } throws Exception("Network error")
+        coEvery { alertsRepository.getAllAlerts() } throws Exception("Network error")
 
         // Skal ikke krasje
         viewModel.onAlertsSelected()

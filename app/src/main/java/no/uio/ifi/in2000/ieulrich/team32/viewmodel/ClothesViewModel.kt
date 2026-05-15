@@ -13,11 +13,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.LocationForecastRepository
+import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ActivityLevel
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendationEngine
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.UserSettings
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
-import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
+import no.uio.ifi.in2000.ieulrich.team32.ui.util.Format
 import javax.inject.Inject
 
 private object ClothesSettingsKeys {
@@ -146,7 +147,7 @@ class ClothesViewModel @Inject constructor(
         returnHour: Int
     ): List<ForecastHourDetails> {
         return forecasts.filter { forecast ->
-            val hour = no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
+            val hour = Format
                 .extractHour(forecast.timestamp).toIntOrNull() ?: return@filter false
             if (departureHour <= returnHour) {
                 hour in departureHour until returnHour

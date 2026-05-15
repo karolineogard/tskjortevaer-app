@@ -1,6 +1,6 @@
 package no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.mapper
 
-import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
+import no.uio.ifi.in2000.ieulrich.team32.ui.util.Format
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.dto.LocationForecastResponse
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.dto.TimeSeries
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails

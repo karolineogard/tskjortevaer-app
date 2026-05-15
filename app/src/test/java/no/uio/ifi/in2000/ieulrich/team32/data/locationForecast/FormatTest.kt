@@ -1,9 +1,9 @@
 package no.uio.ifi.in2000.ieulrich.team32.data.locationForecast
 
-import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format.extractDate
-import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format.extractHour
-import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format.extractTime
-import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format.formatTemp
+import no.uio.ifi.in2000.ieulrich.team32.ui.util.Format.extractDate
+import no.uio.ifi.in2000.ieulrich.team32.ui.util.Format.extractHour
+import no.uio.ifi.in2000.ieulrich.team32.ui.util.Format.extractTime
+import no.uio.ifi.in2000.ieulrich.team32.ui.util.Format.formatTemp
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 

@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
+import no.uio.ifi.in2000.ieulrich.team32.ui.util.Format
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
 
 @Composable

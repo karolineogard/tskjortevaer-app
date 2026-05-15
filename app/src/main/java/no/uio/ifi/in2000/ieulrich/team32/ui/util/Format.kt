@@ -1,5 +1,4 @@
-package no.uio.ifi.in2000.ieulrich.team32.data.locationForecast
-
+package no.uio.ifi.in2000.ieulrich.team32.ui.util
 
 import java.time.Instant
 import java.time.LocalDate
@@ -7,8 +6,6 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import kotlin.math.roundToInt
-import kotlin.text.format
-
 
 object Format {
     const val degreeSign = "°"
@@ -34,7 +31,7 @@ object Format {
     }
 
     fun extractDate(time: String): String{
-        val parsed =Instant.parse(time).atZone(ZoneId.systemDefault()).toLocalDate()
+        val parsed = Instant.parse(time).atZone(ZoneId.systemDefault()).toLocalDate()
         val today = LocalDate.now(ZoneId.systemDefault())
         return when(parsed){
             today -> "I dag"

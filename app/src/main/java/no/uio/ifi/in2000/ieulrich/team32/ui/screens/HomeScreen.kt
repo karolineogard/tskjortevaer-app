@@ -62,8 +62,9 @@ import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import coil3.svg.SvgDecoder
 import no.uio.ifi.in2000.ieulrich.team32.R
-import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
+import no.uio.ifi.in2000.ieulrich.team32.ui.util.Format
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
+import no.uio.ifi.in2000.ieulrich.team32.model.location.AppLocation
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.imageUrl
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
@@ -77,7 +78,6 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRødGjennomsiktig
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.PlussTekst
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.AppLocation
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.UiState

@@ -44,7 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import no.uio.ifi.in2000.ieulrich.team32.R
-import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
+import no.uio.ifi.in2000.ieulrich.team32.ui.util.Format
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ForecastHour
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TopAppBar
@@ -212,7 +212,6 @@ fun DayForecastCard(
                     val avgWind = hours.map { it.windSpeed }.average()
                     val totalPrecipitation = hours.sumOf { it.precipitationAmount }
                     val symbolCode = hours.firstOrNull()?.symbolCode ?: ""
-                    val windDirection = hours.firstOrNull()?.windDirection ?: 0.0
                     val imageUrl =
                         "https://raw.githubusercontent.com/metno/weathericons/main/weather/svg/$symbolCode.svg"
 
