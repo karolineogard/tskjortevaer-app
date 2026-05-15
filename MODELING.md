@@ -238,7 +238,7 @@ UiState <|-- Error
     ClothesViewModel --> ClothesRecommendation
 
 ```
-
+Viser delene av kodebasen som er relevante for use case klesanbefaling
 ## sekvensdiagram
 
 ```mermaid
