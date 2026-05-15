@@ -68,52 +68,51 @@ fun LocationForecastScreen(
         LaunchedEffect(lat, lon) {
             viewModel.loadForecast(lat, lon)
         }
-    }
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    when (val state = uiState) {
-        is LocationForecastUiState.Loading -> {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(modifier = Modifier.size(32.dp))
-            }
-        }
-
-        is LocationForecastUiState.Error -> {
-            ErrorScreen()
-        }
-
-        is LocationForecastUiState.Success -> {
-            val forecastByDay = state.forecastByDay
-            val placeName = state.placeName
-
-            Scaffold(
-                topBar = {
-                    TopAppBar(
-                        title = placeName,
-                        onBack = { navController.popBackStack() }
-                    )
-                }
-            ) { innerPadding: PaddingValues ->
-                LazyColumn(
-                    modifier = Modifier.padding(
-                        top = innerPadding.calculateTopPadding(),
-                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
-                        bottom = 0.dp
-                    )
+        when (val state = uiState) {
+            is LocationForecastUiState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    forecastByDay.forEach { (date, forecastForDay) ->
-                        item {
-                            DayForecastCard(
-                                date = date,
-                                forecastForDay = forecastForDay
-                            )
+                    CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                }
+            }
+
+            is LocationForecastUiState.Error -> {
+                ErrorScreen()
+            }
+
+            is LocationForecastUiState.Success -> {
+                val forecastByDay = state.forecastByDay
+                val placeName = state.placeName
+
+                Scaffold(
+                    topBar = {
+                        TopAppBar(
+                            title = placeName,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                ) { innerPadding: PaddingValues ->
+                    LazyColumn(
+                        modifier = Modifier.padding(
+                            top = innerPadding.calculateTopPadding(),
+                            start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                            end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
+                            bottom = 0.dp
+                        )
+                    ) {
+                        forecastByDay.forEach { (date, forecastForDay) ->
+                            item {
+                                DayForecastCard(
+                                    date = date,
+                                    forecastForDay = forecastForDay
+                                )
+                            }
                         }
                     }
                 }
