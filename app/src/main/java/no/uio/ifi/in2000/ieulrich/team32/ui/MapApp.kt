@@ -98,7 +98,7 @@ fun MapApp(
                 NavigationBar(containerColor = MediumBlue) {
                     Destination.entries.forEach { destination ->
                         NavigationBarItem(
-                            selected = currentRoute == destination.route,
+                            selected = currentRoute?.startsWith(destination.route) == true,
                             onClick = {
                                 navController.navigate(destination.route) {
                                     launchSingleTop = true
