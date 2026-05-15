@@ -153,7 +153,7 @@ fun MapScreen(
     }
     val systemBars = WindowInsets.statusBars.asPaddingValues()
     val statusBarHeight = systemBars.calculateTopPadding()
-    // Dynamically calculate the top padding for the legend based on search bar state
+    // Beregner dynamisk topp-padding for forklaringsboksen basert på søkefeltets tilstand
     val legendTopPadding by animateDpAsState(
         targetValue = if (isSearchExpanded) statusBarHeight + 80.dp else statusBarHeight + 8.dp,
         label = "legendTopPadding"
@@ -263,7 +263,7 @@ fun MapScreen(
                             )
                         }
                     }
-                    // Top Search Bar
+                    // Øverste søkefelt
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
@@ -305,7 +305,7 @@ fun MapScreen(
 
                     }
 
-                    // Legend (Top Left) - Padding adjusts based on search bar expansion
+                    // Forklaringsboks (øverst til venstre) - padding justeres basert på om søkefeltet er utvidet
                     else if (uiState.currentLayer == WeatherLayer.TEMPERATURE) {
                         TemperatureLegendCard(
                             modifier = Modifier
@@ -326,7 +326,7 @@ fun MapScreen(
                         )
                     }
 
-                    // Layer Selection Menu
+                    // Lagvalg-meny
                     Column(
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
@@ -432,7 +432,7 @@ fun MapScreen(
                         }
                     }
 
-                    // Bottom Time Slider Card
+                    // Tidslinjesliderkort
                     if (!uiState.showAlerts) {
                         TimeSliderCard(
                             modifier = Modifier
@@ -750,7 +750,7 @@ fun TimeSliderCard(
                     value = sliderPosition,
                     onValueChange = {
                         sliderPosition = it
-                        isPlaying = false // Stop animation if user moves slider manually
+                        isPlaying = false // Stopp animasjonen hvis brukeren beveger slideren manuelt
                     },
                     onValueChangeFinished = {
                         onTimeSelected(formattedTimeUTC)
