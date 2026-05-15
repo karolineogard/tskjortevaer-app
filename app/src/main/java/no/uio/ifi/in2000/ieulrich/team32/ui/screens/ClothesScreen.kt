@@ -72,9 +72,9 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.ieulrich.team32.R
-import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.Format
+import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ActivityLevel
+import no.uio.ifi.in2000.ieulrich.team32.ui.util.Format
 import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
-import no.uio.ifi.in2000.ieulrich.team32.ui.components.ActivityLevel
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TravelTimesCard
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue

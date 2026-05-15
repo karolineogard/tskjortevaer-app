@@ -87,7 +87,7 @@ import no.uio.ifi.in2000.ieulrich.team32.R
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.iconUrl
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.toMetAlert
-import no.uio.ifi.in2000.ieulrich.team32.model.victoriaWMS.WeatherLayer
+import no.uio.ifi.in2000.ieulrich.team32.model.weather.WeatherLayer
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.SearchBar
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGul
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGulGjennomsiktig

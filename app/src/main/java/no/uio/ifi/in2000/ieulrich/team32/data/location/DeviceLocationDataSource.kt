@@ -9,7 +9,7 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.suspendCancellableCoroutine
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.AppLocation
+import no.uio.ifi.in2000.ieulrich.team32.model.location.AppLocation
 import javax.inject.Inject
 import kotlin.coroutines.resume
 

@@ -1,2 +1,63 @@
-package no.uio.ifi.in2000.ieulrich.team32.ui.util 
+package no.uio.ifi.in2000.ieulrich.team32.ui.util
 
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+import kotlin.math.roundToInt
+
+object Format {
+    const val degreeSign = "°"
+    const val precipitationSuffix = " mm"
+    const val windSuffix = " m/s"
+
+
+    fun extractHour(time: String): String {
+        val parsed = Instant.parse(time).atZone(ZoneId.systemDefault())
+        return parsed.format(DateTimeFormatter.ofPattern("HH"))
+    }
+
+    fun formatTemp(temp: Double): String {
+        return temp.roundToInt().toString() + degreeSign
+    }
+
+    fun formatPrecipitation(amount: Double): String{
+        return "%.1f".format(amount)
+    }
+
+    fun formatWind(speed: Double): String{
+        return speed.roundToInt().toString() + windSuffix
+    }
+
+    fun extractDate(time: String): String{
+        val parsed = Instant.parse(time).atZone(ZoneId.systemDefault()).toLocalDate()
+        val today = LocalDate.now(ZoneId.systemDefault())
+        return when(parsed){
+            today -> "I dag"
+            today.plusDays(1) -> "I morgen"
+            else -> {
+                val formatter = DateTimeFormatter.ofPattern("EEEE d. MMMM", Locale("no"))
+                parsed.format(formatter).replaceFirstChar{it.uppercase()}
+            }
+        }
+    }
+
+    fun extractDayName(time: String): String{
+        val parsed = Instant.parse(time).atZone(ZoneId.systemDefault())
+        return parsed.format((DateTimeFormatter.ofPattern("EEEE", Locale("no"))))
+    }
+
+    fun extractSixHourInterval(time: String): String{
+        val parsed = Instant.parse(time).atZone(ZoneId.systemDefault())
+        val hour = parsed.hour
+        val intervalStart = (hour/6)*6
+        val intervalEnd = intervalStart + 6
+        return "%02d - %02d".format(intervalStart, intervalEnd)
+    }
+
+    fun extractTime(time: String): String{
+        val parsed = Instant.parse(time).atZone(ZoneId.systemDefault())
+        return parsed.format(DateTimeFormatter.ofPattern("HH:mm"))
+    }
+}

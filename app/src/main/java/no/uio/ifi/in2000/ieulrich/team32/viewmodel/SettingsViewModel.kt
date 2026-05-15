@@ -1,12 +1,10 @@
 package no.uio.ifi.in2000.ieulrich.team32.viewmodel
 
-import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,8 +13,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-val Context.settingsDataStore: DataStore<Preferences> by preferencesDataStore(name = "user_settings")
 
 data class SettingsUiState(
     val departureHour: Int = 8,
@@ -56,7 +52,7 @@ class SettingsViewModel @Inject constructor(
                 returnHour = prefs[SettingsKeys.RETURN_HOUR] ?: 16,
                 returnMinute = prefs[SettingsKeys.RETURN_MINUTE] ?: 0,
                 temperatureOffset = try { prefs[SettingsKeys.TEMPERATURE_OFFSET] ?: 0f }
-                catch (e: ClassCastException) { 0f }
+                catch (_: ClassCastException) { 0f }
             )
         }
     }

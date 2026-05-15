@@ -17,7 +17,8 @@ import kotlinx.coroutines.test.setMain
 import no.uio.ifi.in2000.ieulrich.team32.data.geocoding.LocationRepository
 import no.uio.ifi.in2000.ieulrich.team32.data.location.DeviceLocationDataSource
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.LocationForecastRepository
-import no.uio.ifi.in2000.ieulrich.team32.data.victoriaWMS.WeatherRepository
+import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.MetAlertsRepository
+import no.uio.ifi.in2000.ieulrich.team32.model.location.AppLocation
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.TimeInterval
@@ -32,7 +33,7 @@ import org.junit.jupiter.api.assertInstanceOf
 class HomeViewModelTest {
     private val deviceLocationDataSource: DeviceLocationDataSource = mockk()
     private val locationForecastRepository: LocationForecastRepository = mockk()
-    private val weatherRepository: WeatherRepository = mockk()
+    private val alertsRepository: MetAlertsRepository = mockk()
     private val locationRepository: LocationRepository = mockk()
 
     private val testDispatcher = StandardTestDispatcher()
@@ -149,7 +150,7 @@ class HomeViewModelTest {
     private fun createViewModel() = HomeViewModel(
         deviceLocationDataSource,
         locationForecastRepository,
-        weatherRepository,
+        alertsRepository,
         locationRepository
     )
 
@@ -162,7 +163,7 @@ class HomeViewModelTest {
         coEvery { deviceLocationDataSource.getCurrentLocation() } returns location
         coEvery { locationForecastRepository.getForecastNow(any(), any()) } returns forecast
         coEvery { locationRepository.getPlaceName(any(), any()) } returns place
-        coEvery { weatherRepository.getAlertsByLocation(any(), any()) } returns alerts
+        coEvery { alertsRepository.getAlertsByLocation(any(), any()) } returns alerts
     }
 
     // tester som burde være suksess
@@ -201,7 +202,7 @@ class HomeViewModelTest {
         // verifiserer at faktiske koordinater blir brukt, ikke fallback
         coVerify {
             locationForecastRepository.getForecastNow(59.9432, 10.7173)
-            weatherRepository.getAlertsByLocation(59.9432,10.7173)
+            alertsRepository.getAlertsByLocation(59.9432,10.7173)
             locationRepository.getPlaceName(59.9432, 10.7173)
         }
     }
@@ -216,7 +217,7 @@ class HomeViewModelTest {
 
         coVerify {
             locationForecastRepository.getForecastNow(59.9432, 10.7173)
-            weatherRepository.getAlertsByLocation(59.9432, 10.7173)
+            alertsRepository.getAlertsByLocation(59.9432, 10.7173)
             locationRepository.getPlaceName(59.9432, 10.7173)
         }
 
@@ -269,7 +270,7 @@ class HomeViewModelTest {
     fun `loadData emits Error when alertsRepository throws`() = runTest {
         stubHappyPath()
         coEvery {
-            weatherRepository.getAlertsByLocation(any(), any())
+            alertsRepository.getAlertsByLocation(any(), any())
         } throws Exception("Timeout")
 
         viewModel = createViewModel()
@@ -355,7 +356,7 @@ class HomeViewModelTest {
         coEvery { locationRepository.getPlaceName(any(), any()) } coAnswers {
             delay(100); "Oslo"
         }
-        coEvery { weatherRepository.getAlertsByLocation(any(), any()) } coAnswers {
+        coEvery { alertsRepository.getAlertsByLocation(any(), any()) } coAnswers {
             delay(100); fakeAlerts
         }
 
