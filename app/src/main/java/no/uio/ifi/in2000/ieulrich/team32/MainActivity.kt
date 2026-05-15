@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        // Initialize MapLibre before setContent
+        // Initialiserer MapLibre før setContent
         MapLibre.getInstance(this, null, WellKnownTileServer.MapLibre)
 
         SingletonImageLoader.setSafe { context ->
