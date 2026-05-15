@@ -3,6 +3,7 @@ package no.uio.ifi.in2000.ieulrich.team32.di
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import dagger.Module
@@ -15,9 +16,9 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import no.uio.ifi.in2000.ieulrich.team32.viewmodel.settingsDataStore
 import javax.inject.Singleton
 
+val Context.settingsDataStore: DataStore<Preferences> by preferencesDataStore(name = "user_settings")
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
