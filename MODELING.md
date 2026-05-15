@@ -1,130 +1,86 @@
 # Modellering for T-skjortevær
 
-## Arkitekturskisse
-```mermaid
----
-config:
-  layout: fixed
----
-flowchart TB
- subgraph UI_Layer["UI / Presentasjonslag"]
-    direction TB
-        HS["HomeScreen"]
-        MS["MapScreen"]
-        CS["ClothesScreen"]
-        LFS["LocationForecastScreen"]
-        HVM["HomeViewModel"]
-        MVM["MapViewModel"]
-        CVM["ClothesViewModel"]
-        LFVM["LocationForecastViewModel"]
-        SVM["SearchViewModel"]
-
-        
-  end
- subgraph Data_Layer["Datalaget"]
-    direction TB
-        LFR["LocationForecastRepository"]
-        WR["WeatherRepository"]
-        LR["LocationRepository"]
-        LFDS["LocationForecastDataSource"]
-        MADS["MetAlertsDatasource"]
-        MLSDK["MapLibre SDK / Kart-motor"]
-        DLDS["DeviceLocationDataSource"]
-        AR["AlertsRepository"]
-        LDS["LocationDataSource"]
-  end
- subgraph External["Eksterne APIer"]
-        MET(("Victoria WMS"))
-        Alert(("MetAlerts"))
-        Location(("LocationForecast"))
-        GEO(("Nominatim"))
-  end
-    HS --- HVM
-    MS --- MVM
-    CS --- CVM
-    LFS --- LFVM
-    HVM --> LFR & LR & WR
-    MVM --> WR
-    WR --> MLSDK & MADS
-    CVM --> LFR
-    LFVM --> LFR
-    LFR --> LFDS
-    LFDS --- Location
-    MADS --- Alert
-    MLSDK --- MET & Alert
-    LR --> LDS
-    LDS --- GEO
-    MS --- SVM
-    HS --- SVM
-    SVM --> LFR
-    HVM --> DLDS
-    AR --> MADS
-    HVM --> AR
-    MVM --> AR
-    
-
-    style HS fill:#d1f2eb,stroke:#333
-    style MS fill:#d6eaf8,stroke:#333
-    style CS fill:#fdf2e9,stroke:#333
-    style LFS fill:#f9ebea,stroke:#333
-    style HVM fill:#d1f2eb,stroke:#333
-    style MVM fill:#d6eaf8,stroke:#333
-    style CVM fill:#fdf2e9,stroke:#333
-    style LFVM fill:#f9ebea,stroke:#333
-    style SVM fill:#F6E215,stroke:#333
-    style MLSDK fill:#3498db,color:#fff
-    style MET fill:#fff,stroke-dasharray: 5 5
-    style Alert fill:#fff,stroke-dasharray: 5 5
-    style Location fill:#fff,stroke-dasharray: 5 5
-    style GEO fill:#fff,stroke-dasharray: 5 5
-```
-
+## User stories
+Vi har samlet noen user stories som konkretiserer noen av de sentrale funksjonelle kraven i appen. 
+1. Som student vil jeg vite hva jeg burde ha på meg når jeg pendler til universitetet så jeg føler meg komfortabel
+2. Som danser vil jeg kunne tilpasse klesanbefalingen min etter aktivitetsnivå så jeg ikke blir for varm
+3. Som student vil jeg kunne tilpasse reisetidene mine så jeg får en klesanbefaling tilpassset mine behov
+4. Som en frysepinne vil jeg kunne tilpasse innstillenger så jeg får klesanbefalinger tilpasset hvor kald jeg føler meg, så jeg slipper å fryse
+   
 ## Tekstlige use case
 ### Klesanbefaling
 Primæraktør: Bruker \
 Sekundæraktør: LocationForecast, MetAlerts \
 Prebetingelser: Bruker har installert appen T-skjortevær på sin enhet \
-Postbetingelser: Ingen 
+Postbetingelser: Bruker har fått vist en klesanbefaling basert på værvarselet for sin posisjon
 
 ##### Hovedflyt
 1. Bruker åpner appen 
 2. Appen ber om tilgang til lokasjon
-3. Bruker tillatter lokasjonstilgang
+3. Bruker tillater lokasjonstilgang
 4. Appen henter brukerens posisjon
 5. Appen viser været, mulige farevarsler og klesanbefaling basert på brukerens posisjon
 
 ##### Alternativ flyt punkt 3
 3.1 Bruker tillater ikke lokasjonstilgang \
-3.2 Appen går videre med default-lokasjon (Oslo) \
+3.2 Appen går videre med default-lokasjon (Oslo) 
+
+##### Alternativ flyt punkt 5
+5.1 Appen får ikke hentet data fra API \
+5.2 Appen viser feilmelding om manglende internettforbindelse
 
 ### Søk på sted
 Primæraktør: Bruker \
-Sekundæraktør: Locationforecast \
+Sekundæraktør: Nominatim, Locationforecast \
 Prebetingelser: Bruker har installert appen T-skjortevær på sin enhet \
-Postbetingelser: Ingen \
+Postbetingelser: Bruker har fått vist værmelding for stedet den søkte opp
 
 ##### Hovedflyt
-1. Bruker åpner appen \
-2. Bruker trykker i søkefeltet på hjemskjermen \
-3. Bruker taster inn "oslo" \
-4. Appen viser forslag basert på søketeksten \
-5. Bruker trykker på et av forslagene \
-6. Appen laster inn værmelding for stedet bruker valgte \
-7. 
+1. Bruker åpner appen 
+2. Bruker trykker i søkefeltet på hjemskjermen 
+3. Bruker taster inn "oslo" 
+4. Appen viser forslag basert på søketeksten 
+5. Bruker trykker på et av forslagene 
+6. Appen henter værmelding for det valgte stedet fra LocationForecast
+7. Appen viser værmelding for stedet
 
-##### Alternativ flyt punkt 
+##### Alternativ flyt – punkt 4
+4.1 Bruker trykker søk uten å velge et forslag \
+4.2 Appen slår opp koordinater for søketeksten direkte \
+4.3 Appen fortsetter til punkt 6
+
+##### Alternativ flyt – punkt 4 (ingen treff)
+4.1 Nominatim finner ingen koordinater for søketeksten \
+4.2 Appen viser ingen værmelding \
+4.3 Bruker kan endre søketeksten og prøve på nytt
+
+##### Alternativ flyt – punkt 6
+6.1 Appen får ikke hentet data (ingen internettforbindelse) \
+6.2 Appen viser feilmelding om manglende internettforbindelse
 
 
 ## Aktivitetsdiagram
 ```mermaid
-flowchart LR
+flowchart TD
     Start((Start))
     Åpne([Bruker åpner appen])
     Lokasjon([Appen spør bruker om tilgang til lokasjon])
     Standard([Bruker standard-lokasjon])
     Tilgang{Tillat lokasjonstilgang?}
     Vær([Henter værmelding for lokasjon])
-    Klær([Viser klesanbefaling for lokasjon])
+    Klær([Viser klesanbefaling og værmelding for lokasjon])
+    Internett{Internett-tilgang?}
+    Feilmelding([Viser feilmelding])
+    Søk{Søker på lokasjon?}
+    Skriv([Bruker skriver inn stedsnavn])
+    Forslag{Velger forslag?}
+    Koordinater([Appen slår opp koordinater])
+    Treff{Treff funnet?}
+    Endre([Bruker endrer søketekst])
+    Værmelding([Henter værmelding for sted])
+    Værmelding2([Viser værmelding for sted])
+    Internett2{Internett-tilgang?}
+    Feilmelding2([Viser feilmelding])
     Slutt(((Slutt)))
 
     Start --> Åpne
@@ -133,9 +89,27 @@ flowchart LR
     Tilgang --Tillater tilgang--> Vær
     Tilgang --Tillater ikke tilgang --> Standard
     Standard --> Vær
-    Vær --> Klær
-    Klær --> Slutt
+    Vær --> Internett
+    Internett --Ingen internett-tilgang--> Feilmelding
+    Internett --Har internett-tilgang--> Klær
+    Feilmelding --> Slutt
+    Søk --Nei--> Slutt
+    Søk --Ja--> Skriv
+    Skriv --> Forslag
+    Forslag --Nei--> Koordinater
+    Forslag --Ja--> Værmelding
+    Koordinater --> Treff
+    Treff --Ja--> Værmelding
+    Treff --Nei--> Endre
+    Værmelding --> Internett2
+    Internett2 --Ja--> Værmelding2
+    Internett2 --Nei--> Feilmelding2
+    Feilmelding2 --> Slutt
+    Værmelding2 --> Slutt
+    Endre --> Skriv
+    Klær --> Søk
 ```
+Aktivitetsdiagrammet er basert på de tekstlige use casene over kombinert. 
 ## Klassediagram
 ```mermaid
 classDiagram
@@ -150,11 +124,86 @@ classDiagram
     class HomeViewModel {
         -DeviceLocationDataSource deviceLocationDataSource
         -LocationForecastRepository locationForecastRepository
-        -WeatherRepository weatherRepository
+        -MetAlertsRepository alertsRepository 
         -LocationRepository locationRepository
-        +MutableStateFlow~UiState~ uiState
+        +StateFlow~UiState~ uiState
         +loadData()
     }
+
+    class ClothesViewModel{
+     -LocationForecastRepository repository
+    -DataStore dataStore
+    +Double currentLat
+    +Double currentLon
+    +StateFlow~UserSettings~ settings
+    +StateFlow~ClothesRecommendation~ recommendation
+    +StateFlow~Boolean~ isLoading
+    +updateLocation(lat, lon)
+    +updateSettings(depHour, depMinute, retHour, retMinute, isOutdoors, isPhysical, activityLevel)
+    +loadRecommendation()
+}
+
+
+    %% Business Logic
+    class ClothesRecommendationEngine {
+        <<utility>>
+        +recommend(forecasts, settings, offset) ClothesRecommendation
+    }
+
+    %% Repositories / Data Sources
+
+class DataStore {
+    <<persistence>>
+}
+    class DeviceLocationDataSource {
+        +getCurrentLocation() AppLocation
+    }
+
+    class LocationForecastRepository {
+        -LocationForecastDataSource dataSource
+        +getForecastNow(lat, lon) ForecastHourDetails
+    }
+
+    class LocationRepository {
+        +getPlaceName(lat, lon) String
+    }
+
+    class MetAlertsRepository {
+        +getAlertsByLocation(lat, lon) List~MetAlert~
+}
+
+    %% Data Models
+    class AppLocation {
+        +Double lat
+        +Double lon
+    }
+
+    class ForecastHourDetails {
+        +Double temperature
+        +Double windSpeed
+        +String symbolCode
+        +Double precipitationAmount
+    }
+class ClothesRecommendation {
+    +Double effectiveTemp
+    +Boolean wearHeavyJacket
+    +Boolean wearLightJacket
+    +Boolean wearSweater
+    +Boolean wearTshirt
+    +Boolean wearShorts
+    +Boolean bringUmbrella
+    +Boolean wearRainGear
+}
+
+class UserSettings {
+    +Int departureHour
+    +Int departureMinute
+    +Int returnHour
+    +Int returnMinute
+    +Boolean isOutdoors
+    +Boolean isPhysicallyActive
+    +ActivityLevel activityLevel
+}
 
     class UiState {
         <<sealed>>
@@ -165,46 +214,9 @@ classDiagram
         +ForecastHourDetails forecast
         +String place
         +List~MetAlert~ alerts
-        +ClothesRecommendation recommendation
     }
-
-    %% Business Logic
-    class ClothesRecommendationEngine {
-        <<utility>>
-        +recommend(forecasts, settings, offset) ClothesRecommendation
-    }
-
-    %% Repositories / Data Sources
-    class DeviceLocationDataSource {
-        +getCurrentLocation() AppLocation
-    }
-
-    class LocationForecastRepository {
-        -LocationForecastDataSource dataSource
-        +getForecastNow(lat, lon) ForecastHourDetails
-    }
-
-    class WeatherRepository {
-        -MetAlertsDatasource alertDataSource
-        +getAlertsByLocation(lat, lon) List~MetAlert~
-    }
-
-    class LocationRepository {
-        +getPlaceName(lat, lon) String
-    }
-
-    %% Data Models
-    class AppLocation {
-        +Double lat
-        +Double lon
-    }
-
-    class ForecastHourDetails {
-        +Double airTemperature
-        +Double windSpeed
-        +String symbolCode
-        +Double precipitationAmount
-    }
+UiState <|-- Loading
+UiState <|-- Error
 
     %% Relationships
     HomeScreen --> HomeViewModel : observerer
@@ -213,15 +225,17 @@ classDiagram
     
     HomeViewModel --> DeviceLocationDataSource : bruker
     HomeViewModel --> LocationForecastRepository : bruker
-    HomeViewModel --> WeatherRepository : bruker
+    HomeViewModel --> MetAlertsRepository : bruker
     HomeViewModel --> LocationRepository : bruker
-    HomeViewModel ..> ClothesRecommendationEngine : beregner via
-
-    LocationForecastRepository --> AppLocation : krever
-    WeatherRepository --> AppLocation : krever
     
     Success --> AppLocation
     Success --> ForecastHourDetails
+    ClothesViewModel --> LocationForecastRepository : bruker
+    ClothesViewModel --> DataStore : observerer
+    ClothesViewModel ..> ClothesRecommendationEngine : beregner via
+    ClothesRecommendationEngine ..> ClothesRecommendation : returnerer
+    ClothesViewModel --> UserSettings
+    ClothesViewModel --> ClothesRecommendation
 
 ```
 
