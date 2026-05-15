@@ -119,284 +119,289 @@ fun ClothesScreen(
         scope.launch { sheetState.bottomSheetState.partialExpand() }
     }
 
-    LaunchedEffect(Unit) { clothesViewModel.loadRecommendation() }
-
     LaunchedEffect(expandSheet) {
         if (expandSheet) {
             sheetState.bottomSheetState.expand()
         }
     }
-    if (recommendation != null) {
-        BottomSheetScaffold(
-            scaffoldState = sheetState,
-            sheetPeekHeight = 48.dp,
-            containerColor = MaterialTheme.colorScheme.background,
-            sheetDragHandle = null,
-            sheetShadowElevation = 16.dp,
-            sheetTonalElevation = 16.dp,
-            sheetContainerColor = White,
-            sheetContent = {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable(
-                            indication = null,
-                            interactionSource = remember { MutableInteractionSource() }
-                        ) {
-                            scope.launch {
-                                if (sheetState.bottomSheetState.currentValue == SheetValue.Expanded)
-                                    sheetState.bottomSheetState.partialExpand()
-                                else
-                                    sheetState.bottomSheetState.expand()
-                            }
-                        },
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(R.string.clothes_adjust),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
-                    )
-                    Icon(
-                        painter = painterResource(id = R.drawable.arrow_up_icon),
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp).rotate(rotation)
-                    )
-                }
-
-                var localIsOutdoors by remember { mutableStateOf(if (settings.isOutdoors) true else null) }
-                var localIsPhysical by remember { mutableStateOf(if (settings.isPhysicallyActive) true else null) }
-                var localActivityLevel by remember { mutableStateOf(settings.activityLevel) }
-                var localDepHour by remember(settings) { mutableIntStateOf(settings.departureHour) }
-                var localDepMinute by remember(settings) { mutableIntStateOf(settings.departureMinute) }
-                var localRetHour by remember(settings) { mutableIntStateOf(settings.returnHour) }
-                var localRetMinute by remember(settings) { mutableIntStateOf(settings.returnMinute) }
-
-                Column(
-                    modifier = Modifier.padding(horizontal = 16.dp).verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    TravelTimesCard(
-                        title = stringResource(R.string.clothes_when),
-                        departureHour = localDepHour,
-                        departureMinute = localDepMinute,
-                        returnHour = localRetHour,
-                        returnMinute = localRetMinute,
-                        onDepartureTimeChanged = { h, m -> localDepHour = h; localDepMinute = m },
-                        onReturnTimeChanged = { h, m -> localRetHour = h; localRetMinute = m },
-                        infoTitle = stringResource(R.string.clothes_traveltime_info_title),
-                        infoText = stringResource(R.string.clothes_traveltime_info)
-                    )
-
-                    Card(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    when {
+        recommendation != null -> {
+            BottomSheetScaffold(
+                scaffoldState = sheetState,
+                sheetPeekHeight = 48.dp,
+                containerColor = MaterialTheme.colorScheme.background,
+                sheetDragHandle = null,
+                sheetShadowElevation = 16.dp,
+                sheetTonalElevation = 16.dp,
+                sheetContainerColor = White,
+                sheetContent = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() }
+                            ) {
+                                scope.launch {
+                                    if (sheetState.bottomSheetState.currentValue == SheetValue.Expanded)
+                                        sheetState.bottomSheetState.partialExpand()
+                                    else
+                                        sheetState.bottomSheetState.expand()
+                                }
+                            },
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(stringResource(R.string.clothes_outdoors))
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(
-                                    checked = localIsOutdoors == true,
-                                    onCheckedChange = {
-                                        localIsOutdoors = if (it) true else null
-                                        if (!it) { localIsPhysical = null; localActivityLevel = null }
-                                    }
-                                )
-                                Text(stringResource(R.string.check_yes))
-                                Spacer(modifier = Modifier.width(16.dp))
-                                Checkbox(
-                                    checked = localIsOutdoors == false,
-                                    onCheckedChange = {
-                                        localIsOutdoors = if (it) false else null
-                                        if (it) { localIsPhysical = null; localActivityLevel = null }
-                                    }
-                                )
-                                Text(stringResource(R.string.check_no))
-                            }
-                        }
+                        Text(
+                            text = stringResource(R.string.clothes_adjust),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                        )
+                        Icon(
+                            painter = painterResource(id = R.drawable.arrow_up_icon),
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp).rotate(rotation)
+                        )
                     }
 
-                    AnimatedVisibility(
-                        visible = localIsOutdoors == true,
-                        enter = expandVertically() + fadeIn(),
-                        exit = shrinkVertically() + fadeOut()
+                    var localIsOutdoors by remember { mutableStateOf(if (settings.isOutdoors) true else null) }
+                    var localIsPhysical by remember { mutableStateOf(if (settings.isPhysicallyActive) true else null) }
+                    var localActivityLevel by remember { mutableStateOf(settings.activityLevel) }
+                    var localDepHour by remember(settings) { mutableIntStateOf(settings.departureHour) }
+                    var localDepMinute by remember(settings) { mutableIntStateOf(settings.departureMinute) }
+                    var localRetHour by remember(settings) { mutableIntStateOf(settings.returnHour) }
+                    var localRetMinute by remember(settings) { mutableIntStateOf(settings.returnMinute) }
+
+                    Column(
+                        modifier = Modifier.padding(horizontal = 16.dp).verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        TravelTimesCard(
+                            title = stringResource(R.string.clothes_when),
+                            departureHour = localDepHour,
+                            departureMinute = localDepMinute,
+                            returnHour = localRetHour,
+                            returnMinute = localRetMinute,
+                            onDepartureTimeChanged = { h, m -> localDepHour = h; localDepMinute = m },
+                            onReturnTimeChanged = { h, m -> localRetHour = h; localRetMinute = m },
+                            infoTitle = stringResource(R.string.clothes_traveltime_info_title),
+                            infoText = stringResource(R.string.clothes_traveltime_info)
+                        )
+
                         Card(
                             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
-                                Text(stringResource(R.string.clothes_physical))
+                                Text(stringResource(R.string.clothes_outdoors))
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Checkbox(
-                                        checked = localIsPhysical == true,
+                                        checked = localIsOutdoors == true,
                                         onCheckedChange = {
-                                            localIsPhysical = if (it) true else null
-                                            if (!it) localActivityLevel = null
+                                            localIsOutdoors = if (it) true else null
+                                            if (!it) { localIsPhysical = null; localActivityLevel = null }
                                         }
                                     )
                                     Text(stringResource(R.string.check_yes))
                                     Spacer(modifier = Modifier.width(16.dp))
                                     Checkbox(
-                                        checked = localIsPhysical == false,
+                                        checked = localIsOutdoors == false,
                                         onCheckedChange = {
-                                            localIsPhysical = if (it) false else null
-                                            if (it) localActivityLevel = null
+                                            localIsOutdoors = if (it) false else null
+                                            if (it) { localIsPhysical = null; localActivityLevel = null }
                                         }
                                     )
                                     Text(stringResource(R.string.check_no))
                                 }
-                                AnimatedVisibility(visible = localIsPhysical == true) {
-                                    Column {
-                                        Text(stringResource(R.string.clothes_activity_level))
-                                        ActivityLevel.entries.forEach { level ->
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                RadioButton(
-                                                    selected = localActivityLevel == level,
-                                                    onClick = { localActivityLevel = level }
-                                                )
-                                                Text(level.displayValue)
+                            }
+                        }
+
+                        AnimatedVisibility(
+                            visible = localIsOutdoors == true,
+                            enter = expandVertically() + fadeIn(),
+                            exit = shrinkVertically() + fadeOut()
+                        ) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Text(stringResource(R.string.clothes_physical))
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Checkbox(
+                                            checked = localIsPhysical == true,
+                                            onCheckedChange = {
+                                                localIsPhysical = if (it) true else null
+                                                if (!it) localActivityLevel = null
+                                            }
+                                        )
+                                        Text(stringResource(R.string.check_yes))
+                                        Spacer(modifier = Modifier.width(16.dp))
+                                        Checkbox(
+                                            checked = localIsPhysical == false,
+                                            onCheckedChange = {
+                                                localIsPhysical = if (it) false else null
+                                                if (it) localActivityLevel = null
+                                            }
+                                        )
+                                        Text(stringResource(R.string.check_no))
+                                    }
+                                    AnimatedVisibility(visible = localIsPhysical == true) {
+                                        Column {
+                                            Text(stringResource(R.string.clothes_activity_level))
+                                            ActivityLevel.entries.forEach { level ->
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    RadioButton(
+                                                        selected = localActivityLevel == level,
+                                                        onClick = { localActivityLevel = level }
+                                                    )
+                                                    Text(level.displayValue)
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    OutlinedButton(
-                        border = BorderStroke(2.dp, MediumBlue),
-                        onClick = {
-                            clothesViewModel.updateSettings(
-                                departureHour = localDepHour,
-                                departureMinute = localDepMinute,
-                                returnHour = localRetHour,
-                                returnMinute = localRetMinute,
-                                isOutdoors = localIsOutdoors == true,
-                                isPhysicallyActive = localIsPhysical == true,
-                                activityLevel = localActivityLevel
+                        OutlinedButton(
+                            border = BorderStroke(2.dp, MediumBlue),
+                            onClick = {
+                                clothesViewModel.updateSettings(
+                                    departureHour = localDepHour,
+                                    departureMinute = localDepMinute,
+                                    returnHour = localRetHour,
+                                    returnMinute = localRetMinute,
+                                    isOutdoors = localIsOutdoors == true,
+                                    isPhysicallyActive = localIsPhysical == true,
+                                    activityLevel = localActivityLevel
+                                )
+                                // watning på aldri lest, men denne blir brukt utenfor klassen
+                                showBanner = true
+                                scope.launch { sheetState.bottomSheetState.partialExpand() }
+                            },
+                            modifier = Modifier.wrapContentWidth(align = Alignment.CenterHorizontally).align(Alignment.CenterHorizontally),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                contentColor = MaterialTheme.colorScheme.onSurface
+                            )                ) {
+                            Text(stringResource(R.string.clothes_new_recommendation))
+                            Icon(
+                                painter = painterResource(id = R.drawable.arrow_forward_icon),
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
                             )
-                            // watning på aldri lest, men denne blir brukt utenfor klassen
-                            showBanner = true
-                            scope.launch { sheetState.bottomSheetState.partialExpand() }
-                        },
-                        modifier = Modifier.wrapContentWidth(align = Alignment.CenterHorizontally).align(Alignment.CenterHorizontally),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                            contentColor = MaterialTheme.colorScheme.onSurface
-                        )                ) {
-                        Text(stringResource(R.string.clothes_new_recommendation))
-                        Icon(
-                            painter = painterResource(id = R.drawable.arrow_forward_icon),
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp)
-                        )
+                        }
+                        Spacer(modifier = Modifier.size(24.dp))
                     }
-                    Spacer(modifier = Modifier.size(24.dp))
                 }
-            }
-        ) { _ ->
-            Box(modifier = Modifier.fillMaxSize()) {
-                if (isLoading) {
-                    Box(
-                        modifier = Modifier.fillMaxWidth().padding(top = 64.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.padding(12.dp).background(MaterialTheme.colorScheme.background),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(bottom = 80.dp)
-                    ) {
-                        item {
-                            Column(
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                                horizontalAlignment = Alignment.Start)
-                            {
-                                Text(
-                                    text = stringResource(R.string.clothes_title),
-                                    style = MaterialTheme.typography.titleLarge
-                                )
-                                Spacer(modifier = Modifier.size(4.dp))
-                                Text(
-                                    text = today,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier.padding(top = 4.dp),
-                                )
-                                Spacer(modifier = Modifier.size(4.dp))
-                                var infoString = if(settings.isOutdoors) {
-                                    stringResource(
-                                        R.string.clothes_recommendation_text_outdoors,
-                                        settings.departureHour,
-                                        settings.departureMinute,
-                                        settings.returnHour,
-                                        settings.returnMinute
-                                    )
-                                } else {
-                                    stringResource(
-                                        R.string.clothes_travel_times,
-                                        settings.departureHour,
-                                        settings.departureMinute,
-                                        settings.returnHour,
-                                        settings.returnMinute
-                                    )
-                                }
-
-                                if(settings.isPhysicallyActive) {
-                                    infoString += when (settings.activityLevel) {
-                                        ActivityLevel.LOW -> stringResource(R.string.clothes_recommendation_text_physical_low)
-                                        ActivityLevel.MEDIUM -> stringResource(R.string.clothes_recommendation_text_physical_medium)
-                                        ActivityLevel.HIGH -> stringResource(R.string.clothes_recommendation_text_physical_high)
-                                        else -> stringResource(R.string.clothes_recommendation_text_physical)
-                                    }
-                                }
-                                Text(
-                                    text = infoString,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier.padding(top = 4.dp),
-                                )
-                            }
-
+            ) { _ ->
+                Box(modifier = Modifier.fillMaxSize()) {
+                    if (isLoading) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().padding(top = 64.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
                         }
-
-                        if (recommendation != null) {
-                            item { EffectiveTempCard(recommendation!!) }
-                            item { ClothingCard(recommendation!!) }
-                            if (recommendation!!.bringUmbrella || recommendation!!.wearRainGear) {
-                                item { RainCard(recommendation!!) }
-                            }
-                        } else {
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.padding(12.dp).background(MaterialTheme.colorScheme.background),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            contentPadding = PaddingValues(bottom = 80.dp)
+                        ) {
                             item {
-                                Text(
-                                    text = stringResource(R.string.clothes_no_data),
-                                    modifier = Modifier.padding(16.dp)
-                                )
+                                Column(
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    horizontalAlignment = Alignment.Start)
+                                {
+                                    Text(
+                                        text = stringResource(R.string.clothes_title),
+                                        style = MaterialTheme.typography.titleLarge
+                                    )
+                                    Spacer(modifier = Modifier.size(4.dp))
+                                    Text(
+                                        text = today,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        modifier = Modifier.padding(top = 4.dp),
+                                    )
+                                    Spacer(modifier = Modifier.size(4.dp))
+                                    var infoString = if(settings.isOutdoors) {
+                                        stringResource(
+                                            R.string.clothes_recommendation_text_outdoors,
+                                            settings.departureHour,
+                                            settings.departureMinute,
+                                            settings.returnHour,
+                                            settings.returnMinute
+                                        )
+                                    } else {
+                                        stringResource(
+                                            R.string.clothes_travel_times,
+                                            settings.departureHour,
+                                            settings.departureMinute,
+                                            settings.returnHour,
+                                            settings.returnMinute
+                                        )
+                                    }
+
+                                    if(settings.isPhysicallyActive) {
+                                        infoString += when (settings.activityLevel) {
+                                            ActivityLevel.LOW -> stringResource(R.string.clothes_recommendation_text_physical_low)
+                                            ActivityLevel.MEDIUM -> stringResource(R.string.clothes_recommendation_text_physical_medium)
+                                            ActivityLevel.HIGH -> stringResource(R.string.clothes_recommendation_text_physical_high)
+                                            else -> stringResource(R.string.clothes_recommendation_text_physical)
+                                        }
+                                    }
+                                    Text(
+                                        text = infoString,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        modifier = Modifier.padding(top = 4.dp),
+                                    )
+                                }
+
+                            }
+
+                            if (recommendation != null) {
+                                item { EffectiveTempCard(recommendation!!) }
+                                item { ClothingCard(recommendation!!) }
+                                if (recommendation!!.bringUmbrella || recommendation!!.wearRainGear) {
+                                    item { RainCard(recommendation!!) }
+                                }
+                            } else {
+                                item {
+                                    Text(
+                                        text = stringResource(R.string.clothes_no_data),
+                                        modifier = Modifier.padding(16.dp)
+                                    )
+                                }
                             }
                         }
-                    }
 
-                    AnimatedVisibility(
-                        visible = showBanner,
-                        enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
-                        exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
-                        modifier = Modifier.align(Alignment.TopCenter).zIndex(1f)
-                    ) {
-                        TopBanner(
-                            message = stringResource(R.string.clothes_recommendation_updated),
-                            onDismiss = { showBanner = false }
-                        )
+                        AnimatedVisibility(
+                            visible = showBanner,
+                            enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
+                            exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
+                            modifier = Modifier.align(Alignment.TopCenter).zIndex(1f)
+                        ) {
+                            TopBanner(
+                                message = stringResource(R.string.clothes_recommendation_updated),
+                                onDismiss = { showBanner = false }
+                            )
+                        }
                     }
                 }
             }
         }
-    } else {
-        ErrorScreen()
+        isLoading && recommendation == null -> {
+            Box(modifier = Modifier.fillMaxSize()
+            ){
+                CircularProgressIndicator()
+            }
+        }
+        else -> ErrorScreen()
     }
 }
 
