@@ -64,8 +64,14 @@
     <string name="clothes_no_data">Ingen værdata tilgjengelig. Prøv å søk opp et sted på hjemskjermen først.</string>
     <string name="clothes_effective_temp_text">Justert etter værforhold, tilpasninger og preferanser</string>
     <string name="clothes_recommendation">Klesanbefaling</string>
+    <string name="clothes_effective_temp_info_text">Føles som temperaturen er justert etter vind, skydekke, aktivitet og reisetidspunktene dine\n</string>
+
+    <string name="clothes_clothing_info_text">Klesanbefalingen regnes ut utifra temperaturen ute, reisetidspunktene dine og aktivitetsnivået ditt</string>
+    <string name="clothes_traveltime_info_title">Justering av reisetidspunker</string>
+    <string name="clothes_traveltime_info">Velg når du drar og kommer tilbake. Klesanbefalingen baseres på værmeldingen for dette tidsrommet, slik at du er kledd passende hele turen.</string>
+
+
     <string name="clothes_effective_temp_info_title_text">Føles som temperaturen</string>
-    <string name="clothes_effective_temp_info_text">Temperaturen er justert basert på vind, skydekke, aktivitetsnivå og reisetidspunktene dine – slik at den gjenspeiler hvordan det faktisk føles ute.</string>
     <string name="clothes_clothing_info_title_text">Info om klesanbefalinger.</string>
     <string name="clothes_clothing_info_text">Anbefalingen er basert på hvordan det føles ute i løpet av reisetiden din. Vi tar hensyn til temperatur, vind, skydekke og aktivitetsnivået du har oppgitt, og foreslår klær som passer for hele turen – både tur og retur.</string>
     <string name="clothes_travel_times">For deg som drar hjemmefra %1$02d:%2$02d, og tilbake %3$02d:%4$02d</string>
