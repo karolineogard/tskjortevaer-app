@@ -60,6 +60,7 @@ Postbetingelser: Bruker har fått vist værmelding for stedet den søkte opp
 
 
 ## Aktivitetsdiagram
+Aktivitetsdiagrammet er basert på de tekstlige use casene over kombinert. 
 ```mermaid
 flowchart TD
     Start((Start))
@@ -109,8 +110,8 @@ flowchart TD
     Endre --> Skriv
     Klær --> Søk
 ```
-Aktivitetsdiagrammet er basert på de tekstlige use casene over kombinert. 
 ## Klassediagram
+Klassediagrammet viser delene av kodebasen som er relevante for use caset **klesanbefaling**
 ```mermaid
 classDiagram
     direction TB
@@ -238,9 +239,8 @@ UiState <|-- Error
     ClothesViewModel --> ClothesRecommendation
 
 ```
-Viser delene av kodebasen som er relevante for use case klesanbefaling
-## sekvensdiagram
-
+## Sekvensdiagram
+Sekvensdiagrammet viser en litt abstrahert versjon av dataflyten i appen over tid. 
 ```mermaid
 sequenceDiagram
     actor Bruker
