@@ -48,8 +48,8 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.util.Format
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.ForecastHour
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TopAppBar
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.PlussTekst
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.BlueText
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.RedText
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastUiState
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.LocationForecastViewmodel
 
@@ -202,7 +202,7 @@ fun DayForecastCard(
                         windDirection = details.windDirection,
                         precipitationAmount = details.precipitationAmount,
                         symbolCode = details.symbolCode,
-                        tempColor = if (details.temperature <= 0.0) MinusTekst else PlussTekst,
+                        tempColor = if (details.temperature <= 0.0) BlueText else RedText,
                     )
 
                 }
@@ -236,7 +236,7 @@ fun DayForecastCard(
                         Text(
                             text = Format.formatTemp(maxTemp),
                             style = MaterialTheme.typography.bodySmall,
-                            color = if (maxTemp <= 0.0) MinusTekst else PlussTekst,
+                            color = if (maxTemp <= 0.0) BlueText else RedText,
                             modifier = Modifier.weight(1f)
                         )
                         if (totalPrecipitation > 0) {
@@ -244,7 +244,7 @@ fun DayForecastCard(
                                 text = Format.formatPrecipitation(totalPrecipitation),
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.weight(1f),
-                                color = MinusTekst
+                                color = BlueText
                             )
                         } else {
                             Spacer(modifier = Modifier.weight(1f))

@@ -10,23 +10,19 @@ val Grey = Color(0xff000000)
 
 val MediumBlue = Color(0xff99C4D3)
 
-val Cream = Color(0xffFFFEF5)
-
 val DarkBlue = Color(0xff29527E)
 
 val SuperLightBlue = Color(0xffEFFBFF)
 
 val LightBlue = Color(0xffDBF9FF)
 
-val Unknown = Color(0xffDBF9FF)
+val AlertYellow = Color(0xffFFE600)
+val AlertOrange = Color(0xffFF9D00)
+val AlertRed = Color(0xffC60000)
+val AlertYellowTransparent = Color(0xffFCF8CB)
+val AlertOrangeTransparent = Color(0xffFCF4DF)
+val AlertRedTransparent = Color(0xffF7E3E3)
 
-val FarevarselGul = Color(0xffFFE600)
-val FarevarselOransje = Color(0xffFF9D00)
-val FarevarselRød = Color(0xffC60000)
-val FarevarselGulGjennomsiktig = Color(0xffFCF8CB)
-val FarevarselOranjeGjennomsiktig = Color(0xffFCF4DF)
-val FarevarselRødGjennomsiktig = Color(0xffF7E3E3)
-
-val PlussTekst = Color(0xffBF1D1D)
-val MinusTekst = Color(0xff0358C7)
+val RedText = Color(0xffBF1D1D)
+val BlueText = Color(0xff0358C7)
 

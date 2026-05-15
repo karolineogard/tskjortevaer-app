@@ -93,6 +93,7 @@ fun SearchBar(
                 shape = MaterialTheme.shapes.extraLarge,
                 modifier = Modifier
                     .fillMaxWidth()
+                    // warning for aldri lest, men blir brukt utenfor denne filen
                     .onFocusChanged { hasFocus = it.isFocused },
                 leadingIcon = {
                     Icon(imageVector = Icons.Default.Search,

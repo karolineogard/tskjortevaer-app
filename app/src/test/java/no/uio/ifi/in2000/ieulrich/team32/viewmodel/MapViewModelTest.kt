@@ -17,8 +17,8 @@ import kotlinx.coroutines.test.setMain
 import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.MetAlertsRepository
 import no.uio.ifi.in2000.ieulrich.team32.data.weather.WeatherRepositoryImpl
 import no.uio.ifi.in2000.ieulrich.team32.model.weather.WeatherLayer
-import org.junit.Assert
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -56,9 +56,9 @@ class MapViewModelTest {
     @Test
     fun `uiState initial state verification`() {
         val state = viewModel.uiState.value
-        Assert.assertEquals("https://api.met.no/alerts", state.alertsUrl)
-        Assert.assertEquals(WeatherLayer.TEMPERATURE, state.currentLayer)
-        Assert.assertTrue(state.wmsUrl.contains("met.no"))
+        Assertions.assertEquals("https://api.met.no/alerts", state.alertsUrl)
+        Assertions.assertEquals(WeatherLayer.TEMPERATURE, state.currentLayer)
+        Assertions.assertTrue(state.wmsUrl.contains("met.no"))
     }
 
     @Test
@@ -73,7 +73,7 @@ class MapViewModelTest {
         viewModel.onAlertsSelected()
 
         // Bekrefter at en ny tilstand ble emittert
-        Assert.assertTrue(states.size > 1)
+        Assertions.assertTrue(states.size > 1)
     }
 
     @Test
@@ -81,9 +81,9 @@ class MapViewModelTest {
         viewModel.onAlertsSelected()
 
         val state = viewModel.uiState.value
-        Assert.assertNull(state.currentLayer)
-        Assert.assertEquals("", state.wmsUrl)
-        Assert.assertTrue(state.showAlerts)
+        Assertions.assertNull(state.currentLayer)
+        Assertions.assertEquals("", state.wmsUrl)
+        Assertions.assertTrue(state.showAlerts)
     }
 
 
@@ -96,7 +96,7 @@ class MapViewModelTest {
         advanceUntilIdle()
 
         // Sjekk at tilstanden fortsatt er fornuftig (f.eks. tom liste i stedet for krasj)
-        Assert.assertTrue(viewModel.uiState.value.alerts.isEmpty())
+        Assertions.assertTrue(viewModel.uiState.value.alerts.isEmpty())
     }
 
     @Test
@@ -108,9 +108,9 @@ class MapViewModelTest {
 
         fun testLogic(hour: Int): Int = ((hour + 1) / 3) * 3
 
-        Assert.assertEquals(15, testLogic(14))
-        Assert.assertEquals(0, testLogic(1))
-        Assert.assertEquals(12, testLogic(11))
+        Assertions.assertEquals(15, testLogic(14))
+        Assertions.assertEquals(0, testLogic(1))
+        Assertions.assertEquals(12, testLogic(11))
     }
 
 
@@ -120,7 +120,7 @@ class MapViewModelTest {
 
         // Regex for yyyy-MM-ddTHH:mm:ssZ
         val regex = Regex("""\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z""")
-        Assert.assertTrue(timeString.matches(regex))
+        Assertions.assertTrue(timeString.matches(regex))
     }
 
     @Test
@@ -131,6 +131,6 @@ class MapViewModelTest {
         val result = viewModel.getCurrentTime()
         val currentYear = LocalDate.now(ZoneOffset.UTC).year.toString()
 
-        Assert.assertTrue(result.startsWith(currentYear))
+        Assertions.assertTrue(result.startsWith(currentYear))
     }
 }

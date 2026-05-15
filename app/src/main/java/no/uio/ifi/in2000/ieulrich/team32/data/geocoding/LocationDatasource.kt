@@ -65,7 +65,7 @@ class LocationDatasource @Inject constructor(private val client: HttpClient)  {
                 }
             }
         } catch (e: Exception) {
-            Log.e("LocationDatasource", "error getting coordinates")
+            Log.e("LocationDatasource", "error getting coordinates", e)
             null
         }
     }

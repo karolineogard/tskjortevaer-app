@@ -73,7 +73,6 @@
 
     <string name="clothes_effective_temp_info_title_text">Føles som temperaturen</string>
     <string name="clothes_clothing_info_title_text">Info om klesanbefalinger.</string>
-    <string name="clothes_clothing_info_text">Anbefalingen er basert på hvordan det føles ute i løpet av reisetiden din. Vi tar hensyn til temperatur, vind, skydekke og aktivitetsnivået du har oppgitt, og foreslår klær som passer for hele turen – både tur og retur.</string>
     <string name="clothes_travel_times">For deg som drar hjemmefra %1$02d:%2$02d, og tilbake %3$02d:%4$02d</string>
 
     <!-- text for each clothing item -->
@@ -104,7 +103,7 @@
 
     <!-- Alert screen -->
     <string name="alert_icon_description">Ikon for %1$s</string>
-    <string name="alert_title">Varsel</string>
+    <string name="alert_title">Farevarsel</string>
     <string name="alert_severity">Alvorlighetsgrad</string>
     <string name="alert_area">Område</string>
     <string name="alert_description">Beskrivelse</string>
@@ -115,7 +114,8 @@
     <string name="alert_red">Rødt: Ekstrem fare og ekstremvær</string>
     <string name="alert_levels">Farenivåer</string>
     <string name="alert_validity">Tidsperiode</string>
-    <string name="alert_ongoing">Pågår:  </string>
+    <string name="alert_ongoing">Pågår: %1$s</string>
+
 
 
 

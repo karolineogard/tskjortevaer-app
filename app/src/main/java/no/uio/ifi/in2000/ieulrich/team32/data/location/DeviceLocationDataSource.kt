@@ -14,7 +14,7 @@ import javax.inject.Inject
 import kotlin.coroutines.resume
 
 class DeviceLocationDataSource @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val locationClient: FusedLocationProviderClient
 ) {
     suspend fun getCurrentLocation(): AppLocation? {
