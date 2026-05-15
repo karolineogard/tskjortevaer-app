@@ -205,10 +205,10 @@ Navigation Compose - Navigasjon mellom skjermer \
 DataStore Preferences - Lagring av brukerinnstillinger \
 MapLibre - Kartvisning og WMS-kartlag \
 Coil 3 + SVG-dekoder - Asynkron bildelasting (værsymboler) \
-Play Services LocationGPS-posisjonering via FusedLocationProviderClient \
+Play Services LocationGPS-posisjonering via FusedLocationProviderClient 
 
 ## For videreutvikling
-- Alle MET-kall skal gå via IFI-proxyen (in2000.api.met.no), ikke direkte til api.met.no \
-- ClothesViewModel abonnerer på DataStore direkte — endringer i innstillinger reflekteres automatisk uten manuell synkronisering \
-- NetworkMonitor i MapApp styrer en wasOffline-flagg som brukes til å gjenoppta lasting etter nettverkstap \
-- Nye skjermer legges til i NavHost i MapApp.kt og som konstant i Routes \
+- Alle MET-kall skal gå via IFI-proxyen (in2000.api.met.no), ikke direkte til api.met.no 
+- ClothesViewModel abonnerer på DataStore direkte — endringer i innstillinger reflekteres automatisk uten manuell synkronisering 
+- NetworkMonitor i MapApp styrer en wasOffline-flagg som brukes til å gjenoppta lasting etter nettverkstap 
+- Nye skjermer legges til i NavHost i MapApp.kt og som konstant i Routes 
