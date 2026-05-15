@@ -40,7 +40,9 @@ fun TravelTimesCard(
     returnMinute: Int,
     onDepartureTimeChanged: (hour: Int, minute: Int) -> Unit,
     onReturnTimeChanged: (hour: Int, minute: Int) -> Unit,
-    title: String
+    title: String,
+    infoTitle: String = stringResource(R.string.settings_traveltime_info_title),
+    infoText: String = stringResource(R.string.settings_traveltime_info)
 ){
     var showTimeInfo by remember { mutableStateOf(false) }
 
@@ -109,7 +111,7 @@ fun TravelTimesCard(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) { Text(
-                            text = stringResource(R.string.settings_traveltime_info_title),
+                        text = infoTitle,
                             style = MaterialTheme.typography.titleSmall,
                             modifier = Modifier.weight(1f),
 
@@ -127,7 +129,7 @@ fun TravelTimesCard(
                     }
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(
-                        text = stringResource(R.string.settings_traveltime_info),
+                        text = infoText,
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }

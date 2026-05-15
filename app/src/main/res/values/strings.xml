@@ -66,6 +66,9 @@
     <string name="clothes_effective_temp_info_text">Føles som temperaturen er justert etter vind, skydekke, aktivitet og reisetidspunktene dine\n</string>
 
     <string name="clothes_clothing_info_text">Klesanbefalingen regnes ut utifra temperaturen ute, reisetidspunktene dine og aktivitetsnivået ditt</string>
+    <string name="clothes_traveltime_info_title">Justering av reisetidspunker</string>
+    <string name="clothes_traveltime_info">Velg når du drar og kommer tilbake. Klesanbefalingen baseres på værmeldingen for dette tidsrommet, slik at du er kledd passende hele turen.</string>
+
 
 
     <!-- text for each clothing item -->

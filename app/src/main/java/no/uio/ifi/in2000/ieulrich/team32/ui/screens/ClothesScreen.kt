@@ -192,6 +192,8 @@ fun ClothesScreen(
                         returnMinute = localRetMinute,
                         onDepartureTimeChanged = { h, m -> localDepHour = h; localDepMinute = m },
                         onReturnTimeChanged = { h, m -> localRetHour = h; localRetMinute = m },
+                        infoTitle = stringResource(R.string.clothes_traveltime_info_title),
+                        infoText = stringResource(R.string.clothes_traveltime_info)
                     )
 
                     Card(
