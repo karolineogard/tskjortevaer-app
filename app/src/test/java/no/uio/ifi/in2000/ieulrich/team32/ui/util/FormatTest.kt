@@ -1,10 +1,6 @@
-package no.uio.ifi.in2000.ieulrich.team32.data.locationForecast
+package no.uio.ifi.in2000.ieulrich.team32.ui.util
 
-import no.uio.ifi.in2000.ieulrich.team32.ui.util.Format.extractDate
-import no.uio.ifi.in2000.ieulrich.team32.ui.util.Format.extractHour
-import no.uio.ifi.in2000.ieulrich.team32.ui.util.Format.extractTime
-import no.uio.ifi.in2000.ieulrich.team32.ui.util.Format.formatTemp
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 class FormatTest {
@@ -15,10 +11,10 @@ class FormatTest {
         val timestamp = "2026-04-07T10:00:00Z"
 
         // Act
-        val result = extractHour(timestamp)
+        val result = Format.extractHour(timestamp)
 
         // Assert
-        assertEquals("12", result)
+        Assertions.assertEquals("12", result)
     }
 
     @Test
@@ -27,10 +23,10 @@ class FormatTest {
         val timestamp = "2026-04-07T14:00:00Z"
 
         // Act
-        val result = extractHour(timestamp)
+        val result = Format.extractHour(timestamp)
 
         // Assert
-        assertNotEquals("12", result)
+        Assertions.assertNotEquals("12", result)
     }
 
     @Test
@@ -39,10 +35,10 @@ class FormatTest {
         val temp = 24.5
 
         // Act
-        val result = formatTemp(temp)
+        val result = Format.formatTemp(temp)
 
         // Assert
-        assertEquals("25°", result)
+        Assertions.assertEquals("25°", result)
     }
 
     @Test
@@ -51,10 +47,10 @@ class FormatTest {
         val temp = 24.4
 
         // Act
-        val result = formatTemp(temp)
+        val result = Format.formatTemp(temp)
 
         // Assert
-        assertNotEquals("25°", result)
+        Assertions.assertNotEquals("25°", result)
     }
 
     @Test
@@ -62,9 +58,9 @@ class FormatTest {
         // Arrange
         val date = "2026-05-01T23:00:00Z"
         // Act
-        val result = extractDate(date)
+        val result = Format.extractDate(date)
         // Assert
-        assertEquals("Lørdag 2. mai", result)
+        Assertions.assertEquals("Lørdag 2. mai", result)
     }
 
     @Test
@@ -72,9 +68,9 @@ class FormatTest {
         // Arrange
         val date = "2026-05-01T23:00:00Z"
         // Act
-        val result = extractDate(date)
+        val result = Format.extractDate(date)
         // Assert
-        assertNotEquals("Fredag 1. mai", result)
+        Assertions.assertNotEquals("Fredag 1. mai", result)
     }
 
     @Test
@@ -82,9 +78,9 @@ class FormatTest {
         // Arrange
         val time = "2026-05-01T13:00:00Z"
         // Act
-        val result = extractTime(time)
+        val result = Format.extractTime(time)
         // Assert
-        assertEquals("15:00", result)
+        Assertions.assertEquals("15:00", result)
     }
 
     @Test
@@ -92,9 +88,9 @@ class FormatTest {
         // Arrange
         val time = "2026-05-01T13:00:00Z"
         // Act
-        val result = extractTime(time)
+        val result = Format.extractTime(time)
         // Assert
-        assertNotEquals("13:00", result)
+        Assertions.assertNotEquals("13:00", result)
     }
 
 }
