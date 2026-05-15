@@ -278,7 +278,7 @@ fun ClothesScreen(
                                 isPhysicallyActive = localIsPhysical == true,
                                 activityLevel = localActivityLevel
                             )
-                            // watning på aldri lest, men denne blir brukt utenfor klassen
+                            // warning på aldri lest, men denne blir brukt utenfor klassen
                             showBanner = true
                             scope.launch { sheetState.bottomSheetState.partialExpand() }
                         },
