@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.maplibre.geojson.Feature
 
+private val metAlertJson = Json { ignoreUnknownKeys = true }
+
 @Serializable
 data class MetAlert(
     val event: String? = null,
@@ -45,7 +47,7 @@ data class MetFeature(
 
 fun Feature.toMetAlert(): MetAlert? {
     return try {
-        Json { ignoreUnknownKeys = true }
+        metAlertJson
             .decodeFromString<MetFeature>(this.toJson())
             .toMetAlert()
     } catch (e: Exception) {

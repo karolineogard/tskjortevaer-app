@@ -13,7 +13,6 @@ import no.uio.ifi.in2000.ieulrich.team32.data.geocoding.LocationRepository
 import no.uio.ifi.in2000.ieulrich.team32.data.location.DeviceLocationDataSource
 import no.uio.ifi.in2000.ieulrich.team32.data.locationForecast.LocationForecastRepository
 import no.uio.ifi.in2000.ieulrich.team32.data.metAlert.MetAlertsRepository
-import no.uio.ifi.in2000.ieulrich.team32.data.weather.WeatherRepository
 import no.uio.ifi.in2000.ieulrich.team32.model.location.AppLocation
 import no.uio.ifi.in2000.ieulrich.team32.model.locationForecast.ForecastHourDetails
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert

@@ -59,7 +59,7 @@ class ClothesViewModel @Inject constructor(
             dataStore.data.collect { prefs ->
                 val tempOffset = try {
                     prefs[ClothesSettingsKeys.TEMPERATURE_OFFSET] ?: 0f
-                } catch (e: ClassCastException) { 0f }
+                } catch (_: ClassCastException) { 0f }
 
                 temperatureOffset = tempOffset
 
@@ -153,9 +153,10 @@ class ClothesViewModel @Inject constructor(
                 hour in departureHour until returnHour
             } else {
                 hour >= departureHour || hour < returnHour
-                //Forklaring av warning: kan ikke bruke en vanlig range her fordi logikken er "enten
-                // etter avgang ELLER før retur" (midnatt-kryssing).
-                // En range ville ikke fungert riktig.
+                /* Forklaring av warning: kan ikke bruke en vanlig
+                range her fordi logikken er "enten etter avgang
+                ELLER før retur" (midnatt-kryssing).
+                En range ville ikke fungert riktig. */
             }
         }
     }

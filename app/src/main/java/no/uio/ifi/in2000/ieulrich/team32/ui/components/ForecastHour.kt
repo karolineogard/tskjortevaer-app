@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import no.uio.ifi.in2000.ieulrich.team32.ui.util.Format
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.BlueText
 
 @Composable
 fun ForecastHour(
@@ -96,7 +96,7 @@ fun ForecastHour(
                 modifier = Modifier
                     .weight(1f),
                 textAlign = TextAlign.Left,
-                color = MinusTekst
+                color = BlueText
             )
         } else {
             Spacer(modifier = Modifier.weight(1f))

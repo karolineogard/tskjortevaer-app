@@ -16,6 +16,7 @@ android {
     defaultConfig {
         applicationId = "no.uio.ifi.in2000.ieulrich.team32"
         minSdk = 24
+        // warning: denne måtte settes ned for at appen skulle fungere med hilt
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"

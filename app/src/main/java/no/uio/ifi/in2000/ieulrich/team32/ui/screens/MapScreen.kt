@@ -89,12 +89,12 @@ import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.iconUrl
 import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.toMetAlert
 import no.uio.ifi.in2000.ieulrich.team32.model.weather.WeatherLayer
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.SearchBar
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGul
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGulGjennomsiktig
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOranjeGjennomsiktig
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOransje
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRød
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRødGjennomsiktig
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.AlertYellow
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.AlertYellowTransparent
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.AlertOrangeTransparent
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.AlertOrange
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.AlertRed
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.AlertRedTransparent
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.MapViewModel
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
@@ -140,6 +140,10 @@ fun MapScreen(
     val scope = rememberCoroutineScope()
 
     DisposableEffect(Unit) {
+        /* warning for at vi låser orientation. vi har valgt
+        å gjøre det fordi kartskjermen ikke er designet for
+        liggende visning, dette ville vi fokusert på å gjøre bedre
+        om vi hadde hatt tid */
         val originalOrientation = activity.requestedOrientation
         activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
@@ -339,7 +343,7 @@ fun MapScreen(
                                 horizontalAlignment = Alignment.End
                             ) {
                                 LayerButton(
-                                    "Nedbør",
+                                    WeatherLayer.PRECIPITATION.displayName,
                                     Icons.Outlined.WaterDrop,
                                     uiState.currentLayer == WeatherLayer.PRECIPITATION
                                 ) {
@@ -347,7 +351,7 @@ fun MapScreen(
                                     isMenuExpanded = false
                                 }
                                 LayerButton(
-                                    "Temperatur",
+                                    WeatherLayer.TEMPERATURE.displayName,
                                     Icons.Outlined.DeviceThermostat,
                                     uiState.currentLayer == WeatherLayer.TEMPERATURE
                                 ) {
@@ -355,7 +359,7 @@ fun MapScreen(
                                     isMenuExpanded = false
                                 }
                                 LayerButton(
-                                    "Vind",
+                                    WeatherLayer.WIND.displayName,
                                     Icons.Outlined.Air,
                                     uiState.currentLayer == WeatherLayer.WIND
                                 ) {
@@ -596,9 +600,9 @@ fun AlertsLegendCard(modifier: Modifier = Modifier) {
     )
 
     val colors = listOf(
-        FarevarselGul,
-        FarevarselOransje,
-        FarevarselRød
+        AlertYellow,
+        AlertOrange,
+        AlertRed
     )
 
     Surface(
@@ -825,10 +829,10 @@ fun AlertListItem(
     onClick: () -> Unit
 ) {
     val backgroundColor = when (alert.severity?.lowercase()) {
-        "moderate" -> FarevarselGulGjennomsiktig
-        "severe" -> FarevarselOranjeGjennomsiktig
-        "extreme" -> FarevarselRødGjennomsiktig
-        else -> FarevarselGulGjennomsiktig
+        "moderate" -> AlertYellowTransparent
+        "severe" -> AlertOrangeTransparent
+        "extreme" -> AlertRedTransparent
+        else -> AlertYellowTransparent
     }
 
     Card(
@@ -873,7 +877,7 @@ fun AlertListItem(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "${formatEventName(alert.event)}, ${alert.area}",
+                    text = "${alert.eventAwarenessName}, ${alert.area}",
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                     maxLines = 1
                 )

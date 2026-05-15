@@ -54,8 +54,8 @@ import no.uio.ifi.in2000.ieulrich.team32.ui.components.TopAppBar
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TravelTimesCard
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.PlussTekst
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.BlueText
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.RedText
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.SettingsViewModel
 import kotlin.math.roundToInt
 
@@ -77,7 +77,6 @@ fun SettingsScreen(
     }
 
     var showSliderInfo by remember { mutableStateOf(false) }
-    var showTimeInfo by remember { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -126,7 +125,7 @@ fun SettingsScreen(
                 ) {
                     val degrees = ((sliderValue - 50f) / 50f * 5).roundToInt()
                     val sign = if (degrees >= 0) "+" else ""
-                    val tempColor = if (degrees <= 0) MinusTekst else PlussTekst
+                    val tempColor = if (degrees <= 0) BlueText else RedText
 
                     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
                         // Øverste rad: tittel + infoknapp

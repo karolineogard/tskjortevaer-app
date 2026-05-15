@@ -72,12 +72,12 @@ import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.iconUrl
 import no.uio.ifi.in2000.ieulrich.team32.ui.Routes
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.SearchBar
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGulGjennomsiktig
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOranjeGjennomsiktig
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRødGjennomsiktig
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.AlertYellowTransparent
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.AlertOrangeTransparent
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.AlertRedTransparent
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.PlussTekst
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.BlueText
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.RedText
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.HomeViewModel
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.UiState
@@ -102,6 +102,7 @@ fun HomeScreen(
     selectedAlert?.let { alert ->
         AlertDetailScreen(
             alert = alert,
+            // warning for aldri lest, men denne blir lest utenfor klassen
             onBack = { selectedAlert = null }
         )
     } ?: Box(modifier = Modifier.fillMaxSize()) {
@@ -161,6 +162,7 @@ fun HomeScreen(
                         item {
                             MetalertCarousel(
                                 alerts = state.alerts,
+                                // warning for aldri lest, men denne blir lest utenfor klassen
                                 onAlertClick = { selectedAlert = it }
                             )
                         }
@@ -211,9 +213,9 @@ fun MetalertCard(
             .clickable { onClick(alert) },
         colors = CardDefaults.cardColors(
             containerColor = when (alert.severity?.lowercase()) {
-                "moderate" -> FarevarselGulGjennomsiktig
-                "severe"   -> FarevarselOranjeGjennomsiktig
-                "extreme"  -> FarevarselRødGjennomsiktig
+                "moderate" -> AlertYellowTransparent
+                "severe"   -> AlertOrangeTransparent
+                "extreme"  -> AlertRedTransparent
                 else       -> Color.LightGray
             }
         ),
@@ -333,7 +335,7 @@ fun WeatherCard(
                         }
                     )
                     Spacer(modifier = Modifier.width(5.dp))
-                    val tempColor = if (details.temperature <= 0.0) MinusTekst else PlussTekst
+                    val tempColor = if (details.temperature <= 0.0) BlueText else RedText
                     Text(
                         text = Format.formatTemp(details.temperature),
                         style = MaterialTheme.typography.titleLarge,

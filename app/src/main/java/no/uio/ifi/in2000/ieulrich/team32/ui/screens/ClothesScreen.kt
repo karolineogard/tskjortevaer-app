@@ -78,8 +78,8 @@ import no.uio.ifi.in2000.ieulrich.team32.model.clothes.ClothesRecommendation
 import no.uio.ifi.in2000.ieulrich.team32.ui.components.TravelTimesCard
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.DarkBlue
 import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MediumBlue
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.MinusTekst
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.PlussTekst
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.BlueText
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.RedText
 import no.uio.ifi.in2000.ieulrich.team32.viewmodel.ClothesViewModel
 import java.util.Locale
 
@@ -278,6 +278,7 @@ fun ClothesScreen(
                                 isPhysicallyActive = localIsPhysical == true,
                                 activityLevel = localActivityLevel
                             )
+                            // watning på aldri lest, men denne blir brukt utenfor klassen
                             showBanner = true
                             scope.launch { sheetState.bottomSheetState.partialExpand() }
                         },
@@ -432,7 +433,7 @@ private fun EffectiveTempCard(rec: ClothesRecommendation) {
                     text = Format.formatTemp(rec.effectiveTemp),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = if (rec.effectiveTemp <= 0.0) MinusTekst else PlussTekst
+                    color = if (rec.effectiveTemp <= 0.0) BlueText else RedText
                 )
                 Text(
                     text = stringResource(R.string.clothes_effective_temp_text),

@@ -1,33 +1,49 @@
 package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
 import android.util.Log
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
-import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
-import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.iconUrl
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselGul
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselOransje
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.FarevarselRød
-import no.uio.ifi.in2000.ieulrich.team32.ui.theme.RobotoMono
+import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import no.uio.ifi.in2000.ieulrich.team32.R
+import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.MetAlert
+import no.uio.ifi.in2000.ieulrich.team32.model.metAlerts.iconUrl
+import no.uio.ifi.in2000.ieulrich.team32.ui.components.TopAppBar
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.AlertYellow
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.AlertOrange
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.AlertRed
+import no.uio.ifi.in2000.ieulrich.team32.ui.theme.RobotoMono
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,20 +53,9 @@ fun AlertDetailScreen(
 ) {
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { }, // TODO: remove, already present in API response
-                navigationIcon = {
-                    IconButton(onClick = onBack){
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.navbar_back_description)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                ),
-                expandedHeight = 38.dp
+            TopAppBar(
+                alert.eventAwarenessName ?: stringResource(R.string.alert_title),
+                onBack
             )
         }
     ) { innerPadding ->
@@ -89,7 +94,10 @@ fun AlertDetailScreen(
                             contentScale = ContentScale.Fit
                         )
                         Text(
-                            text = stringResource(R.string.alert_ongoing) + formatEventName(alert.event),
+                            text = stringResource(
+                                R.string.alert_ongoing,
+                                alert.eventAwarenessName ?: stringResource(R.string.alert_title)
+                            ),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             fontFamily = RobotoMono,
@@ -115,7 +123,7 @@ fun AlertDetailScreen(
                     alert.title?.let {
                         InfoSection(
                             label = stringResource(R.string.alert_title),
-                            value = "${formatEventName(alert.event)} – ${alert.area ?: ""}"
+                            value = "${alert.eventAwarenessName} – ${alert.area ?: ""}"
                         )
                     }
 
@@ -177,27 +185,10 @@ fun InfoSection(label: String, value: String, color: Color = MaterialTheme.color
 
 
 fun severityColor(severity: String?): Color = when (severity?.lowercase()){
-    "moderate" -> FarevarselGul
-    "severe"   -> FarevarselOransje
-    "extreme"  -> FarevarselRød
+    "moderate" -> AlertYellow
+    "severe"   -> AlertOrange
+    "extreme"  -> AlertRed
     else -> Color.LightGray
-}
-
-// TODO: remove, already present in API response
-fun formatEventName(event: String?): String = when (event?.lowercase()) {
-    "blowingsnow" -> "Snøfokk"
-    "forestfire"  -> "Skogbrannfare"
-    "gale"        -> "Kuling"
-    "ice"         -> "Is"
-    "icing"       -> "Isingsfare"
-    "lightning"   -> "Lyn"
-    "polarlow"    -> "Polart lavtrykk"
-    "rain"        -> "Regn"
-    "rainflood"   -> "Flom"
-    "snow"        -> "Snø"
-    "stormsurge"  -> "Stormflo"
-    "wind"        -> "Vind"
-    else          -> event ?: "Ukjent varsel"
 }
 
 fun formatSeverity(severity: String?): String = when (severity?.lowercase()) {
@@ -211,9 +202,9 @@ fun formatAlertTime(isoString: String?): String {
     return try {
         val odt = java.time.OffsetDateTime.parse(isoString)
         val zoned = odt.atZoneSameInstant(java.time.ZoneId.of("Europe/Oslo"))
-        val formatter = java.time.format.DateTimeFormatter.ofPattern("EEEE d. MMM HH:mm", java.util.Locale("no"))
+        val formatter = java.time.format.DateTimeFormatter.ofPattern("EEEE d. MMM HH:mm", Locale.forLanguageTag("nb"))
         zoned.format(formatter)
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         isoString
     }
 }
@@ -222,17 +213,17 @@ fun SeverityLegend(modifier: Modifier = Modifier) {
     val levels = listOf(
         Triple(
             "minor",
-            FarevarselGul,
+            AlertYellow,
             stringResource(R.string.alert_yellow)
         ),
         Triple(
             "moderate",
-            FarevarselOransje,
+            AlertOrange,
             stringResource(R.string.alert_orange)
         ),
         Triple(
             "severe",
-            FarevarselRød,
+            AlertRed,
             stringResource(R.string.alert_red)
         ),
     )
