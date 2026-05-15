@@ -1,3 +1,5 @@
+@file:Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
+
 package no.uio.ifi.in2000.ieulrich.team32.ui.screens
 
 import android.app.Activity
