@@ -23,8 +23,8 @@
 
 - **Værkart** - interaktivt kart med kartlag for temperatur, nedbør og vind hentet fra MET sitt Victoria WMS-grensesnitt. Brukeren kan styre hvilket tidspunkt som vises, og søke på lokasjon. Kartet vil da flyttes til stedet som ble søkt på. 
 - **Farevarsler** - aktive farevarsler vises som polygoner på kartet via MetAlerts-APIet.
-- **Punktdata** - trykk på et sted i kartet eller søk etter stedsnavn fra hjemskjermen for å se værvarsel for de neste dagene.
-- **Klesanbefaling** - anbefaler klær basert på værvarsel for din lokasjon og brukerens preferanser (avgangstid, aktivitetsnivå, temperaturpreferanse).
+- **Værvarsel** - trykk på et sted i kartet eller søk etter stedsnavn fra hjemskjermen for å se værvarsel for de neste dagene.
+- **Klesanbefaling** - anbefaler klær basert på værvarsel for enhetens lokasjon og brukerens preferanser (avgangstid, aktivitetsnivå, temperaturpreferanse).
 - **Innstillinger** - lagre standardtider og temperaturpreferanse mellom sesjonene.
 
 ---
@@ -68,14 +68,13 @@
 | `targetSdk` | **35** (Android 15) |
 | `compileSdk` | 36 |
 
-**Begrunnelse for `minSdk = 24`:** API 24 dekker over 97 % av aktive Android-enheter (per Google Play-statistikk) og gir tilgang til `java.time`-biblioteket via core library desugaring, noe vi bruker til tidsparsing i `Format.kt` og `MapViewModel`. Å sette minstenivået lavere (f.eks. 21) ville krevd flere workarounds uten meningsfullt utvidet rekkevidde.
-
+**Begrunnelse for `minSdk = 24`:** API 24 dekker nesten alle aktive Android-enheter og gir tilgang til `java.time`-biblioteket via core library desugaring, noe vi bruker til å parse tid i `Format.kt` og `MapViewModel`. Å sette minstenivået lavere (f.eks. 21) ville krevd flere workarounds, som med tanke på prosjektets skop ikke gir mening å bruke tid på.
 
 ---
 
 ## Biblioteker
 
-Disse bibliotekene brukes i appen. Biblioteker som ikke er vist i kurset, er forklart nærmere.
+Disse bibliotekene brukes i appen. Biblioteker som ikke er vist i kurset, er forklart litt nærmere.
 
 ### Vist i kurset
 
@@ -88,18 +87,18 @@ Disse bibliotekene brukes i appen. Biblioteker som ikke er vist i kurset, er for
 | **ViewModel + StateFlow** | MVVM-arkitektur og tilstandshåndtering |
 
 ### Ikke vist i kurset
-For alle biblioteker ikke vist i emnet etterstrebet vi å finne dem som var gratis, gjerne open source og hvor man ikke trengte å registrere seg for API-nøkler og lignende. Det har i ganske stor grad påvirket valgene vi har gjort her. 
+For alle biblioteker ikke vist i emnet etterstrebet vi å finne dem som var gratis, gjerne open source og hvor man ikke trengte å registrere seg for API-nøkler og lignende. Det har i ganske stor grad påvirket valgene vi har gjort. 
 
 | Bibliotek | Versjon | Forklaring                                                                                                                                                                                                           |
 |---|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **MapLibre Android** | 11.x    | Open source-kartklient som støtter WMS-kartlag. Vi bruker den til å vise Victoria-kartlagene og farevarsler som polygoner. Et alternativ hadde vært Google Maps, men MapLibre er gratis og uten API-nøkkel.          |
-| **Hilt (Dagger)** | 2.51    | Dependency injection-rammeverk fra Google. Forenkler oppretting og deling av avhengigheter (repository, HTTP-klient, DataStore) mellom ViewModels uten å måtte sende dem manuelt gjennom konstruktørkjedene.         |
-| **Coil 3** | 3.x     | Asynkron bildelasting for Compose. Brukes til å laste MET sitt SVG-baserte værsymbolbibliotek fra GitHub. Coil 3 støtter SVG via en egen dekoder (`coil-svg`) og bruker OkHttp for nettverkskall.                    |
+| **MapLibre Android** | 12.2.3   | Open source-kartklient som støtter WMS-kartlag. Vi bruker den til å vise Victoria-kartlagene og farevarsler som polygoner. Et alternativ hadde vært Google Maps, men MapLibre er gratis og uten API-nøkkel.          |
+| **Hilt (Dagger)** | 2.56.1    | Dependency injection-rammeverk fra Google. Forenkler oppretting og deling av avhengigheter (repository, HTTP-klient, DataStore) mellom ViewModels uten å måtte sende dem manuelt gjennom konstruktørkjedene.         |
+| **Coil 3** | 3.4.0    | Asynkron bildelasting for Compose. Brukes til å laste MET sitt SVG-baserte værsymbolbibliotek fra GitHub. Coil 3 støtter SVG via en egen dekoder (`coil-svg`) og bruker OkHttp for nettverkskall.                    |
 | **Play Services Location** | -       | Googles `FusedLocationProviderClient` kombinerer GPS, mobilnett og Wi-Fi for å gi rask og batterivennlig posisjonering. Vi bruker `PRIORITY_BALANCED_POWER_ACCURACY` som er raskere enn ren GPS og nøyaktig nok for værvarsel. |
 | **Core Library Desugaring** | -       | Gjør `java.time`-klasser tilgjengelige på enheter under API 26 (Android 8). Nødvendig siden vi bruker `Instant`, `ZoneOffset`, og `DateTimeFormatter` for tidsparsing og UTC-konvertering.                           |
 | **MockK** | -       | Kotlin-native mock-bibliotek brukt i enhetstester. Støtter `suspend`-funksjoner og coroutines, i motsetning til Mockito som krever ekstra workarounds for Kotlin.                                                    |
 | **JUnit 5 (Jupiter)** | -       | Testrammeverk med bedre støtte for parameteriserte tester og lesbare `@DisplayName`-annotasjoner enn JUnit 4.                                                                                                        |
-| **kotlinx-coroutines-test** | -       | Testverktøy for coroutines: `runTest`, `advanceUntilIdle`, `StandardTestDispatcher`. Lar oss teste asynkron logikk deterministisk.                                                                                   |
+| **kotlinx-coroutines-test** | 1.7.3       | Testverktøy for coroutines: `runTest`, `advanceUntilIdle`, `StandardTestDispatcher`. Lar oss teste asynkron logikk deterministisk.                                                                                   |
 | **DataStore Preferences** | -       | Lagring av brukerinnstillinger mellom sesjonene                                                                                                                                                                      |
 
 ---
