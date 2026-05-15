@@ -16,16 +16,21 @@ flowchart TB
         MVM["MapViewModel"]
         CVM["ClothesViewModel"]
         LFVM["LocationForecastViewModel"]
+        SVM["SearchViewModel"]
+
+        
   end
  subgraph Data_Layer["Datalaget"]
     direction TB
         LFR["LocationForecastRepository"]
         WR["WeatherRepository"]
-        AR["AlertsRepository"]
         LR["LocationRepository"]
         LFDS["LocationForecastDataSource"]
         MADS["MetAlertsDatasource"]
         MLSDK["MapLibre SDK / Kart-motor"]
+        DLDS["DeviceLocationDataSource"]
+        AR["AlertsRepository"]
+        LDS["LocationDataSource"]
   end
  subgraph External["Eksterne APIer"]
         MET(("Victoria WMS"))
@@ -37,17 +42,25 @@ flowchart TB
     MS --- MVM
     CS --- CVM
     LFS --- LFVM
-    HVM --> LFR & LR & AR
-    MVM --> WR & AR
-    WR --> MLSDK 
-    AR --> MADS
+    HVM --> LFR & LR & WR
+    MVM --> WR
+    WR --> MLSDK & MADS
     CVM --> LFR
     LFVM --> LFR
     LFR --> LFDS
     LFDS --- Location
     MADS --- Alert
     MLSDK --- MET & Alert
-    LR --- GEO
+    LR --> LDS
+    LDS --- GEO
+    MS --- SVM
+    HS --- SVM
+    SVM --> LFR
+    HVM --> DLDS
+    AR --> MADS
+    HVM --> AR
+    MVM --> AR
+    
 
     style HS fill:#d1f2eb,stroke:#333
     style MS fill:#d6eaf8,stroke:#333
@@ -57,6 +70,7 @@ flowchart TB
     style MVM fill:#d6eaf8,stroke:#333
     style CVM fill:#fdf2e9,stroke:#333
     style LFVM fill:#f9ebea,stroke:#333
+    style SVM fill:#F6E215,stroke:#333
     style MLSDK fill:#3498db,color:#fff
     style MET fill:#fff,stroke-dasharray: 5 5
     style Alert fill:#fff,stroke-dasharray: 5 5
