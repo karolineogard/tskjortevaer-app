@@ -1,5 +1,26 @@
 # T-skjortevær 🌤️
 
+> Gruppeprosjekt utviklet ved Universitetet i Oslo, våren 2026.
+
+Dette repositoryet er en personlig portfolio-kopi av et prosjekt utviklet i gruppe som del av IN2000 ved UiO.
+
+## Mitt bidrag
+
+Jeg bidro blant annet med:
+- Implementering av navigasjon mellom appens ulike skjermer og funksjoner
+- Utvikling av frontend og brukergrensesnitt (UI)
+- Implementering av UI-komponenter og funksjonalitet med Jetpack Compose
+
+## Teknologi
+
+- Kotlin
+- Jetpack Compose / XML
+- Android Studio
+
+
+
+
+
 **Team 32** — IN2000, Institutt for informatikk, UiO
 
 > En Android-app som viser værkart, farevarsler og klesanbefalinger basert på værvarsel for din lokasjon.
